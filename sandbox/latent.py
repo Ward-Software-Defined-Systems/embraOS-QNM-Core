@@ -36,7 +36,7 @@ from sandbox.replica_test import auc  # reuse the phase-one AUC
 
 Array = NDArray[np.float64]
 
-IDENTITY_GRAPH = Path(__file__).resolve().parents[1] / "identity" / "Embra_IDENTITY.graph.json"
+IDENTITY_GRAPH = Path(__file__).resolve().parents[1] / "identity" / "Embra_IDENTITY-SOUL.graph.json"
 
 
 # --------------------------------------------------------------------------- #

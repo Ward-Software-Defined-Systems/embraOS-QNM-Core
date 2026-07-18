@@ -24,8 +24,8 @@ D = 8
 
 def test_anchors_from_identity_graph():
     ids, anchors = load_identity_anchors(D)
-    assert anchors.shape == (20, D)  # the 20-node Embra identity graph
-    assert len(ids) == 20
+    assert anchors.shape == (22, D)  # 20 original + honoring_the_restoration + voice
+    assert len(ids) == 22
     assert np.allclose(anchors.mean(0), 0.0, atol=1e-6)  # spectral embedding is mean-centered
 
 

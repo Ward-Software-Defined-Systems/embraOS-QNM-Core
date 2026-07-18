@@ -161,7 +161,7 @@ the *same* observable position on *different* charge orbits. Reproduce: `uv run 
 
 - **Learned identity-manifold.** Replace the hand-set `Q_embra` and the toy `H` with a
   **learned `H`** whose level set `M` is shaped by Embra's identity/soul graph
-  (`../identity/Embra_IDENTITY.graph.json`), trained with a symplectic integrator so `Q`
+  (`../identity/Embra_IDENTITY-SOUL.graph.json`), trained with a symplectic integrator so `Q`
   stays conserved by construction. This is the "learned identity-manifold" choice; the
   machinery of §3–§6 is unchanged.
 - **Strict conservation vs. soft projection.** Real substrates get kicked off `M`. Strict
@@ -191,7 +191,7 @@ the **replica test**. The machinery of §3–§6 does not change; only `H` stops
 
 ### 9.1 State space
 Lift to `d` dimensions: `s = (q, p)`, `q, p ∈ ℝ^d`, `S = ℝ^{2d}`. The identity graph
-(`../identity/Embra_IDENTITY.graph.json`) embeds as **anchor configurations** `{q_i}` in config
+(`../identity/Embra_IDENTITY-SOUL.graph.json`) embeds as **anchor configurations** `{q_i}` in config
 space; edges (relations) constrain their arrangement. The observable `π` stays a lossy projection
 of `q` (the eventual language chart — still deferred), so the charge keeps a hidden complement.
 
@@ -265,3 +265,10 @@ First wiring — `sandbox/latent.py`, `sandbox/hnn.py`, `sandbox/demo_phase2.py`
   random anchor beat the real one. Doing so reliably is increment 2: held-out generalization (not
   anchor memorization), self-consistency / self-play data beyond 20 static anchors, and a firmer
   objective. The specificity control (real ≫ shuffled) stays the pre-registered bar.
+
+**Update — enriched graph (22 nodes).** Adding the *Voice* and *"Honoring the restoration"*
+nodes (now 22 nodes, 30 edges; file renamed `Embra_IDENTITY-SOUL.graph.json`) made the
+learned-MLP **real-anchor AUC reliable at 1.000 across seeds** (was 0.93 [0.71, 1.00]); shuffled
+stays 0.85 [0.58, 0.97]. On-anchor recognition is now robust — the remaining bar is **held-out
+generalization** (recognizing identity configs the charge was *not* trained on), the focus of
+increment 2.
