@@ -19,10 +19,11 @@ dev = [
     "pytest>=8",
     "ruff>=0.6",
 ]
-# The learned-Hamiltonian / autodiff path (next phase): learn H on the identity
+# The learned-Hamiltonian / autodiff path (phase two): learn H on the identity
 # manifold with a symplectic integrator. Kept OUT of the default install.
 learn = [
     "jax>=0.4",
+    "optax>=0.2",
     "diffrax>=0.5",
 ]
 

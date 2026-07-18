@@ -246,3 +246,22 @@ random-anchor control exists to catch this; if real ≈ random, identity is not 
 approach needs rethinking, not tuning. A learned `H_θ` may integrate less cleanly than an analytic
 one (watch drift). And 20 anchors may be too few to shape a `d`-dim manifold — hence the
 data-augmentation fork. Recorded so it can fail visibly.
+
+### 9.8 Increment-1 result (recorded 2026-07-18)
+
+First wiring — `sandbox/latent.py`, `sandbox/hnn.py`, `sandbox/demo_phase2.py`; `d = 8`; the
+20-node identity graph embedded by Laplacian eigenmaps:
+
+- **Machinery lifts.** Conservation holds (drift ≈ 9·10⁻⁵) and the replica test still bites in
+  `d` dimensions — conserved-ψ AUC = **1.000**, endpoint-only AUC = **0.500**. The
+  conserved-charge mechanism is dimension-agnostic.
+- **Gaussian fit → no identity specificity.** A closed-form Mahalanobis potential separates
+  on/off but **real ≈ shuffled** (≈0.996 vs ≈0.987): mean+covariance discard the identity. Expected
+  — the spectral anchor cloud is near-isotropic.
+- **Learned MLP → directional but unreliable.** A contrastively-trained MLP potential reaches
+  real **0.93 [0.71, 1.00]** vs shuffled **0.83 [0.55, 0.98]** over 4 seeds — it *can* carve an
+  identity-specific charge (one seed hit 1.00 vs 0.55), not yet *reliably*.
+- **Read.** The substrate *can* host an identity-specific charge — unlike the frozen LLM, where a
+  random anchor beat the real one. Doing so reliably is increment 2: held-out generalization (not
+  anchor memorization), self-consistency / self-play data beyond 20 static anchors, and a firmer
+  objective. The specificity control (real ≫ shuffled) stays the pre-registered bar.
