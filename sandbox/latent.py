@@ -262,3 +262,33 @@ def specificity(d: int = 8, *, n: int = 500, seed: int = 0) -> dict:
     auc_real = auc(list(-m_real.V(on)), list(-m_real.V(off)))  # score = −V (higher = on-manifold)
     auc_shuf = auc(list(-m_shuf.V(on)), list(-m_shuf.V(off)))
     return {"auc_real": auc_real, "auc_shuffled": auc_shuf, "gap": auc_real - auc_shuf}
+
+
+def dynamical_specificity(d: int = 8, *, n_traj: int = 200, seed: int = 0, m: float = 1.0,
+                          e: float = 1.0, dt: float = 0.01, steps: int = 300) -> dict:
+    """Identity through the DYNAMICS (§6, increment 2c). A trajectory belongs to identity R iff it
+    *conserves R's charge* H_R. A survivor (real-identity trajectory) conserves H_real; an impostor
+    (a different identity's trajectory) does not. Discriminator = variance of H_real *along* the
+    trajectory — a conservation test, not a static region test, so it does not depend on where the
+    anchor clouds sit (the isotropy that defeated §9.9–§9.10)."""
+    _, real = load_identity_anchors(d)
+    shuf = shuffled_anchors(d, seed=seed)
+    h_real = GaussianManifold.fit(real)
+    h_shuf = GaussianManifold.fit(shuf)
+    rng = np.random.default_rng(seed)
+
+    def residual(dynamics: GaussianManifold, reader: GaussianManifold) -> float:
+        u = rng.standard_normal(d)
+        u /= np.linalg.norm(u)
+        qs, ps = rollout(dynamics.force, m, dynamics.center, u * np.sqrt(2 * m * e), dt, steps)
+        return float(np.var(reader.energy(qs, ps, m)))  # how much H_reader drifts along the flow
+
+    surv = [residual(h_real, h_real) for _ in range(n_traj)]  # real traj read by H_real → ≈0
+    imp = [residual(h_shuf, h_real) for _ in range(n_traj)]  # different-identity traj read by H_real → >0
+    imp_own = [residual(h_shuf, h_shuf) for _ in range(n_traj)]  # control: impostor conserves its OWN charge
+    return {
+        "auc": auc([-x for x in surv], [-x for x in imp]),  # low H_real-variance ⇒ real identity
+        "surv_resid": float(np.mean(surv)),
+        "imp_resid": float(np.mean(imp)),
+        "imp_own_resid": float(np.mean(imp_own)),
+    }

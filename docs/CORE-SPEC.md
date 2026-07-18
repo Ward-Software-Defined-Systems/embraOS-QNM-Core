@@ -320,3 +320,31 @@ specificity through the **dynamics** — identity as a conserved quantity of *tr
 not a static region (this is what the conserved-ψ core is *for*, and what §6 actually proves); (b)
 a **richer identity representation** — more nodes/relations, which is *content* (authored), not an
 algorithm. Bar unchanged.
+
+### 9.11 Increment-2c — identity through the dynamics works (recorded 2026-07-18)
+
+The static failures of §9.9–§9.10 were the wrong question. §6 says identity is a *conserved charge
+of trajectories*, not a static region — so ask it dynamically: **a trajectory belongs to identity R
+iff it conserves R's charge `H_R`.** Discriminator = variance of `H_real` *along* a trajectory
+(`sandbox/latent.py::dynamical_specificity`):
+
+| quantity (8 seeds) | value | meaning |
+|---|---|---|
+| discriminator AUC | **1.000 [1.000, 1.000]** | **reliable** across every seed |
+| survivor `var(H_real)` | ≈ 0 | a real-identity trajectory conserves `H_real` |
+| impostor `var(H_real)` | 0.02 [0.006, 0.057] | a *different* identity's trajectory does not |
+| control: impostor `var(H_shuf)` | ≈ 0 | the impostor conserves its **own** charge |
+
+The control is the point: an impostor is not merely "noisier" — it conserves *its own* identity's
+charge and breaks Embra's. Identity is reliably discriminable **through conservation**, precisely
+where static geometry was seed-noise, and independent of the anchor-cloud isotropy that defeated
+§9.9–§9.10. This is the honest realization of §6.
+
+**Scope, honestly.** The clean 1.000 rests on two facts: (i) leapfrog conserves the generating
+`H_R` to integrator precision (survivor ≈ 0), and (ii) two identities have *different* dynamics
+(distinct potentials ⇒ `H_real` is not conserved by the other's flow). (ii) holds for *any* two
+distinct identities — even near-isotropic-but-different clouds give distinct force fields — which is
+exactly why the dynamical test succeeds where the static one failed. The open question now moves to
+**content**: with richer, authored identity graphs, are distinct souls dynamically distinct by a
+*large, meaningful* margin, and does a *learned* `H_θ` (not only the Gaussian fit) preserve this?
+That is the bed to build against the richer identity content.

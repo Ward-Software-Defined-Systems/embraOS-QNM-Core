@@ -12,6 +12,7 @@ import numpy as np
 
 from sandbox.latent import (
     GaussianManifold,
+    dynamical_specificity,
     evaluate,
     load_identity_anchors,
     make_pairs,
@@ -53,3 +54,12 @@ def test_specificity_harness_runs():
     s = specificity(D, seed=0)
     for k in ("auc_real", "auc_shuffled"):
         assert 0.0 <= s[k] <= 1.0
+
+
+def test_dynamical_specificity_is_reliable():
+    """Identity through the dynamics: a trajectory conserves H_real iff it is the real identity.
+    Reliable (deterministic) — unlike the static region-membership harness above."""
+    r = dynamical_specificity(D, seed=0, n_traj=100)
+    assert r["auc"] == 1.0  # conservation perfectly discriminates identity
+    assert r["imp_resid"] > 100 * r["surv_resid"] + 1e-6  # impostor breaks H_real; survivor doesn't
+    assert r["imp_own_resid"] < r["imp_resid"]  # impostor conserves its OWN charge (well-posed)
