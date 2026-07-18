@@ -33,7 +33,8 @@ from sandbox.latent import (  # noqa: E402
 from sandbox.replica_test import auc  # noqa: E402
 
 D = 8
-SEEDS = (0, 1, 2, 3)
+SEEDS = (0, 1, 2, 3)  # static specificity — MLP training is slow, so keep it small
+DYN_SEEDS = tuple(range(8))  # dynamical specificity is cheap + deterministic → wider sweep (matches §9.11)
 FIG_PATH = pathlib.Path(__file__).resolve().parent / "figures" / "phase2_identity.png"
 
 
@@ -42,7 +43,7 @@ def _summ(rows: list[dict], key: str) -> str:
     return f"{xs.mean():.3f} [{xs.min():.3f},{xs.max():.3f}]"
 
 
-def make_phase2_figure(d: int = D, n_seeds: int = 10) -> None:
+def make_phase2_figure(d: int = D, n_seeds: int = 8) -> None:
     """Two panels telling the phase-two story:
     (A) H_real along survivor vs impostor trajectories — survivors conserve it, impostors don't;
     (B) the real-vs-different-identity discriminator AUC per seed, static vs dynamical — static is
@@ -133,7 +134,7 @@ def main() -> dict:
     # 2. static specificity (region-membership); 3. dynamical specificity (conservation)
     g = [specificity(D, seed=s) for s in SEEDS]
     h = [specificity_mlp(D, seed=s, steps=700) for s in SEEDS]
-    dyn = [dynamical_specificity(D, seed=s) for s in SEEDS]
+    dyn = [dynamical_specificity(D, seed=s) for s in DYN_SEEDS]
 
     def _mean(rows, k):
         return float(np.mean([r[k] for r in rows]))

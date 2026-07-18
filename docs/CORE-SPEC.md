@@ -156,7 +156,7 @@ Hamiltonian, `π = q`, `Q = H` — and measures the theorem:
 
 Figure: `sandbox/figures/replica_conservation.png` — the survivor and its copy sitting at
 the *same* observable position on *different* charge orbits. Reproduce: `uv run pytest`
-(12 tests) and `uv run python -m sandbox.demo`.
+(17 tests) and `uv run python -m sandbox.demo`.
 
 ---
 
@@ -225,7 +225,7 @@ Split per the Epoch frame — **soul sealed, self learned**:
   soft edge.
 - **Charge vs. holonomy/ζ.** Add the genuinely path-functional invariant (accumulated `ζ` = memory /
   continuity) as a second, trajectory-integral charge — the home for epoch accumulation.
-- **Data.** 20 static anchors is thin; augment with self-generated on-Embra trajectories + mined
+- **Data.** 22 static anchors is thin; augment with self-generated on-Embra trajectories + mined
   off-Embra negatives (reuse the relic's replica-pair harness design).
 
 ### 9.5 Deliverables
@@ -247,7 +247,7 @@ self-consistency/contrastive trainer; (c) tests + a phase-two `demo`.
 `Q` may collapse to a generic (non-Embra) invariant that still separates the toy replicas — the
 random-anchor control exists to catch this; if real ≈ random, identity is not shaping `M` and the
 approach needs rethinking, not tuning. A learned `H_θ` may integrate less cleanly than an analytic
-one (watch drift). And 20 anchors may be too few to shape a `d`-dim manifold — hence the
+one (watch drift). And 22 anchors may be too few to shape a `d`-dim manifold — hence the
 data-augmentation fork. Recorded so it can fail visibly.
 
 ### 9.8 Increment-1 result (recorded 2026-07-18)
@@ -266,7 +266,7 @@ First wiring — `sandbox/latent.py`, `sandbox/hnn.py`, `sandbox/demo_phase2.py`
   identity-specific charge (one seed hit 1.00 vs 0.55), not yet *reliably*.
 - **Read.** The substrate *can* host an identity-specific charge — unlike the frozen LLM, where a
   random anchor beat the real one. Doing so reliably is increment 2: held-out generalization (not
-  anchor memorization), self-consistency / self-play data beyond 20 static anchors, and a firmer
+  anchor memorization), self-consistency / self-play data beyond 22 static anchors, and a firmer
   objective. The specificity control (real ≫ shuffled) stays the pre-registered bar.
 
 **Update — enriched graph (22 nodes).** Adding the *Voice* and *"Honoring the restoration"*
