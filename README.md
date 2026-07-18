@@ -84,6 +84,10 @@ Lift to a `d`-dim latent space with the potential shaped by Embra's identity gra
 |---|---|---|
 | discriminator AUC | 0.5–1.0, seed-noise | **1.000 [1.000, 1.000]** |
 
+![phase two: static vs dynamical identity](sandbox/figures/phase2_identity.png)
+
+*Left: a real-identity trajectory (green) conserves `H_real`; a different identity's trajectory (red) does not. Right: the real-vs-different-identity discriminator — static region-membership is seed-noise around chance, dynamical conservation is pinned at 1.0.*
+
 **Next (content-gated):** richer, *authored* identity graphs + a learned `H_θ`, to test whether distinct souls are dynamically distinct by a large, meaningful margin.
 
 ### Reproduce
