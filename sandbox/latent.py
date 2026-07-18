@@ -67,16 +67,8 @@ def _spectral_embed(a: Array, d: int) -> Array:
     return coords / (np.abs(coords).max() + 1e-12)
 
 
-def load_identity_anchors(d: int = 8, *, graph_path: Path = IDENTITY_GRAPH) -> tuple[list[str], Array]:
-    """The identity graph embedded as `(n, d)` anchor configurations in latent config space."""
-    ids, a = _adjacency(graph_path)
-    return ids, _spectral_embed(a, d)
-
-
-def shuffled_anchors(d: int = 8, *, graph_path: Path = IDENTITY_GRAPH, seed: int = 0) -> Array:
-    """Control: rewire the graph to a random graph with the same node and edge counts, then
-    re-embed. Destroys the real relational structure → a different anchor cloud."""
-    _, a = _adjacency(graph_path)
+def _rewired_adjacency(a: Array, seed: int) -> Array:
+    """A random graph with the same node and edge counts as ``a`` — the shuffled-identity control."""
     n = a.shape[0]
     m_edges = int((a > 0).sum() // 2)
     rng = np.random.default_rng(seed)
@@ -87,7 +79,41 @@ def shuffled_anchors(d: int = 8, *, graph_path: Path = IDENTITY_GRAPH, seed: int
         if i != j and b[i, j] == 0:
             b[i, j] = b[j, i] = 1.0
             placed += 1
-    return _spectral_embed(b, d)
+    return b
+
+
+def _diffusion_embed(a: Array, d: int, t: float = 2.0) -> Array:
+    """Diffusion-map embedding (Coifman–Lafon): random-walk eigenvectors scaled by μ_k^t. The
+    eigenvalue weighting emphasizes the graph's slow, structural modes, so distinct graphs land in
+    distinct regions of the space — the anisotropy the plain Laplacian eigenmap lacks.
+
+    Explored in increment 2b and NOT adopted: it did not improve identity separation over the
+    Laplacian eigenmap (`load_identity_anchors` still uses `_spectral_embed`). Kept for the
+    reproducible comparison — see CORE-SPEC §9.10."""
+    n = a.shape[0]
+    a = a + np.eye(n)  # lazy self-loops → nonnegative, aperiodic walk
+    dinv_sqrt = 1.0 / np.sqrt(a.sum(1))
+    s = (dinv_sqrt[:, None] * a) * dinv_sqrt[None, :]  # symmetric D^-1/2 A D^-1/2
+    mu, v = np.linalg.eigh(s)
+    order = np.argsort(mu)[::-1]  # descending; μ_0 ≈ 1 is trivial
+    mu, v = mu[order], v[:, order]
+    psi = dinv_sqrt[:, None] * v  # right eigenvectors of the walk P = D^-1 A
+    weight = np.clip(mu[1 : 1 + d], 0.0, 1.0) ** t
+    coords = (psi[:, 1 : 1 + d] * weight) - (psi[:, 1 : 1 + d] * weight).mean(0)
+    return coords / (np.abs(coords).max() + 1e-12)
+
+
+def load_identity_anchors(d: int = 8, *, graph_path: Path = IDENTITY_GRAPH) -> tuple[list[str], Array]:
+    """The identity graph embedded as `(n, d)` anchor configurations in latent config space."""
+    ids, a = _adjacency(graph_path)
+    return ids, _spectral_embed(a, d)
+
+
+def shuffled_anchors(d: int = 8, *, graph_path: Path = IDENTITY_GRAPH, seed: int = 0) -> Array:
+    """Control: rewire the graph to a random graph with the same node and edge counts, then
+    re-embed. Destroys the real relational structure → a different anchor cloud."""
+    _, a = _adjacency(graph_path)
+    return _spectral_embed(_rewired_adjacency(a, seed), d)
 
 
 # --------------------------------------------------------------------------- #

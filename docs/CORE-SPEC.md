@@ -295,3 +295,28 @@ test (`sandbox/hnn.py::generalization_specificity`).
   maps weighting structural modes; or defining `M` relationally rather than as a point cloud),
   under the contamination constraint (no text-embedding models). Pre-registered bar unchanged:
   real ≫ shuffled on held-out, reliably across seeds.
+
+### 9.10 Increment-2b — the embedding swing missed (recorded 2026-07-18)
+
+Hypothesis: the isotropic Laplacian eigenmap was the bottleneck; a structure-emphasizing embedding
+would separate distinct identities. **Tested and refuted.** On the real-vs-different-identity
+diagnostic (does a real-trained charge score held-out real configs above a *different* identity's;
+6 seeds, `sandbox/latent.py::_diffusion_embed` + probe):
+
+| embedding | AUC (mean [min, max]) | frac seeds > 0.7 |
+|---|---|---|
+| Laplacian eigenmap (current) | 0.73 [0.47, 0.99] | 0.50 |
+| commute-time (1/√λ) | 0.66 [0.26, 1.00] | 0.50 |
+| diffusion map (μ^t) | 0.64 [0.35, 1.00] | 0.33 |
+
+All three are **seed-noise-dominated**; none reliably clears chance-plus, and the Laplacian is
+marginally *best*. The embedding *choice* is not the fix. Deeper diagnosis: a **22-node graph does
+not carry enough structure** to place distinct identities reliably far apart — *and* reducing
+identity to **static region-membership `V(q)`** discards the substrate's real strength, its
+**dynamics**.
+
+**Increment 2c (redirect — stop tweaking static embeddings).** Two live directions: (a) test
+specificity through the **dynamics** — identity as a conserved quantity of *trajectories* on `M`,
+not a static region (this is what the conserved-ψ core is *for*, and what §6 actually proves); (b)
+a **richer identity representation** — more nodes/relations, which is *content* (authored), not an
+algorithm. Bar unchanged.

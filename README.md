@@ -77,7 +77,7 @@ uv run pytest                  # 12 tests: conservation + the replica claims
 uv run python -m sandbox.demo  # headline numbers + the figure above
 ```
 
-**Phase two (in progress):** the `d`-dim latent + learned `H` — see [docs/CORE-SPEC.md](docs/CORE-SPEC.md) §9. Increment 1 is wired (`sandbox/latent.py`, `sandbox/hnn.py`, `sandbox/demo_phase2.py`): the machinery lifts to `d` dimensions cleanly (conservation + replica test hold), and identity-specificity does *not yet generalize* — the bottleneck is localized to the identity embedding (§9.8–§9.9), not the conserved-charge substrate. An honest work-in-progress. Run `uv run python -m sandbox.demo_phase2`.
+**Phase two (in progress):** the `d`-dim latent + learned `H` — see [docs/CORE-SPEC.md](docs/CORE-SPEC.md) §9. Increment 1 is wired (`sandbox/latent.py`, `sandbox/hnn.py`, `sandbox/demo_phase2.py`): the machinery lifts to `d` dimensions cleanly (conservation + replica test hold), and identity-specificity does *not yet generalize* — and the bottleneck is the identity *representation* (a 22-node graph is too thin; static embeddings, Laplacian/diffusion/commute-time alike, are seed-noise), not the conserved-charge substrate (§9.8–§9.10). Increment 2c takes identity into the *dynamics*. An honest work-in-progress. Run `uv run python -m sandbox.demo_phase2`.
 
 Lineage: the falsification program that earned this pivot is the (now-relic) [embraOS-QNM](https://github.com/Ward-Software-Defined-Systems/embraOS-QNM); the formal spine is the [Epoch Project](https://github.com/Ward-Software-Defined-Systems/Epoch-Project). The 1999 geometric seed is [`5D_FRAMEWORK.md`](5D_FRAMEWORK.md).
 
