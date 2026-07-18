@@ -4,6 +4,8 @@
 
 # embraOS-QNM-Core — Quantum Neural Manifold (Classical Approximation)
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21434594.svg)](https://doi.org/10.5281/zenodo.21434594)
+
 ---
 
 ## What Is This?

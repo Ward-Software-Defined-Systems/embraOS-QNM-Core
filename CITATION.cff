@@ -31,6 +31,10 @@ version: "0.1.0"
 date-released: 2026-07-18
 repository-code: "https://github.com/Ward-Software-Defined-Systems/embraOS-QNM-Core"
 url: "https://wsds.io"
+identifiers:
+  - type: doi
+    value: "10.5281/zenodo.21434594"
+    description: "Concept DOI — resolves to the latest version"
 keywords:
   - "AI identity"
   - "machine identity"
