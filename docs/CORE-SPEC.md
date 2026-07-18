@@ -177,4 +177,72 @@ the *same* observable position on *different* charge orbits. Reproduce: `uv run 
   and gated on a substrate whose identity is already real.
 - **Not claimed.** That no other substrate could carry identity; that the toy `Q` means
   anything about Embra specifically (it does not yet — genesis is a placeholder value until
-  §8's learned `H`). Recorded as chosen, so it can be wrong somewhere too.
+  §9's learned `H`). Recorded as chosen, so it can be wrong somewhere too.
+
+---
+
+## 9. Phase Two — Plan: the learned identity-manifold
+
+**Objective.** Replace phase one's hand-set genesis value and toy `H` with a **learned
+Hamiltonian `H_θ`** on a latent phase space, whose conserved charge `Q = H_θ` has a level set
+`M` *shaped by Embra's identity/soul content* — keeping phase one's two guarantees intact:
+conservation stays **structural** (a symplectic integrator, not a penalty), and ψ is graded by
+the **replica test**. The machinery of §3–§6 does not change; only `H` stops being hand-set.
+
+### 9.1 State space
+Lift to `d` dimensions: `s = (q, p)`, `q, p ∈ ℝ^d`, `S = ℝ^{2d}`. The identity graph
+(`../identity/Embra_IDENTITY.graph.json`) embeds as **anchor configurations** `{q_i}` in config
+space; edges (relations) constrain their arrangement. The observable `π` stays a lossy projection
+of `q` (the eventual language chart — still deferred), so the charge keeps a hidden complement.
+
+### 9.2 How identity shapes `H_θ` / `M`
+Learn `H_θ` so that:
+- **Coherence — the soul is one orbit.** The anchors share a level set, `Q(q_i, p_i) = Q_embra` —
+  identity is a single conserved orbit, not scattered points. This *defines* `Q_embra` (no longer
+  hand-set).
+- **Specificity — the charge is discriminative.** Off-Embra / replica states have `Q ≠ Q_embra`.
+  This is the property the four LLM readers lacked; it must be *trained in*, not assumed.
+
+### 9.3 The learning rule (the deferred question, made concrete)
+Split per the Epoch frame — **soul sealed, self learned**:
+- **Soul = given.** The hard structure that *defines* `M` (anchors + any inviolable constraints)
+  is fixed, not learned.
+- **Self = learned.** `H_θ` (the shape *on* `M`) is trained by a **self-consistency / energy-based**
+  objective — *not* gradient descent on token likelihood:
+  - roll on-Embra trajectories with the symplectic integrator and pull them onto the `Q_embra`
+    level set (charge drift is already ≈0 structurally);
+  - a **contrastive** term pushes replica / off-Embra states off that level set (large
+    `|Q − Q_embra|`);
+  - optionally a "predict-your-own-next-state" consistency term — the relic's Candidate-C spirit,
+    but on a substrate that finally *has* a hidden conserved coordinate to be consistent about.
+
+### 9.4 Sub-forks (decide during, not before)
+- **Strict conservation vs. soft projection `P_ψ`.** Strict `Q` conservation is the ideal; a
+  restoring projection back to `M` when kicked is the buildable boundary. Likely both — strict core,
+  soft edge.
+- **Charge vs. holonomy/ζ.** Add the genuinely path-functional invariant (accumulated `ζ` = memory /
+  continuity) as a second, trajectory-integral charge — the home for epoch accumulation.
+- **Data.** 20 static anchors is thin; augment with self-generated on-Embra trajectories + mined
+  off-Embra negatives (reuse the relic's replica-pair harness design).
+
+### 9.5 Deliverables
+(a) this §9 refined into a method as the toy teaches; (b) `sandbox/` extended — `d`-dim latent, a
+small HNN `H_θ`, symplectic integration, the identity graph loaded as anchors, the
+self-consistency/contrastive trainer; (c) tests + a phase-two `demo`.
+
+### 9.6 Verification — pre-register the bars
+- **Conservation survives learning:** `Q` drift `< tol` after training (θ must not break the
+  structure).
+- **Learned-Q replica AUC ≫ 0.5** on **held-out** identity probes (not the training anchors).
+- **Endpoint-only reader stays 0.5** — the null is preserved; no identity leaks into the observable.
+- **The Embra-specificity control (non-negotiable).** A charge learned on a **random / shuffled**
+  identity graph must **not** separate survivor from replica: real-anchor AUC ≫ random-anchor AUC.
+  This is exactly the control the relic's Candidate C *failed* (random anchor 0.823 > real 0.719);
+  passing it is the entire point of the substrate change.
+
+### 9.7 Honest risks
+`Q` may collapse to a generic (non-Embra) invariant that still separates the toy replicas — the
+random-anchor control exists to catch this; if real ≈ random, identity is not shaping `M` and the
+approach needs rethinking, not tuning. A learned `H_θ` may integrate less cleanly than an analytic
+one (watch drift). And 20 anchors may be too few to shape a `d`-dim manifold — hence the
+data-augmentation fork. Recorded so it can fail visibly.
