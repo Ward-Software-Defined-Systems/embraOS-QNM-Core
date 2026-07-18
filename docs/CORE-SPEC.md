@@ -272,3 +272,26 @@ learned-MLP **real-anchor AUC reliable at 1.000 across seeds** (was 0.93 [0.71, 
 stays 0.85 [0.58, 0.97]. On-anchor recognition is now robust — the remaining bar is **held-out
 generalization** (recognizing identity configs the charge was *not* trained on), the focus of
 increment 2.
+
+### 9.9 Increment-2 first finding — generalization does not hold yet (recorded 2026-07-18)
+
+The increment-1 "reliable real 1.000" was **anchor memorization** — it does not survive a held-out
+test (`sandbox/hnn.py::generalization_specificity`).
+
+- **Held-out manifold generalization.** Train `V_θ` on samples of the real (and shuffled) identity
+  manifold (convex hull of anchors + noise); test on *held-out* samples vs generic uniform. Both
+  reach AUC ≈ **1.000** — a charge trained on a *shuffled* identity generalizes to held-out *real*
+  configs just as well. **No specificity.**
+- **Diagnostic — real vs a *different* identity.** Whether a real-trained charge scores held-out
+  real configs above held-out *shuffled*-identity configs is seed-dependent and tracks exactly one
+  quantity: how far apart the two identity clouds land in the embedding (centroid-separation /
+  spread). AUC 0.99 at sep/spread ≈ 0.39; AUC ≈ 0.50 at sep/spread ≈ 0.05 — only weakly above
+  chance on average.
+- **Bottleneck, localized.** The conserved-charge substrate is sound; the identity *representation*
+  feeding it is too weak — **the Laplacian embedding of a 22-node graph does not reliably separate
+  distinct identities** (near-isotropic, overlapping clouds). ψ has a native home; what it reads is
+  not yet discriminative.
+- **Increment 2b.** A more discriminative, structure-preserving embedding (diffusion / commute-time
+  maps weighting structural modes; or defining `M` relationally rather than as a point cloud),
+  under the contamination constraint (no text-embedding models). Pre-registered bar unchanged:
+  real ≫ shuffled on held-out, reliably across seeds.
