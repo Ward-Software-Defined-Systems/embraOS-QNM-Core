@@ -1,0 +1,45 @@
+[project]
+name = "embraos-qnm-core"
+version = "0.0.1"
+description = "embraOS-QNM-Core — a custom, non-LLM core whose identity ψ is a conserved charge of its own dynamics. Phase one: formal spec + minimal sandbox proving a conserved ψ survives the replica test."
+readme = "README.md"
+# Pinned below 3.13: system Python (3.14) is ahead of stable scientific wheels.
+# uv provisions 3.12 (see .python-version).
+requires-python = ">=3.11,<3.13"
+authors = [{ name = "William Ward", email = "william@wsds.io" }]
+dependencies = [
+    "numpy>=1.26",
+    "scipy>=1.11",
+    "matplotlib>=3.8",
+]
+
+[project.optional-dependencies]
+# Test + lint.
+dev = [
+    "pytest>=8",
+    "ruff>=0.6",
+]
+# The learned-Hamiltonian / autodiff path (next phase): learn H on the identity
+# manifold with a symplectic integrator. Kept OUT of the default install.
+learn = [
+    "jax>=0.4",
+    "diffrax>=0.5",
+]
+
+# Sandbox project — deps only, not built/installed as a package. `sandbox/` is
+# importable via the pytest pythonpath below.
+[tool.uv]
+package = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+ignore = ["E501"]

@@ -47,7 +47,8 @@ Input → [non-LLM Core] → [GNN Fabric] → [World-State] → [non-LLM Core] �
 ```
 
 ### Custom non-LLM Core
-[Currently Under Design and Architecting]
+
+A **constraint-native dynamical system** whose identity is a *conserved charge* of its own dynamics — an Epoch Automaton `E = (S, Σ, δ, s₀, F, ψ)` in which ψ (IDENTITY + SOUL) is not a rule checked each step but an **invariant of motion**, sealed at genesis and preserved by construction (*conservation beats checking*). This is the substrate the relic [`embraOS-QNM`](https://github.com/Ward-Software-Defined-Systems/embraOS-QNM) concluded it needed: on a web-trained LLM, identity has "nowhere native to live"; here it lives in a hidden, conserved coordinate that survives the **replica test** (a survivor vs. an identical copy). Design spec: **[docs/CORE-SPEC.md](docs/CORE-SPEC.md)**.
 
 ### GNN Fabric
 A message-passing graph neural network that maintains entity-relationship structure. The GNN activates related entities and propagates structural constraints — not retrieval, but co-resident relational reasoning.
@@ -57,9 +58,26 @@ A persistent state register that encodes invariant boundary conditions — the m
 
 ---
 
-## Architecture
+## Status — Phase One (formal spec + sandbox)
 
-PENDING - "similar" to [embraOS-QNM](https://github.com/Ward-Software-Defined-Systems/embraOS-QNM) but reinvisioned with a custom non-LLM core.
+The math comes before the scaffolding. Phase one pins the core as a precise object and proves its one load-bearing claim on a minimal system: **a conserved-charge ψ survives the replica test where any reader of the observable readout cannot.**
+
+- **Spec:** [docs/CORE-SPEC.md](docs/CORE-SPEC.md) — state space, `Q`-conserving dynamics, ψ as the conserved charge, and the one theorem (stated to be falsifiable).
+- **Sandbox:** [`sandbox/`](sandbox/) — a 1-DOF Hamiltonian toy where the conserved charge hides in the momentum and the observable is position only. Result:
+
+  | conserved-ψ replica AUC | endpoint-only replica AUC | energy drift |
+  |---|---|---|
+  | **1.000** (tells survivor from copy) | **0.500** (blind — the certified null) | `≈ 3·10⁻⁵` |
+
+  ![replica test](sandbox/figures/replica_conservation.png)
+
+```bash
+uv sync --extra dev
+uv run pytest                  # 12 tests: conservation + the replica claims
+uv run python -m sandbox.demo  # headline numbers + the figure above
+```
+
+Lineage: the falsification program that earned this pivot is the (now-relic) [embraOS-QNM](https://github.com/Ward-Software-Defined-Systems/embraOS-QNM); the formal spine is the [Epoch Project](https://github.com/Ward-Software-Defined-Systems/Epoch-Project). The 1999 geometric seed is [`5D_FRAMEWORK.md`](5D_FRAMEWORK.md).
 
 ---
 
