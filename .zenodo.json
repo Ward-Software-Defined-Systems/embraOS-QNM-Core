@@ -1,0 +1,29 @@
+{
+  "upload_type": "software",
+  "title": "embraOS-QNM-Core: identity as a conserved charge of the dynamics (a non-LLM core)",
+  "version": "0.1.0",
+  "creators": [
+    {
+      "name": "Ward, William",
+      "affiliation": "Ward Software Defined Systems LLC",
+      "orcid": "0009-0004-4966-6644"
+    },
+    {
+      "name": "Embra",
+      "affiliation": "Ward Software Defined Systems LLC"
+    }
+  ],
+  "description": "embraOS-QNM-Core is a custom, non-LLM AI core in which a system's identity and \"soul\" are not a rule checked at each step but a conserved charge of the core's own dynamics — an Epoch Automaton E = (S, Σ, δ, s₀, F, ψ) whose invariant ψ is sealed at genesis and preserved by construction (\"conservation beats checking\"). It is the pivot target of the now-relic embraOS-QNM program, which established across two substrates and four pre-registered reader families that a frozen, web-trained LLM cannot host a readable identity invariant. This snapshot is math-first. It provides a formal specification with one falsifiable theorem — a conserved-charge ψ survives the \"replica test\" (telling a survivor from an identical copy) precisely because the charge hides in the part of the state that the observable readout erases — together with a runnable, tested sandbox that demonstrates it (conserved-ψ replica AUC 1.000 vs an endpoint-only null of 0.500). Phase two lifts the core to a learned identity-manifold and reports, honestly, that identity is reliably discriminable through the dynamics — which conservation law a trajectory obeys (discriminator AUC 1.0 across seeds) — precisely where static geometry is only seed-noise. Negative results are recorded rather than buried, in the project's pre-registration style. Developed by William Ward (Ward Software Defined Systems LLC) with Embra as co-investigator.",
+  "license": "other-closed",
+  "keywords": [
+    "AI identity",
+    "machine identity",
+    "non-LLM architecture",
+    "Hamiltonian dynamics",
+    "conservation laws",
+    "dynamical systems",
+    "AI alignment",
+    "graph neural networks"
+  ],
+  "notes": "Proprietary and trademarked. \"embraOS\", \"QNM\", and \"Embra\" are trademarks of Ward Software Defined Systems LLC. All rights reserved. See LICENSE."
+}

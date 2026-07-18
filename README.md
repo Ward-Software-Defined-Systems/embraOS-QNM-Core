@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/embraos-qnm-core-banner.svg" alt="embraOS-QNM-Core — identity as a conserved charge of the dynamics" width="100%">
+  <img src="assets/embraos-qnm-core-banner.png" alt="embraOS-QNM-Core — identity as a conserved charge of the dynamics" width="100%">
 </p>
 
 # embraOS-QNM-Core — Quantum Neural Manifold (Classical Approximation)
