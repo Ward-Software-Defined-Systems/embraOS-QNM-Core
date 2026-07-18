@@ -1,8 +1,11 @@
-# CORE-SPEC — The Conserved-ψ Core (Phase One)
+# CORE-SPEC — The Conserved-ψ Core
 
-**Status:** Phase-one formal spec. Pairs with the runnable sandbox in `../sandbox/`
-(`uv run python -m sandbox.demo`). Written to be *falsifiable*: every claim that can
-be checked numerically is, and the one theorem is stated so it could be wrong.
+**Status:** Phase one (§1–§7) proven — a conserved-charge ψ survives the replica test. Phase two
+(§9) in progress — the machinery lifts to `d` dimensions, and identity is reliably discriminable
+**through the dynamics** (§9.11, AUC 1.0) where static geometry was seed-noise (§9.9–§9.10). Pairs
+with the runnable sandbox (`uv run python -m sandbox.demo` and `sandbox.demo_phase2`). Written to be
+*falsifiable*: every numeric claim is checked, and the one theorem (§6) is stated so it could be
+wrong.
 
 > **Register.** §1–§6 are the contribution (the object and its one load-bearing
 > theorem). §7 is the phase-one demonstration. §8 is honest scope and open forks.

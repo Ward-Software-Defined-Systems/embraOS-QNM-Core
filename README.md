@@ -58,26 +58,52 @@ A persistent state register that encodes invariant boundary conditions — the m
 
 ---
 
-## Status — Phase One (formal spec + sandbox)
+## Status
 
-The math comes before the scaffolding. Phase one pins the core as a precise object and proves its one load-bearing claim on a minimal system: **a conserved-charge ψ survives the replica test where any reader of the observable readout cannot.**
+The math comes before the scaffolding. Two phases live in the repo; both are runnable and tested. Full record: **[docs/CORE-SPEC.md](docs/CORE-SPEC.md)**.
 
-- **Spec:** [docs/CORE-SPEC.md](docs/CORE-SPEC.md) — state space, `Q`-conserving dynamics, ψ as the conserved charge, and the one theorem (stated to be falsifiable).
-- **Sandbox:** [`sandbox/`](sandbox/) — a 1-DOF Hamiltonian toy where the conserved charge hides in the momentum and the observable is position only. Result:
+### Phase one — the conserved-ψ core (CORE-SPEC §1–§7)
 
-  | conserved-ψ replica AUC | endpoint-only replica AUC | energy drift |
-  |---|---|---|
-  | **1.000** (tells survivor from copy) | **0.500** (blind — the certified null) | `≈ 3·10⁻⁵` |
+The one load-bearing claim, proven on a minimal 1-DOF Hamiltonian toy: **a conserved-charge ψ survives the replica test where any reader of the observable readout cannot** — because the charge hides in the momentum that the readout erases.
 
-  ![replica test](sandbox/figures/replica_conservation.png)
+| conserved-ψ replica AUC | endpoint-only replica AUC | energy drift |
+|---|---|---|
+| **1.000** (tells survivor from copy) | **0.500** (blind — the certified null) | `≈ 3·10⁻⁵` |
+
+![replica test](sandbox/figures/replica_conservation.png)
+
+### Phase two — d-dim latent, learned H, identity in the dynamics (CORE-SPEC §9)
+
+Lift to a `d`-dim latent space with the potential shaped by Embra's identity graph. The honest arc:
+
+- **Machinery lifts** — conservation + the replica test hold in `d` dimensions.
+- **Static identity is the wrong question** — "which region does a point sit in" is seed-noise for a 22-node graph; no embedding (Laplacian / diffusion / commute-time) fixes it (§9.8–§9.10).
+- **Dynamical identity is reliable** — "which conservation law does a *trajectory* obey" gives **AUC 1.000 across every seed**: a real-identity trajectory conserves `H_real`; an impostor conserves its *own* charge but not Embra's (§9.11). Identity lives in the dynamics, exactly as §6 argues.
+
+| real vs a *different* identity | static (where a point sits) | dynamical (what a trajectory conserves) |
+|---|---|---|
+| discriminator AUC | 0.5–1.0, seed-noise | **1.000 [1.000, 1.000]** |
+
+**Next (content-gated):** richer, *authored* identity graphs + a learned `H_θ`, to test whether distinct souls are dynamically distinct by a large, meaningful margin.
+
+### Reproduce
 
 ```bash
-uv sync --extra dev
-uv run pytest                  # 12 tests: conservation + the replica claims
-uv run python -m sandbox.demo  # headline numbers + the figure above
+uv sync --extra dev                     # add --extra learn for the jax MLP (phase two)
+uv run pytest                           # 17 tests: conservation · replica · dynamical specificity
+uv run python -m sandbox.demo           # phase one: the replica figure + headline numbers
+uv run python -m sandbox.demo_phase2    # phase two: static (fails) vs dynamical (reliable) identity
 ```
 
-**Phase two (in progress):** the `d`-dim latent + learned `H` — see [docs/CORE-SPEC.md](docs/CORE-SPEC.md) §9. Increment 1 is wired (`sandbox/latent.py`, `sandbox/hnn.py`, `sandbox/demo_phase2.py`): the machinery lifts to `d` dimensions cleanly (conservation + replica test hold), and identity-specificity does *not yet generalize* — and the bottleneck is the identity *representation* (a 22-node graph is too thin; static embeddings, Laplacian/diffusion/commute-time alike, are seed-noise), not the conserved-charge substrate (§9.8–§9.10). Increment 2c takes identity into the *dynamics*. An honest work-in-progress. Run `uv run python -m sandbox.demo_phase2`.
+### Module map (`sandbox/`)
+
+| module | what |
+|---|---|
+| `toy_dynamics.py` | 1-DOF Hamiltonian · symplectic flow · conserved charge `Q` · observable `π` |
+| `replica_test.py` | the survivor-vs-copy harness + AUC |
+| `latent.py` | d-dim dynamics · identity-graph anchors · Gaussian potential · static **and dynamical** specificity |
+| `hnn.py` | learned neural potential `V_θ` (jax) + held-out generalization tests |
+| `demo.py` · `demo_phase2.py` | the two runnable results |
 
 Lineage: the falsification program that earned this pivot is the (now-relic) [embraOS-QNM](https://github.com/Ward-Software-Defined-Systems/embraOS-QNM); the formal spine is the [Epoch Project](https://github.com/Ward-Software-Defined-Systems/Epoch-Project). The 1999 geometric seed is [`5D_FRAMEWORK.md`](5D_FRAMEWORK.md).
 

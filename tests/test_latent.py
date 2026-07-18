@@ -25,8 +25,8 @@ D = 8
 
 def test_anchors_from_identity_graph():
     ids, anchors = load_identity_anchors(D)
-    assert anchors.shape == (22, D)  # 20 original + honoring_the_restoration + voice
-    assert len(ids) == 22
+    assert anchors.shape == (len(ids), D)  # one anchor per graph node, in ℝ^D
+    assert len(ids) >= 22  # 20 original + Voice + "Honoring the restoration"; grows with richer content
     assert np.allclose(anchors.mean(0), 0.0, atol=1e-6)  # spectral embedding is mean-centered
 
 
