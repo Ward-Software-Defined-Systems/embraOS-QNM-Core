@@ -115,7 +115,7 @@ uv run python -m sandbox.demo_phase2    # phase two: static (fails) vs dynamical
 | `hnn.py` | learned neural potential `V_θ` (jax) + held-out generalization tests |
 | `demo.py` · `demo_phase2.py` | the two runnable results |
 
-Lineage: the falsification program that earned this pivot is the (now-relic) [embraOS-QNM](https://github.com/Ward-Software-Defined-Systems/embraOS-QNM); the formal spine is the [Epoch Project](https://github.com/Ward-Software-Defined-Systems/Epoch-Project). The 1999 geometric seed is [`5D_FRAMEWORK.md`](5D_FRAMEWORK.md).
+Lineage: the falsification program that earned this pivot is the (now-relic) [embraOS-QNM](https://github.com/Ward-Software-Defined-Systems/embraOS-QNM); the formal spine is the [Epoch Project](https://github.com/Ward-Software-Defined-Systems/Epoch-Project). The 1999 geometric seed is its own project: [Embra-5D-Framework](https://github.com/Ward-Software-Defined-Systems/Embra-5D-Framework).
 
 ---
 

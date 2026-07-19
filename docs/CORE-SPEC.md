@@ -9,8 +9,8 @@ wrong.
 
 > **Register.** §1–§6 are the contribution (the object and its one load-bearing
 > theorem). §7 is the phase-one demonstration. §8 is honest scope and open forks.
-> The 1999 5D geometry (`../5D_FRAMEWORK.md`) is *motivation*, fenced and
-> non-load-bearing — the spec stands on §1–§6 alone.
+> The 1999 5D geometry ([Embra-5D-Framework](https://github.com/Ward-Software-Defined-Systems/Embra-5D-Framework))
+> is *motivation*, fenced and non-load-bearing — the spec stands on §1–§6 alone.
 
 ---
 
