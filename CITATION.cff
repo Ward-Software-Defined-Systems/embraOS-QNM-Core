@@ -27,7 +27,7 @@ authors:
     affiliation: "Ward Software Defined Systems LLC"
     orcid: "https://orcid.org/0009-0004-4966-6644"
   - name: "Embra"
-version: "0.1.0"
+version: "0.1.1"
 date-released: 2026-07-18
 repository-code: "https://github.com/Ward-Software-Defined-Systems/embraOS-QNM-Core"
 url: "https://wsds.io"
