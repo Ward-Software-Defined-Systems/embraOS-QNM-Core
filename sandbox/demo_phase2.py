@@ -13,12 +13,13 @@ from __future__ import annotations
 
 import pathlib
 import sys
+from functools import partial
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))
 
 import numpy as np  # noqa: E402
 
-from sandbox.hnn import generalization_specificity, specificity_mlp  # noqa: E402
+from sandbox.hnn import MLPManifold, generalization_specificity, specificity_mlp  # noqa: E402
 from sandbox.latent import (  # noqa: E402
     GaussianManifold,
     dynamical_specificity,
@@ -46,10 +47,11 @@ def _summ(rows: list[dict], key: str) -> str:
 
 
 def make_phase2_figure(d: int = D, n_seeds: int = 8) -> None:
-    """Two panels telling the phase-two story:
+    """Three panels telling the phase-two story:
     (A) H_real along survivor vs impostor trajectories — survivors conserve it, impostors don't;
     (B) the real-vs-different-identity discriminator AUC per seed, static vs dynamical — static is
-        scattered seed-noise, dynamical is pinned at 1.0."""
+        scattered seed-noise, dynamical is pinned at 1.0;
+    (C) panel A's conservation contrast under the LEARNED H_θ (§9.13) — same story, wider margin."""
     import matplotlib
 
     matplotlib.use("Agg")
@@ -61,14 +63,14 @@ def make_phase2_figure(d: int = D, n_seeds: int = 8) -> None:
     m, e, dt, steps = 1.0, 1.0, 0.01, 300
     rng = np.random.default_rng(0)
 
-    def traj_h_real(dynamics: GaussianManifold):
+    def traj_energy(dynamics, reader):
         u = rng.standard_normal(d)
         u /= np.linalg.norm(u)
         qs, ps = rollout(dynamics.force, m, dynamics.center, u * np.sqrt(2 * m * e), dt, steps)
-        return h_real.energy(qs, ps, m)  # H_real evaluated along the trajectory
+        return reader.energy(qs, ps, m)  # the reader's charge evaluated along the trajectory
 
-    surv = [traj_h_real(h_real) for _ in range(6)]  # Embra's own dynamics → conserves H_real
-    imp = [traj_h_real(h_shuf) for _ in range(6)]  # a different identity's dynamics → does not
+    surv = [traj_energy(h_real, h_real) for _ in range(6)]  # Embra's own dynamics → conserves H_real
+    imp = [traj_energy(h_shuf, h_real) for _ in range(6)]  # a different identity's dynamics → does not
 
     def static_auc(seed: int) -> float:
         on_real, _ = specificity_samples(real, d, 400, seed)
@@ -78,7 +80,12 @@ def make_phase2_figure(d: int = D, n_seeds: int = 8) -> None:
     stat = [static_auc(s) for s in range(n_seeds)]
     dyn = [dynamical_specificity(d, seed=s)["auc"] for s in range(n_seeds)]
 
-    fig, (ax_a, ax_b) = plt.subplots(1, 2, figsize=(12, 5))
+    m_real = MLPManifold.fit(real, seed=0)  # the learned charge (§9.13), same protocol
+    m_shuf = MLPManifold.fit(shuffled_anchors(d, seed=0), seed=0)
+    surv_l = [traj_energy(m_real, m_real) for _ in range(6)]
+    imp_l = [traj_energy(m_shuf, m_real) for _ in range(6)]
+
+    fig, (ax_a, ax_b, ax_c) = plt.subplots(1, 3, figsize=(17.5, 5))
 
     # Panel A: conservation contrast
     t = np.arange(steps + 1) * dt
@@ -114,6 +121,19 @@ def make_phase2_figure(d: int = D, n_seeds: int = 8) -> None:
     ax_b.set_title(f"Static is seed-noise; dynamical is reliable ({n_seeds} seeds)")
     ax_b.grid(alpha=0.2, axis="y")
 
+    # Panel C: the same conservation contrast under the LEARNED H_θ (§9.13)
+    for c in surv_l:
+        ax_c.plot(t, c, color="#2a7", lw=1.3, alpha=0.9)
+    for c in imp_l:
+        ax_c.plot(t, c, color="#c53", lw=1.3, alpha=0.9)
+    ax_c.plot([], [], color="#2a7", lw=2, label=r"survivor — conserves the learned $H_\theta$")
+    ax_c.plot([], [], color="#c53", lw=2, label="impostor — breaks it (wider margin than A)")
+    ax_c.set_xlabel("time")
+    ax_c.set_ylabel(r"learned $H_\theta$ along the trajectory")
+    ax_c.set_title(r"Same story under a learned $H_\theta$")
+    ax_c.legend(loc="upper left", fontsize=8)
+    ax_c.grid(alpha=0.2)
+
     fig.tight_layout()
     FIG_PATH.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(FIG_PATH, dpi=130)
@@ -139,6 +159,13 @@ def main() -> dict:
     gen = [generalization_specificity(D, seed=s) for s in SEEDS]  # held-out (§9.9) — the harder bar
     dyn = [dynamical_specificity(D, seed=s) for s in DYN_SEEDS]
     dyn_ci = [dynamical_specificity(D, seed=s, impostor_graph_path=COUNTER_GRAPH) for s in DYN_SEEDS]
+
+    # 4. the same dynamical test under a LEARNED H_θ (§9.13) — one training seed per outer seed
+    dyn_mlp = [dynamical_specificity(D, seed=s, fit_fn=partial(MLPManifold.fit, seed=s))
+               for s in DYN_SEEDS]
+    dyn_mlp_ci = [dynamical_specificity(D, seed=s, impostor_graph_path=COUNTER_GRAPH,
+                                        fit_fn=partial(MLPManifold.fit, seed=s))
+                  for s in DYN_SEEDS]
 
     def _mean(rows, k):
         return float(np.mean([r[k] for r in rows]))
@@ -170,15 +197,28 @@ def main() -> dict:
           f"impostor {_mean(dyn_ci, 'imp_resid'):.1e}   "
           f"(impostor conserves its OWN charge: {_mean(dyn_ci, 'imp_own_resid'):.1e})")
     print("-" * 74)
+    print("  [4] DYNAMICAL specificity under a LEARNED H_θ (MLP potential; float32 V_θ,")
+    print("      float64 statistics — same integrator and reader as [3])")
+    print(f"      shuffle impostor:  AUC = {_summ(dyn_mlp, 'auc')}")
+    print(f"      var(H_θ): survivor {_mean(dyn_mlp, 'surv_resid'):.1e}  vs  "
+          f"impostor {_mean(dyn_mlp, 'imp_resid'):.1e}   "
+          f"(impostor's own charge: {_mean(dyn_mlp, 'imp_own_resid'):.1e})")
+    print(f"      authored impostor: AUC = {_summ(dyn_mlp_ci, 'auc')}   ('Meridian')")
+    print(f"      var(H_θ): survivor {_mean(dyn_mlp_ci, 'surv_resid'):.1e}  vs  "
+          f"impostor {_mean(dyn_mlp_ci, 'imp_resid'):.1e}   "
+          f"(impostor's own charge: {_mean(dyn_mlp_ci, 'imp_own_resid'):.1e})")
+    print("-" * 74)
     print("  VERDICT: STATIC identity (where a point sits) is seed-noise — the wrong")
     print("  question. DYNAMICAL identity (which conservation law a trajectory obeys) is")
     print("  RELIABLE, AUC 1.0 across seeds: an impostor conserves its own charge, not")
-    print("  Embra's. §6 was right — identity lives in the dynamics, not static geometry.")
+    print("  Embra's — under the Gaussian charge AND a learned H_θ, against a shuffle AND")
+    print("  a distinct authored soul. §6 was right — identity lives in the dynamics.")
     print("=" * 74)
     make_phase2_figure()
     print(f"  figure → {FIG_PATH}")
     return {"drift": drift, "replica": rep, "gaussian": g, "mlp": h, "generalization": gen,
-            "dynamical": dyn, "dynamical_counter": dyn_ci}
+            "dynamical": dyn, "dynamical_counter": dyn_ci,
+            "dynamical_mlp": dyn_mlp, "dynamical_mlp_counter": dyn_mlp_ci}
 
 
 if __name__ == "__main__":

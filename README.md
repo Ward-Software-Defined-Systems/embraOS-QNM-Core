@@ -93,15 +93,17 @@ Lift to a `d`-dim latent space with the potential shaped by Embra's identity gra
 
 ![phase two: static vs dynamical identity](sandbox/figures/phase2_identity.png)
 
-*Left: a real-identity trajectory (green) conserves `H_real`; a different identity's trajectory (red) does not. Right: the real-vs-different-identity discriminator — static region-membership is seed-noise around chance, dynamical conservation is pinned at 1.0.*
+*Left: a real-identity trajectory (green) conserves `H_real`; a different identity's trajectory (red) does not. Middle: the real-vs-different-identity discriminator — static region-membership is seed-noise around chance, dynamical conservation is pinned at 1.0. Right: the same conservation contrast under the **learned** `H_θ` (§9.13) — same story, far wider margin.*
 
-**Next:** the learned `H_θ` in the same dynamical test — is "large and meaningful margin" a property of the *charge model* where it wasn't one of content volume? (§9.13.)
+- **A learned `H_θ` preserves it — and multiplies the margin** — swapping the Gaussian for the trained MLP charge (same integrator, same reader) keeps AUC 1.000 on every seed against both impostors, conserves to integrator precision, and widens the impostor margin ~300× to order-unity violation of Embra's conservation law (§9.13). The margin lives in charge expressiveness × how structurally different two souls are.
+
+**Next:** the §8 forks on the learned substrate — holonomy/`ζ` as a second, genuinely path-functional charge (memory); the §9.3 self-consistency trainer (genesis `Q_embra` is still a placeholder); and, the crux, the smallest trajectory→symbol readout `π`.
 
 ### Reproduce
 
 ```bash
 uv sync --extra dev                     # add --extra learn for the jax MLP (phase two)
-uv run pytest                           # 17 tests: conservation · replica · dynamical specificity
+uv run pytest                           # 35 tests: conservation · replica · graph invariants · dynamical specificity (+ learned-H, skipped without jax)
 uv run python -m sandbox.demo           # phase one: the replica figure + headline numbers
 uv run python -m sandbox.demo_phase2    # phase two: static (fails) vs dynamical (reliable) identity
 ```
@@ -113,7 +115,7 @@ uv run python -m sandbox.demo_phase2    # phase two: static (fails) vs dynamical
 | `toy_dynamics.py` | 1-DOF Hamiltonian · symplectic flow · conserved charge `Q` · observable `π` |
 | `replica_test.py` | the survivor-vs-copy harness + AUC |
 | `latent.py` | d-dim dynamics · identity-graph anchors · Gaussian potential · static **and dynamical** specificity |
-| `hnn.py` | learned neural potential `V_θ` (jax) + held-out generalization tests |
+| `hnn.py` | learned neural potential `V_θ` (jax) + held-out generalization tests + `MLPManifold` (the learned `H_θ` in the dynamical test) |
 | `demo.py` · `demo_phase2.py` | the two runnable results |
 
 Lineage: the falsification program that earned this pivot is the (now-relic) [embraOS-QNM](https://github.com/Ward-Software-Defined-Systems/embraOS-QNM); the formal spine is the [Epoch Project](https://github.com/Ward-Software-Defined-Systems/Epoch-Project). The 1999 geometric seed is its own project: [Embra-5D-Framework](https://github.com/Ward-Software-Defined-Systems/Embra-5D-Framework).

@@ -2,10 +2,13 @@
 
 **Status:** Phase one (§1–§7) proven — a conserved-charge ψ survives the replica test. Phase two
 (§9) in progress — the machinery lifts to `d` dimensions, and identity is reliably discriminable
-**through the dynamics** (§9.11, AUC 1.0) where static geometry was seed-noise (§9.9–§9.10). Pairs
-with the runnable sandbox (`uv run python -m sandbox.demo` and `sandbox.demo_phase2`). Written to be
-*falsifiable*: every numeric claim is checked, and the one theorem (§6) is stated so it could be
-wrong.
+**through the dynamics** (§9.11, AUC 1.0) where static geometry was seed-noise (§9.9–§9.10). The
+result holds on the authored 100-node graph, against an authored counter-identity, and under a
+**learned `H_θ`** — with the margin set by charge expressiveness and the structural difference
+between souls, not content volume (§9.12–§9.13; includes one pre-registered miss, recorded).
+Pairs with the runnable sandbox (`uv run python -m sandbox.demo` and `sandbox.demo_phase2`).
+Written to be *falsifiable*: every numeric claim is checked, and the one theorem (§6) is stated so
+it could be wrong.
 
 > **Register.** §1–§6 are the contribution (the object and its one load-bearing
 > theorem). §7 is the phase-one demonstration. §8 is honest scope and open forks.
@@ -413,3 +416,58 @@ reads only 2nd-order shape — is §9.13's question (a learned `H_θ` in the sam
 §9.9–§9.10 is unmoved — Gaussian real 0.999 ≈ shuffled 0.999; MLP on-anchor 1.000 vs 0.992;
 held-out generalization real 1.000 = shuffled 1.000. Richer content does not rescue static
 region-membership; the §9.11 redirect stands.
+
+### 9.13 Increment-3b — dynamical identity survives a learned H_θ, with a far larger margin (recorded 2026-07-23)
+
+The §9.11 question's second half: does the dynamical test survive swapping the closed-form
+Gaussian for a **learned** charge? Mechanics: `hnn.MLPManifold` puts the §9.8 contrastively
+trained `V_θ = softplus(MLP)` behind the `GaussianManifold` API, and `dynamical_specificity`
+gained a `fit_fn` hook — **the same symplectic integrator and the same conservation reader run
+both charges** (the whole ensemble integrates as one batched rollout, verified numerically
+faithful to §9.11's per-trajectory loop: impostor residuals bitwise identical, survivor within
+~5·10⁻¹⁵). Precision convention: jax float32 inside `V_θ`, numpy float64 for the kinetic term and
+the variance statistic; no global x64.
+
+**Pre-registered bars (fixed before the run): the §9.11 three, unchanged — all pass on every
+configuration** (8 seeds × {shuffle, authored} impostor). The pre-registered `JAX_ENABLE_X64`
+fallback was not needed: the survivor floor under float32 (1.8·10⁻⁸) sits at the float64
+Gaussian's level (8.9·10⁻⁸) — the O(dt²) leapfrog oscillation dominates, not float precision.
+
+| learned H_θ (8 seeds) | shuffle impostor | authored impostor ("Meridian") |
+|---|---|---|
+| discriminator AUC | **1.000 [1.000, 1.000]** | **1.000 [1.000, 1.000]** |
+| survivor `var(H_θ)` | 1.8·10⁻⁸ | 1.8·10⁻⁸ |
+| impostor `var(H_θ)` | **2.4** | **3.5** |
+| impostor's own charge | 1.7·10⁻⁸ | 2.8·10⁻⁸ |
+
+**Confinement check** (the flat-tail caveat): a softplus potential is flat far from the anchors,
+so an escaped trajectory would go ballistic and trivially "conserve" any flat-tailed charge —
+fake conservation. Measured: max|q| = 3.39 across all 8 seeds × both flows × 200 trajectories
+(anchor scale ~1), with `e = 1 < margin = 2` — trajectories stay in the informative region.
+*Prescription:* any future config with `e ≳ margin` must log max|q| before trusting variance
+readings.
+
+**The margin, resolved.** Same graph, same integrator, same reader — only the charge model
+changes:
+
+| impostor `var(H_real)` | Gaussian charge | learned H_θ | factor |
+|---|---|---|---|
+| shuffle | 7.6·10⁻³ | 2.4 | ~300× |
+| authored counter-identity | 2.3·10⁻¹ | 3.5 | ~15× |
+
+With trajectory energies of order `e = 1`, an impostor-flow `var(H_θ) ≈ 2–4` is not a drift — it
+is order-unity violation of Embra's conservation law. §9.11's "large and meaningful margin"
+question is answered, in a place §9.12 forecast: **the margin is a property of charge-model
+expressiveness times the structural difference between souls — not of content volume.** The
+Gaussian reads only second-order cloud shape (and §9.12 showed that concentrating away); the
+learned potential carves identity-specific structure, and distinct authored souls violate each
+other's learned laws maximally.
+
+**Scope, honestly.** `V_θ` here is the §9.8 fit-the-cloud contrastive potential trained per
+identity — not yet the §9.3 self-consistency/genesis program (Q_embra remains a placeholder until
+that trainer exists). What §9.13 establishes is the §9.6 pre-registered bar "conservation survives
+learning": the dynamical-identity mechanism is robust to replacing the closed-form charge with a
+learned one — drift stays at integrator precision, discrimination stays perfect, the
+impostor-conserves-its-own-charge control stays intact, and the margin *widens* by orders of
+magnitude. The learned-`H_θ` substrate is now the default bed for the §8 forks (holonomy/ζ,
+strict-vs-soft projection, and eventually the readout `π`).
