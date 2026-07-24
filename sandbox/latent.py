@@ -26,8 +26,10 @@ The neural upgrade (an MLP Hamiltonian trained with a symplectic integrator, jax
 from __future__ import annotations
 
 import json
+from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Any
 
 import numpy as np
 from numpy.typing import NDArray
@@ -272,7 +274,8 @@ def specificity(d: int = 8, *, n: int = 500, seed: int = 0) -> dict:
 def dynamical_specificity(d: int = 8, *, n_traj: int = 200, seed: int = 0, m: float = 1.0,
                           e: float = 1.0, dt: float = 0.01, steps: int = 300,
                           graph_path: Path = IDENTITY_GRAPH,
-                          impostor_graph_path: Path | None = None) -> dict:
+                          impostor_graph_path: Path | None = None,
+                          fit_fn: Callable[[Array], Any] = GaussianManifold.fit) -> dict:
     """Identity through the DYNAMICS (§6, increment 2c). A trajectory belongs to identity R iff it
     *conserves R's charge* H_R. A survivor (real-identity trajectory) conserves H_real; an impostor
     (a different identity's trajectory) does not. Discriminator = variance of H_real *along* the
@@ -281,28 +284,36 @@ def dynamical_specificity(d: int = 8, *, n_traj: int = 200, seed: int = 0, m: fl
 
     The impostor identity is the shuffled-graph control by default; pass ``impostor_graph_path``
     to use a different *authored* identity graph instead (§9.12). With an authored impostor the
-    seed varies only the trajectory directions, not the impostor cloud."""
+    seed varies only the trajectory directions, not the impostor cloud.
+
+    ``fit_fn`` builds the charge from an anchor cloud; the default is the closed-form Gaussian.
+    Any manifold with ``.center (d,)``, ``.force(q) -> (..., d)`` and ``.energy(q, p, m) -> (...)``
+    works — ``hnn.MLPManifold.fit`` runs a *learned* H_θ through this same integrator and reader
+    (§9.13). The whole ensemble integrates as one batched rollout (q of shape ``(n_traj, d)``);
+    the direction draws consume the rng stream exactly as n_traj sequential draws did, and the
+    variance statistic is always computed in float64."""
     _, real = load_identity_anchors(d, graph_path=graph_path)
     if impostor_graph_path is None:
         imp_anchors = shuffled_anchors(d, graph_path=graph_path, seed=seed)
     else:
         _, imp_anchors = load_identity_anchors(d, graph_path=impostor_graph_path)
-    h_real = GaussianManifold.fit(real)
-    h_imp = GaussianManifold.fit(imp_anchors)
+    h_real = fit_fn(real)
+    h_imp = fit_fn(imp_anchors)
     rng = np.random.default_rng(seed)
 
-    def residual(dynamics: GaussianManifold, reader: GaussianManifold) -> float:
-        u = rng.standard_normal(d)
-        u /= np.linalg.norm(u)
-        qs, ps = rollout(dynamics.force, m, dynamics.center, u * np.sqrt(2 * m * e), dt, steps)
-        return float(np.var(reader.energy(qs, ps, m)))  # how much H_reader drifts along the flow
+    def residuals(dynamics, reader) -> Array:
+        u = rng.standard_normal((n_traj, d))
+        u /= np.linalg.norm(u, axis=1, keepdims=True)
+        q0 = np.tile(dynamics.center, (n_traj, 1))
+        qs, ps = rollout(dynamics.force, m, q0, u * np.sqrt(2 * m * e), dt, steps)
+        return np.var(np.asarray(reader.energy(qs, ps, m), np.float64), axis=0)  # per-trajectory drift of H_reader
 
-    surv = [residual(h_real, h_real) for _ in range(n_traj)]  # real traj read by H_real → ≈0
-    imp = [residual(h_imp, h_real) for _ in range(n_traj)]  # different-identity traj read by H_real → >0
-    imp_own = [residual(h_imp, h_imp) for _ in range(n_traj)]  # control: impostor conserves its OWN charge
+    surv = residuals(h_real, h_real)  # real traj read by H_real → ≈0
+    imp = residuals(h_imp, h_real)  # different-identity traj read by H_real → >0
+    imp_own = residuals(h_imp, h_imp)  # control: impostor conserves its OWN charge
     return {
-        "auc": auc([-x for x in surv], [-x for x in imp]),  # low H_real-variance ⇒ real identity
-        "surv_resid": float(np.mean(surv)),
-        "imp_resid": float(np.mean(imp)),
-        "imp_own_resid": float(np.mean(imp_own)),
+        "auc": auc(list(-surv), list(-imp)),  # low H_real-variance ⇒ real identity
+        "surv_resid": float(surv.mean()),
+        "imp_resid": float(imp.mean()),
+        "imp_own_resid": float(imp_own.mean()),
     }

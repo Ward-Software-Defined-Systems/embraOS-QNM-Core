@@ -12,12 +12,14 @@ Requires the ``learn`` extra (jax, optax). Kept off the default (dev) test path.
 
 from __future__ import annotations
 
+from dataclasses import dataclass
+
 import jax
 import jax.numpy as jnp
 import numpy as np
 import optax
 
-from sandbox.latent import load_identity_anchors, shuffled_anchors, specificity_samples
+from sandbox.latent import Array, load_identity_anchors, shuffled_anchors, specificity_samples
 from sandbox.replica_test import auc
 
 
@@ -69,6 +71,43 @@ def train_potential(anchors, d: int, *, hidden: int = 64, steps: int = 800,
         neg = jnp.asarray(rng.uniform(-scale, scale, (128, d)), jnp.float32)
         params, state, _ = step(params, state, pos, neg)
     return params
+
+
+@jax.jit
+def _force_fn(params: dict, q):
+    """−∇_q V_θ, per row: the gradient of the *summed* batched potential (rows are independent),
+    so one jitted call serves both a single ``(d,)`` state and an ensemble ``(n, d)`` batch."""
+    return -jax.grad(lambda qq: jnp.sum(potential_V(params, qq)))(q)
+
+
+@dataclass
+class MLPManifold:
+    """The trained MLP potential ``V_θ`` behind the ``GaussianManifold`` API (``.center`` /
+    ``.force`` / ``.energy`` / ``.V``), so ``latent.dynamical_specificity`` runs a *learned* H_θ
+    through the SAME symplectic integrator and conservation reader (§9.13) — the swap the
+    ``GaussianManifold`` docstring promises. numpy float64 at the boundary, jax float32 inside;
+    the kinetic term and the variance statistic never touch float32."""
+
+    params: dict
+    center: Array  # rollout start — the anchor centroid, mirroring GaussianManifold.center
+
+    @classmethod
+    def fit(cls, anchors: Array, *, hidden: int = 64, steps: int = 800, margin: float = 2.0,
+            noise: float = 0.05, seed: int = 0) -> MLPManifold:
+        anchors = np.asarray(anchors, float)
+        params = train_potential(anchors, anchors.shape[1], hidden=hidden, steps=steps,
+                                 margin=margin, noise=noise, seed=seed)
+        return cls(params=params, center=anchors.mean(0))
+
+    def V(self, q: Array) -> Array:
+        return np.asarray(potential_V(self.params, jnp.asarray(q, jnp.float32)), np.float64)
+
+    def force(self, q: Array) -> Array:
+        return np.asarray(_force_fn(self.params, jnp.asarray(q, jnp.float32)), np.float64)
+
+    def energy(self, q: Array, p: Array, m: float = 1.0) -> Array:
+        p = np.asarray(p, np.float64)
+        return 0.5 * np.sum(p * p, axis=-1) / m + self.V(q)
 
 
 def _score(params, x) -> list[float]:
