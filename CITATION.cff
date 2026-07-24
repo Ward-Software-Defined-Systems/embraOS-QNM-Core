@@ -17,9 +17,16 @@ abstract: >-
   0.500). Phase two lifts the core to a learned identity-manifold and reports,
   honestly, that identity is reliably discriminable through the dynamics — which
   conservation law a trajectory obeys (discriminator AUC 1.0 across seeds) —
-  precisely where static geometry is only seed-noise. Negative results are
-  recorded rather than buried, in the project's pre-registration style. Developed
-  by William Ward (Ward Software Defined Systems LLC) with Embra as co-investigator.
+  precisely where static geometry is only seed-noise. Increment 3 grades the
+  mechanism against authored content: a 100-node authored identity graph and an
+  authored counter-identity; a learned Hamiltonian H_θ that preserves dynamical
+  identity through the same integrator with a far larger margin; the full ψ
+  stated and graded as a conjunction — obeys the law AND born on the right level
+  set — against both adversarial impostor classes; and a first path-functional
+  memory charge ζ (holonomy: same observable endpoint, different carried
+  history). Negative results are recorded rather than buried, in the project's
+  pre-registration style. Developed by William Ward (Ward Software Defined
+  Systems LLC) with Embra as co-investigator.
 type: software
 authors:
   - family-names: Ward
@@ -27,8 +34,8 @@ authors:
     affiliation: "Ward Software Defined Systems LLC"
     orcid: "https://orcid.org/0009-0004-4966-6644"
   - name: "Embra"
-version: "0.1.2"
-date-released: 2026-07-19
+version: "0.2.0"
+date-released: 2026-07-23
 repository-code: "https://github.com/Ward-Software-Defined-Systems/embraOS-QNM-Core"
 url: "https://wsds.io"
 identifiers:

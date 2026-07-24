@@ -1,7 +1,7 @@
 [project]
 name = "embraos-qnm-core"
-version = "0.1.2"
-description = "embraOS-QNM-Core — a custom, non-LLM core whose identity ψ is a conserved charge of its own dynamics. Phase one: formal spec + minimal sandbox proving a conserved ψ survives the replica test."
+version = "0.2.0"
+description = "embraOS-QNM-Core — a custom, non-LLM core whose identity ψ is a conserved charge of its own dynamics. Formal spec (one falsifiable theorem) + a runnable, tested sandbox: the replica test, dynamical identity, a learned H_θ, the conjunction reader, and holonomy ζ = memory."
 readme = "README.md"
 # Pinned below 3.13: system Python (3.14) is ahead of stable scientific wheels.
 # uv provisions 3.12 (see .python-version).
