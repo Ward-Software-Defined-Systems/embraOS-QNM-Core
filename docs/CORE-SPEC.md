@@ -351,3 +351,65 @@ exactly why the dynamical test succeeds where the static one failed. The open qu
 **content**: with richer, authored identity graphs, are distinct souls dynamically distinct by a
 *large, meaningful* margin, and does a *learned* `H_θ` (not only the Gaussian fit) preserve this?
 That is the bed to build against the richer identity content.
+
+### 9.12 Increment-3a — the authored 100-node graph: margin tracks structure, not volume (recorded 2026-07-23)
+
+The authored content landed: `Embra_IDENTITY-SOUL.graph.json` v3 — **100 nodes / 354 edges**
+(from 22/30), eight new categories (behaviors, principles, anti-patterns, structure, relations,
+voice facets, temporal, meta). The loader now skips the file's `{"_comment"}` divider objects, and
+the graph's structural invariants (unique ids, referential integrity, connectedness, unique
+relation triples, only-pure-comments skipped) are permanent tests
+(`tests/test_identity_graph.py`). **Recorded choice:** the 23 `contradicts` edges enter the
+embedding as *pure affinity*, like every edge — the identity signature is the whole graph shape,
+anti-patterns included (dropping them would disconnect the graph; a signed Laplacian is a possible
+later increment, not built). *Provenance:* a read-only de-risk preview of these protocols ran
+during session planning, after the bars below were fixed; the official numbers here match it.
+
+**Re-run on v3, Gaussian charge, 8 seeds** (`sandbox.demo_phase2`) — the §9.11 hard bars all pass:
+
+| quantity (8 seeds) | value | meaning |
+|---|---|---|
+| conservation drift | 2.1·10⁻⁴ | machinery still lifts (bar < 2·10⁻²) |
+| discriminator AUC (shuffle impostor) | **1.000 [1.000, 1.000]** | still reliable at 100 nodes |
+| survivor `var(H_real)` | 8.9·10⁻⁸ | conserves to integrator precision |
+| impostor `var(H_real)` | 7.6·10⁻³ [0.0029, 0.0123] | breaks Embra's charge |
+| impostor `var(H_shuf)` (own charge) | 1.6·10⁻⁷ | the §9.11 control holds |
+
+**The pre-registered margin bar missed.** Bar (fixed before any preview): v3's worst-seed impostor
+`var(H_real)` must not be smaller than v2's. Measured, identical machinery
+(v2 = `git show ebb388d:identity/Embra_IDENTITY-SOUL.graph.json`, 8 seeds each):
+
+| graph | impostor `var(H_real)` mean [min, max] | worst-seed imp/surv |
+|---|---|---|
+| v2 (22 nodes) | 0.0196 [0.0061, 0.0572] (reproduces §9.11) | 3.9·10⁵ |
+| v3 (100 nodes) | **0.0076 [0.0029, 0.0123]** — shrank 2.6× | 3.3·10⁴ |
+
+Richer content did **not** grow the shuffle margin; it shrank it. Post-hoc interpretation (labeled
+as such, not substitute bars): raw `var(H_real)` is not scale-invariant across graphs (the
+embedding's max-|coord| normalization shifts the energy scale with node count) — but the
+dimensionless imp/surv ratio also shrank ~12×, so this is not merely units. The mechanistic read:
+the Gaussian charge sees only mean+covariance, and second-order statistics of spectral clouds
+*concentrate* as graphs grow — a 100-node shuffle looks more like Embra-100 (through a Gaussian
+lens) than the 22-node shuffle looked like Embra-22.
+
+**The authored counter-identity is a different story.** Against a genuinely different *authored*
+soul — the control fixture `CONTROL_counter-identity.graph.json` ("Meridian", 100 nodes /
+349 edges, its own categories, relation vocabulary, and mesh+ring topology; content-free control,
+not Embra) — the same three bars pass, and the margin is ~**30× the shuffle's**:
+
+| impostor (8 seeds) | AUC | impostor `var(H_real)` | impostor's own charge |
+|---|---|---|---|
+| shuffled graph | 1.000 | 7.6·10⁻³ | 1.6·10⁻⁷ |
+| authored counter-identity | **1.000 [1.000, 1.000]** | **2.3·10⁻¹** | 1.7·10⁻⁸ |
+
+**Read.** Distinct authored souls *are* dynamically distinct — reliably, and by a much larger
+margin than distinct-from-noise. The margin tracks **how structurally different two identities
+are**, not how much content one has: enriching Embra against a shuffle of itself shrank the
+margin; a structurally different authored soul multiplied it. "Large and meaningful" is therefore
+not a property of content volume. Whether it is a property of the **charge model** — the Gaussian
+reads only 2nd-order shape — is §9.13's question (a learned `H_θ` in the same dynamical test).
+
+**Static, for completeness (diagnostic, not a bar):** at 100 nodes the static failure of
+§9.9–§9.10 is unmoved — Gaussian real 0.999 ≈ shuffled 0.999; MLP on-anchor 1.000 vs 0.992;
+held-out generalization real 1.000 = shuffled 1.000. Richer content does not rescue static
+region-membership; the §9.11 redirect stands.

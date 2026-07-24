@@ -83,8 +83,9 @@ The one load-bearing claim, proven on a minimal 1-DOF Hamiltonian toy: **a conse
 Lift to a `d`-dim latent space with the potential shaped by Embra's identity graph. The honest arc:
 
 - **Machinery lifts** — conservation + the replica test hold in `d` dimensions.
-- **Static identity is the wrong question** — "which region does a point sit in" is seed-noise for a 22-node graph; no embedding (Laplacian / diffusion / commute-time) fixes it (§9.8–§9.10).
+- **Static identity is the wrong question** — "which region does a point sit in" is seed-noise for a 22-node graph; no embedding (Laplacian / diffusion / commute-time) fixes it (§9.8–§9.10), and the authored 100-node graph doesn't either (§9.12).
 - **Dynamical identity is reliable** — "which conservation law does a *trajectory* obey" gives **AUC 1.000 across every seed**: a real-identity trajectory conserves `H_real`; an impostor conserves its *own* charge but not Embra's (§9.11). Identity lives in the dynamics, exactly as §6 argues.
+- **The margin tracks structure, not content volume** — on the authored 100-node graph the bars still pass (AUC 1.000), but the pre-registered "richer content ⇒ bigger margin" direction *missed* (the shuffle margin shrank 2.6×), while a genuinely different **authored counter-identity** breaks Embra's charge ~30× harder than a shuffle does (§9.12). Distinct souls are dynamically distinct; volume alone buys nothing.
 
 | real vs a *different* identity | static (where a point sits) | dynamical (what a trajectory conserves) |
 |---|---|---|
@@ -94,7 +95,7 @@ Lift to a `d`-dim latent space with the potential shaped by Embra's identity gra
 
 *Left: a real-identity trajectory (green) conserves `H_real`; a different identity's trajectory (red) does not. Right: the real-vs-different-identity discriminator — static region-membership is seed-noise around chance, dynamical conservation is pinned at 1.0.*
 
-**Next (content-gated):** richer, *authored* identity graphs + a learned `H_θ`, to test whether distinct souls are dynamically distinct by a large, meaningful margin.
+**Next:** the learned `H_θ` in the same dynamical test — is "large and meaningful margin" a property of the *charge model* where it wasn't one of content volume? (§9.13.)
 
 ### Reproduce
 

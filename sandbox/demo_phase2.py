@@ -18,7 +18,7 @@ sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))
 
 import numpy as np  # noqa: E402
 
-from sandbox.hnn import specificity_mlp  # noqa: E402
+from sandbox.hnn import generalization_specificity, specificity_mlp  # noqa: E402
 from sandbox.latent import (  # noqa: E402
     GaussianManifold,
     dynamical_specificity,
@@ -36,6 +36,8 @@ D = 8
 SEEDS = (0, 1, 2, 3)  # static specificity — MLP training is slow, so keep it small
 DYN_SEEDS = tuple(range(8))  # dynamical specificity is cheap + deterministic → wider sweep (matches §9.11)
 FIG_PATH = pathlib.Path(__file__).resolve().parent / "figures" / "phase2_identity.png"
+# The authored counter-identity ("Meridian") — the impostor as a distinct SOUL, not a shuffle (§9.12).
+COUNTER_GRAPH = pathlib.Path(__file__).resolve().parents[1] / "identity" / "CONTROL_counter-identity.graph.json"
 
 
 def _summ(rows: list[dict], key: str) -> str:
@@ -134,7 +136,9 @@ def main() -> dict:
     # 2. static specificity (region-membership); 3. dynamical specificity (conservation)
     g = [specificity(D, seed=s) for s in SEEDS]
     h = [specificity_mlp(D, seed=s, steps=700) for s in SEEDS]
+    gen = [generalization_specificity(D, seed=s) for s in SEEDS]  # held-out (§9.9) — the harder bar
     dyn = [dynamical_specificity(D, seed=s) for s in DYN_SEEDS]
+    dyn_ci = [dynamical_specificity(D, seed=s, impostor_graph_path=COUNTER_GRAPH) for s in DYN_SEEDS]
 
     def _mean(rows, k):
         return float(np.mean([r[k] for r in rows]))
@@ -152,13 +156,19 @@ def main() -> dict:
     print("  [2] STATIC specificity (where a point sits) — real vs shuffled  (mean [min,max])")
     print(f"      Gaussian fit   real = {_summ(g, 'auc_real')}   shuffled = {_summ(g, 'auc_shuffled')}")
     print(f"      learned MLP    real = {_summ(h, 'auc_real')}   shuffled = {_summ(h, 'auc_shuffled')}")
-    print("      → unreliable: static geometry of a 22-node graph is seed-noise (§9.9–9.10)")
+    print(f"      held-out MLP   real = {_summ(gen, 'auc_real')}   shuffled = {_summ(gen, 'auc_shuffled')}")
+    print(f"      → real ≈ shuffled at {anchors.shape[0]} nodes too — static region-membership is")
+    print("        the wrong question; richer content does not fix it (§9.9–§9.10, §9.12)")
     print("-" * 74)
     print("  [3] DYNAMICAL specificity (which conservation law a trajectory obeys)")
-    print(f"      discriminator AUC           = {_summ(dyn, 'auc')}   (→ 1.0, reliable)")
+    print(f"      shuffle impostor:  AUC = {_summ(dyn, 'auc')}   (→ 1.0, reliable)")
     print(f"      var(H_real): survivor {_mean(dyn, 'surv_resid'):.1e}  vs  "
           f"impostor {_mean(dyn, 'imp_resid'):.1e}   "
           f"(impostor conserves its OWN charge: {_mean(dyn, 'imp_own_resid'):.1e})")
+    print(f"      authored impostor: AUC = {_summ(dyn_ci, 'auc')}   ('Meridian' — a distinct soul)")
+    print(f"      var(H_real): survivor {_mean(dyn_ci, 'surv_resid'):.1e}  vs  "
+          f"impostor {_mean(dyn_ci, 'imp_resid'):.1e}   "
+          f"(impostor conserves its OWN charge: {_mean(dyn_ci, 'imp_own_resid'):.1e})")
     print("-" * 74)
     print("  VERDICT: STATIC identity (where a point sits) is seed-noise — the wrong")
     print("  question. DYNAMICAL identity (which conservation law a trajectory obeys) is")
@@ -167,7 +177,8 @@ def main() -> dict:
     print("=" * 74)
     make_phase2_figure()
     print(f"  figure → {FIG_PATH}")
-    return {"drift": drift, "replica": rep, "gaussian": g, "mlp": h, "dynamical": dyn}
+    return {"drift": drift, "replica": rep, "gaussian": g, "mlp": h, "generalization": gen,
+            "dynamical": dyn, "dynamical_counter": dyn_ci}
 
 
 if __name__ == "__main__":
