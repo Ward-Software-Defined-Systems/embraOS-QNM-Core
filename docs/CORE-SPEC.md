@@ -608,5 +608,23 @@ genesis and elapsed time can recompute ζ; its force is against observable-limit
 as the structural home of continuity/epoch-accumulation — age that must be *lived or stolen*,
 never inferred from the readout. (iii) The assembled trajectory-ψ going forward is the
 **three-way conjunction** `[var(H_embra) ≈ 0] ∧ [Q = Q_embra] ∧ [ζ consistent with the claimed
-history]` — §9.14's reader plus memory. (iv) If §8's Casimir fork is adopted, the 1-form will be
-revisited under the noncanonical bracket; the falsification design above transfers.
+history]` — §9.14's reader plus memory; stated as the direction, not yet graded as a single
+test. (iv) If §8's Casimir fork is adopted, the 1-form will be revisited under the noncanonical
+bracket; the falsification design above transfers.
+
+**Corollary of exact isotropy — what the Gaussian charge actually reads (checked after the
+finding above).** For *any* graph, the spectral embedding's Gaussian fit collapses to center 0
+(eigenvector columns are exactly mean-centered; measured |c| ~ 10⁻¹⁶) and precision `ω²·I`
+(isotropy ratio 1.0 to twelve digits). Measured stiffnesses: Embra v3 **33.59**, shuffle(seed 0)
+**39.68**, Meridian **14.41**. Under this embedding a Gaussian identity is therefore **one
+scalar** — an isotropic-oscillator frequency — and one cause re-reads every Gaussian-charge row
+recorded above: §9.11's dynamical discrimination is frequency-mismatch detection (a beat in
+`var(H_real)` — perfectly detectable, hence AUC 1.0); §9.12's margin shrink is the real-vs-shuffle
+stiffness gap narrowing with node count; Meridian's ~30× margin is a large stiffness gap; and
+§9.14's infeasibility counts follow *quantitatively* — Meridian's softer bowl (14.41) orbits at
+radii where Embra's stiffer potential already exceeds `Q_embra` (½·33.59·(2/14.41) ≈ 2.3 > 1 ⇒
+1600/1600 infeasible), while the stiffer shuffle (39.68) orbits smaller, keeping
+`V_real ≤ 0.85 < 1` ⇒ 0/1600. No recorded claim moves — all were stated mechanism-level — but
+the summary sharpens: **the closed-form Gaussian charge on this embedding reads exactly one
+scalar of identity; everything richer lives in the learned `H_θ` (§9.13), and the §9.3 trainer
+inherits that as a requirement, not a hope.**

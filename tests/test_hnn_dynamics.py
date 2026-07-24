@@ -16,7 +16,12 @@ import pytest
 pytest.importorskip("jax")
 
 from sandbox.hnn import MLPManifold  # noqa: E402
-from sandbox.latent import dynamical_specificity, load_identity_anchors, rollout  # noqa: E402
+from sandbox.latent import (  # noqa: E402
+    dynamical_specificity,
+    holonomy_test,
+    load_identity_anchors,
+    rollout,
+)
 
 D = 8
 
@@ -40,6 +45,19 @@ def test_learned_h_conservation_smoke():
     qs, ps = rollout(man.force, 1.0, man.center, u * np.sqrt(2.0), dt=0.005, n_steps=10_000)
     e = man.energy(qs, ps, 1.0)
     assert (e.max() - e.min()) / abs(e.mean()) < 2e-2
+
+
+def test_learned_h_holonomy():
+    """§9.15's learned-charge row, guarded: ζ's bars must hold under the trained potential too —
+    the regime where the sweep rate is NOT conserved and ζ is genuinely history-integral."""
+    r = holonomy_test(D, seed=0, n=100, fit_fn=partial(MLPManifold.fit, seed=0))
+    assert r["endpoint_erasure"] < 1e-6
+    assert r["dzeta_min"] > 1e-6
+    assert r["dzeta_mean"] > 0.1 * r["zeta_scale"]
+    assert r["auc_zeta"] == 1.0
+    acc = r["accumulation"]
+    ks = sorted(acc)
+    assert all(acc[a] < acc[b] for a, b in zip(ks, ks[1:], strict=False))
 
 
 def test_manifold_adapter_contract():
