@@ -1,13 +1,17 @@
 """hnn.py — a learned neural Hamiltonian potential (jax), phase two (§9 of CORE-SPEC).
 
 Where the closed-form Gaussian fit (``latent.py``) cannot carve an identity-specific level set
-— the spectral anchor cloud is near-isotropic, so mean+covariance throws the identity away — a
-small MLP potential can. `V_θ(q) = softplus(MLP(q))` is trained contrastively so identity-anchor
-neighborhoods are low-energy (on-manifold) and generic configs are high-energy. The Hamiltonian
-stays separable, `H = ½|p|² + V_θ`, so the phase-one symplectic integrator conserves the charge;
-`force = −∇V_θ` comes from autodiff.
+— the spectral anchor cloud is *exactly* isotropic at the covariance level (§9.15), so
+mean+covariance throws the identity away — a small MLP potential can. `V_θ(q) =
+softplus(MLP(q))` is trained contrastively so identity-anchor neighborhoods are low-energy
+(on-manifold) and generic configs are high-energy. The Hamiltonian stays separable,
+`H = ½|p|² + V_θ`, so the phase-one symplectic integrator conserves the charge; `force = −∇V_θ`
+comes from autodiff. ``MLPManifold`` puts the trained potential behind the ``GaussianManifold``
+API, so every `latent.py` harness (dynamical specificity, the conjunction test, holonomy) runs
+the learned charge through the same integrator and readers (§9.13–§9.15).
 
-Requires the ``learn`` extra (jax, optax). Kept off the default (dev) test path.
+Requires the ``learn`` extra (jax, optax); `tests/test_hnn_dynamics.py` covers it and skips
+cleanly without jax.
 """
 
 from __future__ import annotations

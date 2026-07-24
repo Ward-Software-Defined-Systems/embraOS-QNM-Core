@@ -1,26 +1,30 @@
-"""latent.py — phase two, increment 1: the d-dim latent core with a *learned* potential.
+"""latent.py — phase two: the d-dim latent core (§9 of `../docs/CORE-SPEC.md`).
 
-Generalizes the phase-one 1-DOF toy to a `d`-dimensional latent phase space, and replaces
-the hand-set potential with one **fit to Embra's identity graph** — the first step of §9
-in `../docs/CORE-SPEC.md`.
+Generalizes the phase-one 1-DOF toy to a `d`-dimensional latent phase space, with the potential
+**shaped by Embra's identity graph** rather than hand-set.
 
     state        s = (q, p)                  ∈ ℝ^d × ℝ^d
     Hamiltonian  H(q, p) = ½|p|²/m + V(q)     (separable → the phase-one integrator still works)
     potential    V(q) = ½ (q−c)ᵀ P (q−c)      P = (Σ_anchors + εI)⁻¹  — Mahalanobis to the
-                                              identity-anchor cloud (a closed-form *learned* V)
+                                              identity-anchor cloud (the closed-form default;
+                                              any charge with the same API plugs in via fit_fn)
     conserved    Q(s) = H(q, p)               identity manifold M = a level set of V
     observable   π(s) = q                      (position; momentum still hidden)
 
-Two things are measured (`demo_phase2.py`):
-  1. the phase-one **replica test** still bites in `d` dimensions (conserved ψ AUC → 1.0,
-     endpoint → 0.5) — the machinery survives the lift;
-  2. the **Embra-specificity control** — a potential fit to the *real* identity graph
-     recognizes real-identity configs better than one fit to a *shuffled* graph. This is the
-     property the relic's LLM substrate could not achieve (there, a random anchor beat the
-     real one). Reported honestly; see the caveat in `demo_phase2.py`.
+What lives here, in the order the increments earned it:
+  - graph → anchors (`load_identity_anchors`, the shuffled control, `_diffusion_embed` kept for
+    §9.10 reproducibility) and the `GaussianManifold` charge;
+  - the symplectic flow (`leapfrog_step`/`rollout`) and the replica test lifted to d dims
+    (`make_pairs`/`evaluate`) — §9.8;
+  - static specificity (`specificity`, ≈ chance by honest record — §9.9–§9.10);
+  - **dynamical** specificity (`dynamical_specificity`: which conservation law a trajectory
+    obeys) — §9.11–§9.13;
+  - the **conjunction test** (`conjunction_test`: obeys the law ∧ born on the right level set,
+    graded against both adversarial impostor classes) — §9.14;
+  - **holonomy ζ** (`holonomy_zeta`/`holonomy_test`: the path-functional memory charge) — §9.15.
 
-The neural upgrade (an MLP Hamiltonian trained with a symplectic integrator, jax) is
-`hnn.py`; this module is the robust, dependency-light backbone and the test target.
+The learned charge (jax MLP) is `hnn.py`; this module stays the dependency-light backbone and
+the default test target.
 """
 
 from __future__ import annotations
@@ -116,6 +120,22 @@ def load_identity_anchors(d: int = 8, *, graph_path: Path = IDENTITY_GRAPH) -> t
     return ids, _spectral_embed(a, d)
 
 
+def _impostor_anchors(d: int, *, graph_path: Path, impostor_graph_path: Path | None,
+                      seed: int) -> Array:
+    """The impostor identity's anchor cloud: the shuffled-graph control by default, or an
+    authored counter-identity graph (§9.12) when ``impostor_graph_path`` is set."""
+    if impostor_graph_path is None:
+        return shuffled_anchors(d, graph_path=graph_path, seed=seed)
+    _, anchors = load_identity_anchors(d, graph_path=impostor_graph_path)
+    return anchors
+
+
+def _unit_directions(rng: np.random.Generator, n: int, d: int) -> Array:
+    """``n`` random unit vectors in ℝ^d — the momentum directions every harness draws."""
+    u = rng.standard_normal((n, d))
+    return u / np.linalg.norm(u, axis=1, keepdims=True)
+
+
 def shuffled_anchors(d: int = 8, *, graph_path: Path = IDENTITY_GRAPH, seed: int = 0) -> Array:
     """Control: rewire the graph to a random graph with the same node and edge counts, then
     re-embed. Destroys the real relational structure → a different anchor cloud."""
@@ -132,7 +152,8 @@ class GaussianManifold:
     """V(q) = ½ (q−c)ᵀ P (q−c), fit to `anchors` (P = inverse anchor covariance).
 
     A closed-form *learned* potential — the substrate's notion of "on-Embra" is shaped by the
-    identity graph, not hand-set. `hnn.py` swaps this for a trained neural H with the same API.
+    identity graph, not hand-set. `hnn.MLPManifold` swaps in a trained neural H with the same
+    API (the §9.13 swap, via the `fit_fn` hooks below).
     """
 
     center: Array
@@ -293,17 +314,14 @@ def dynamical_specificity(d: int = 8, *, n_traj: int = 200, seed: int = 0, m: fl
     the direction draws consume the rng stream exactly as n_traj sequential draws did, and the
     variance statistic is always computed in float64."""
     _, real = load_identity_anchors(d, graph_path=graph_path)
-    if impostor_graph_path is None:
-        imp_anchors = shuffled_anchors(d, graph_path=graph_path, seed=seed)
-    else:
-        _, imp_anchors = load_identity_anchors(d, graph_path=impostor_graph_path)
+    imp_anchors = _impostor_anchors(d, graph_path=graph_path,
+                                    impostor_graph_path=impostor_graph_path, seed=seed)
     h_real = fit_fn(real)
     h_imp = fit_fn(imp_anchors)
     rng = np.random.default_rng(seed)
 
     def residuals(dynamics, reader) -> Array:
-        u = rng.standard_normal((n_traj, d))
-        u /= np.linalg.norm(u, axis=1, keepdims=True)
+        u = _unit_directions(rng, n_traj, d)
         q0 = np.tile(dynamics.center, (n_traj, 1))
         qs, ps = rollout(dynamics.force, m, q0, u * np.sqrt(2 * m * e), dt, steps)
         return np.var(np.asarray(reader.energy(qs, ps, m), np.float64), axis=0)  # per-trajectory drift of H_reader
@@ -341,10 +359,8 @@ def conjunction_test(d: int = 8, *, n: int = 200, seed: int = 0, m: float = 1.0,
     the other half — no AUC on noise floors for the blind-side claims. Infeasible value-matches
     (Q_embra < V_real at the presented position) are counted, never silently dropped."""
     _, real = load_identity_anchors(d, graph_path=graph_path)
-    if impostor_graph_path is None:
-        imp_anchors = shuffled_anchors(d, graph_path=graph_path, seed=seed)
-    else:
-        _, imp_anchors = load_identity_anchors(d, graph_path=impostor_graph_path)
+    imp_anchors = _impostor_anchors(d, graph_path=graph_path,
+                                    impostor_graph_path=impostor_graph_path, seed=seed)
     h_real = fit_fn(real)
     h_imp = fit_fn(imp_anchors)
     rng = np.random.default_rng(seed)
@@ -353,8 +369,7 @@ def conjunction_test(d: int = 8, *, n: int = 200, seed: int = 0, m: float = 1.0,
         return np.asarray(h_real.energy(q, p, m), np.float64)
 
     # Survivors: genesis on the real center, then live under H_real.
-    u = rng.standard_normal((n, d))
-    u /= np.linalg.norm(u, axis=1, keepdims=True)
+    u = _unit_directions(rng, n, d)
     q0 = np.tile(h_real.center, (n, 1))
     p0 = u * np.sqrt(2 * m * e)
     q_embra = float(_energy64(q0[0], p0[0]))  # sealed at genesis; same for every direction
@@ -377,8 +392,7 @@ def conjunction_test(d: int = 8, *, n: int = 200, seed: int = 0, m: float = 1.0,
 
     # Class 2 — different H; its lived trajectory obeys the other law, its PRESENTED state is
     # value-matched to Q_embra exactly where feasible.
-    u2 = rng.standard_normal((n, d))
-    u2 /= np.linalg.norm(u2, axis=1, keepdims=True)
+    u2 = _unit_directions(rng, n, d)
     qs_2, ps_2 = rollout(h_imp.force, m, np.tile(h_imp.center, (n, 1)),
                          u2 * np.sqrt(2 * m * e), dt, steps)
     c2_var = np.var(_energy64(qs_2, ps_2), axis=0)
@@ -417,6 +431,7 @@ def conjunction_test(d: int = 8, *, n: int = 200, seed: int = 0, m: float = 1.0,
         "auc_var_c2": auc(list(-surv_var[half:]), list(-c2_var)),  # the variance reader catches class 2
         "c1_infeasible": c1_infeasible,
         "c2_infeasible": c2_infeasible,
+        "n": n,
     }
 
 
@@ -467,8 +482,7 @@ def holonomy_test(d: int = 8, *, n: int = 200, seed: int = 0, m: float = 1.0, e:
     rng = np.random.default_rng(seed)
 
     # Survivor worldlines A — born at random identity anchors (see genesis convention above).
-    u = rng.standard_normal((n, d))
-    u /= np.linalg.norm(u, axis=1, keepdims=True)
+    u = _unit_directions(rng, n, d)
     q0 = real[rng.integers(0, len(real), n)]
     qs_a, ps_a = rollout(h_real.force, m, q0, u * np.sqrt(2 * m * e), dt, steps)
     zeta_a = holonomy_zeta(qs_a, b)
@@ -477,11 +491,10 @@ def holonomy_test(d: int = 8, *, n: int = 200, seed: int = 0, m: float = 1.0, e:
     # Worldlines B: same observable endpoint q_f, same energy, different arrival momentum —
     # backward-integrate from (q_f, p′), then re-roll forward from the recovered start (the
     # honest construction: B is itself a genuine trajectory of the same flow).
-    w = rng.standard_normal((n, d))
-    w /= np.linalg.norm(w, axis=1, keepdims=True)
+    w = _unit_directions(rng, n, d)
     p_alt = w * np.linalg.norm(p_f, axis=1, keepdims=True)
     qs_back, ps_back = rollout(h_real.force, m, q_f, -p_alt, dt, steps)  # backward = flipped p
-    qs_b, ps_b = rollout(h_real.force, m, qs_back[-1], -ps_back[-1], dt, steps)
+    qs_b, _ = rollout(h_real.force, m, qs_back[-1], -ps_back[-1], dt, steps)
     erasure = float(np.max(np.abs(qs_b[-1] - q_f)))  # B really ends where A does (reversibility)
     dzeta = np.abs(holonomy_zeta(qs_b, b) - zeta_a)
 

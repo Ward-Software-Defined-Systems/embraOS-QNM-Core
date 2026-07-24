@@ -1,12 +1,17 @@
-"""demo_phase2.py — phase two, increment 1: d-dim latent + learned H. Honest results.
+"""demo_phase2.py — phase two, end to end. Honest results, one section per recorded increment.
 
 Run:  ``uv run python -m sandbox.demo_phase2``   (needs the ``learn`` extra: jax/optax)
 
-Reports two things:
-  1. the phase-one machinery lifted to ``d`` dimensions — conservation + the replica test;
-  2. the Embra-specificity control — a charge fit to the REAL identity graph vs a SHUFFLED
-     one — for both the closed-form Gaussian and a learned MLP, averaged over seeds and
-     reported as-is. This is research-in-progress, not a pass/fail.
+  [1] the phase-one machinery lifted to ``d`` dimensions — conservation + the replica test (§9.8)
+  [2] STATIC specificity — Gaussian, MLP, and held-out: recorded ≈ chance, the honest negative
+      that motivated the redirect (§9.9–§9.10, §9.12)
+  [3] DYNAMICAL specificity — which conservation law a trajectory obeys; shuffle AND authored
+      ("Meridian") impostors (§9.11–§9.12)
+  [4] the same dynamical test under a LEARNED H_θ (§9.13)
+  [5] the full ψ as a CONJUNCTION — graded against both adversarial impostor classes (§9.14)
+  [6] HOLONOMY ζ = memory — the path-functional second charge (§9.15)
+
+Numbers print as mean [min, max] over seeds and are recorded as-is in CORE-SPEC §9.
 """
 
 from __future__ import annotations
@@ -228,9 +233,9 @@ def main() -> dict:
     print(f"      value reader blind to c2     = {_summ(conj, 'c2_value_blind')}   (1.0 = fully fooled)")
     print(f"      catch AUCs: value vs c1 = {_summ(conj, 'auc_value_c1')}   var vs c2 = {_summ(conj, 'auc_var_c2')}")
     print(f"      authored impostor as c2: accuracy = {_summ(conj_ci, 'accuracy')}   "
-          f"(infeasible value-matches: {int(sum(r['c2_infeasible'] for r in conj_ci))}/{len(conj_ci) * 200})")
+          f"(infeasible value-matches: {sum(r['c2_infeasible'] for r in conj_ci)}/{sum(r['n'] for r in conj_ci)})")
     print(f"      learned H_θ charge:      accuracy = {_summ(conj_mlp, 'accuracy')}   "
-          f"(infeasible value-matches: {int(sum(r['c2_infeasible'] for r in conj_mlp))}/{len(conj_mlp) * 200})")
+          f"(infeasible value-matches: {sum(r['c2_infeasible'] for r in conj_mlp)}/{sum(r['n'] for r in conj_mlp)})")
     print("-" * 74)
     print("  [6] HOLONOMY ζ = memory (§9.15) — ζ = b × signed area swept in (q₁, q₂)")
     print(f"      anti-fold-in: same endpoint (erasure {max(r['endpoint_erasure'] for r in hol):.1e}), "
