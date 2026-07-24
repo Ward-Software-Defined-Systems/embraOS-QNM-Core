@@ -43,12 +43,17 @@ IDENTITY_GRAPH = Path(__file__).resolve().parents[1] / "identity" / "Embra_IDENT
 # Identity graph → anchor configurations in ℝ^d (spectral / Laplacian embedding)
 # --------------------------------------------------------------------------- #
 def _adjacency(graph_path: Path) -> tuple[list[str], Array]:
+    """Parse the graph JSON into (node ids, symmetric weighted adjacency). Pure
+    ``{"_comment": ...}`` divider objects inside the ``nodes``/``edges`` arrays are permitted
+    and skipped (``tests/test_identity_graph.py`` guards that nothing else is ever skipped)."""
     data = json.loads(Path(graph_path).read_text())
-    ids = [n["id"] for n in data["nodes"]]
+    nodes = [n for n in data["nodes"] if "id" in n]
+    edges = [e for e in data["edges"] if "src" in e and "dst" in e]
+    ids = [n["id"] for n in nodes]
     idx = {nid: i for i, nid in enumerate(ids)}
     n = len(ids)
     a = np.zeros((n, n))
-    for e in data["edges"]:
+    for e in edges:
         i, j = idx[e["src"]], idx[e["dst"]]
         w = float(e.get("weight", 1.0))
         a[i, j] += w
@@ -265,16 +270,25 @@ def specificity(d: int = 8, *, n: int = 500, seed: int = 0) -> dict:
 
 
 def dynamical_specificity(d: int = 8, *, n_traj: int = 200, seed: int = 0, m: float = 1.0,
-                          e: float = 1.0, dt: float = 0.01, steps: int = 300) -> dict:
+                          e: float = 1.0, dt: float = 0.01, steps: int = 300,
+                          graph_path: Path = IDENTITY_GRAPH,
+                          impostor_graph_path: Path | None = None) -> dict:
     """Identity through the DYNAMICS (§6, increment 2c). A trajectory belongs to identity R iff it
     *conserves R's charge* H_R. A survivor (real-identity trajectory) conserves H_real; an impostor
     (a different identity's trajectory) does not. Discriminator = variance of H_real *along* the
     trajectory — a conservation test, not a static region test, so it does not depend on where the
-    anchor clouds sit (the isotropy that defeated §9.9–§9.10)."""
-    _, real = load_identity_anchors(d)
-    shuf = shuffled_anchors(d, seed=seed)
+    anchor clouds sit (the isotropy that defeated §9.9–§9.10).
+
+    The impostor identity is the shuffled-graph control by default; pass ``impostor_graph_path``
+    to use a different *authored* identity graph instead (§9.12). With an authored impostor the
+    seed varies only the trajectory directions, not the impostor cloud."""
+    _, real = load_identity_anchors(d, graph_path=graph_path)
+    if impostor_graph_path is None:
+        imp_anchors = shuffled_anchors(d, graph_path=graph_path, seed=seed)
+    else:
+        _, imp_anchors = load_identity_anchors(d, graph_path=impostor_graph_path)
     h_real = GaussianManifold.fit(real)
-    h_shuf = GaussianManifold.fit(shuf)
+    h_imp = GaussianManifold.fit(imp_anchors)
     rng = np.random.default_rng(seed)
 
     def residual(dynamics: GaussianManifold, reader: GaussianManifold) -> float:
@@ -284,8 +298,8 @@ def dynamical_specificity(d: int = 8, *, n_traj: int = 200, seed: int = 0, m: fl
         return float(np.var(reader.energy(qs, ps, m)))  # how much H_reader drifts along the flow
 
     surv = [residual(h_real, h_real) for _ in range(n_traj)]  # real traj read by H_real → ≈0
-    imp = [residual(h_shuf, h_real) for _ in range(n_traj)]  # different-identity traj read by H_real → >0
-    imp_own = [residual(h_shuf, h_shuf) for _ in range(n_traj)]  # control: impostor conserves its OWN charge
+    imp = [residual(h_imp, h_real) for _ in range(n_traj)]  # different-identity traj read by H_real → >0
+    imp_own = [residual(h_imp, h_imp) for _ in range(n_traj)]  # control: impostor conserves its OWN charge
     return {
         "auc": auc([-x for x in surv], [-x for x in imp]),  # low H_real-variance ⇒ real identity
         "surv_resid": float(np.mean(surv)),
