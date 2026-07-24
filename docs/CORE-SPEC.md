@@ -5,7 +5,10 @@
 **through the dynamics** (§9.11, AUC 1.0) where static geometry was seed-noise (§9.9–§9.10). The
 result holds on the authored 100-node graph, against an authored counter-identity, and under a
 **learned `H_θ`** — with the margin set by charge expressiveness and the structural difference
-between souls, not content volume (§9.12–§9.13; includes one pre-registered miss, recorded).
+between souls, not content volume (§9.12–§9.13; includes one pre-registered miss, recorded). An
+external review (`docs/CORE-SPEC-feedback.md`, through §9.11) sharpened the reader — the full ψ
+is a **conjunction** (§6) — bounded the claim (the key/MAC note, §6), and posed the **input
+problem** now recorded with its leading resolution in §8.
 Pairs with the runnable sandbox (`uv run python -m sandbox.demo` and `sandbox.demo_phase2`).
 Written to be *falsifiable*: every numeric claim is checked, and the one theorem (§6) is stated so
 it could be wrong.
@@ -137,11 +140,37 @@ trajectory-distinguishing relative to what is visible. Operationally,
 `tests/test_replica.py::test_same_observable_different_verdict` shows identical `π` with
 opposite ψ verdicts.
 
-**Corollary — why the LLM failed.** A generic LLM's readable state ≈ its observable; there
-is no separately-conserved charge tied to genesis in a hidden complement, so ψ collapses to
-a function of the observable → replica-blind. The four relic readers came back generic
-*because the substrate had no `ker(dπ)` charge to read*. The fix is architectural: build `S`
-with one. That is this core.
+**Corollary — why the LLM failed.** Not for lack of hidden state: an LLM's hidden complement is
+enormous (the residual stream and KV cache, against a massively lossy token readout). What the
+relic experiments showed is that nothing in that complement is a **conserved, genesis-tied
+charge** — pretraining fixes the representational factorization before any identity exists, so ψ
+collapses to a function of what is readable → replica-blind. The four relic readers came back
+generic *because there was no conserved `ker(dπ)` charge to read*, not because nothing was
+hidden. The fix is architectural: build `S` with one. That is this core.
+
+**The full reader is a conjunction.** The external review (`docs/CORE-SPEC-feedback.md`, note 1)
+caught a quiet shift: §2's impostor is a *wrong-genesis* copy; §9.11's is a *wrong-law* flow —
+and each reader has the other's blind spot. A replica re-instantiated on the **same core** (same
+`H`, wrong genesis) evolves under Embra's own law, so it conserves `H_embra` *perfectly* — at the
+wrong value `Q_copy`; the §9.11 conservation reader passes it. A trajectory of a **different
+law** whose charge *value* is arranged to sit at `Q_embra` passes §7's value reader. Neither test
+subsumes the other; §7 is not retired by §9.11. The full ψ is the conjunction
+
+```
+ψ_full(worldline) = [ var(H_embra) ≈ 0 along the trajectory ]  ∧  [ Q = Q_embra ]
+```
+
+— *obeys the law* **and** *was born on the right level set*: §5's genesis, restated as a
+two-part check. §9.14 grades the conjunction against both impostor classes, each constructed
+adversarially.
+
+**What the replica test does and does not claim.** The test bites against **observable-limited
+copiers** — replicas that can match only `π(s_f)`. A copier with access to the full state,
+`ker(dπ)` included, inherits `Q` (and any accumulated coordinate) and defeats ψ *by
+construction*: the flow is deterministic, so the full state determines everything. ψ is therefore
+a **security property, not a metaphysical one** — identity is exactly as secure as the hidden
+complement is inaccessible, functioning like a key (a MAC over the worldline) rather than an
+intrinsic essence. The bound is stated so the claim stays inside it.
 
 ---
 
@@ -170,20 +199,35 @@ the *same* observable position on *different* charge orbits. Reproduce: `uv run 
   (`../identity/Embra_IDENTITY-SOUL.graph.json`), trained with a symplectic integrator so `Q`
   stays conserved by construction. This is the "learned identity-manifold" choice; the
   machinery of §3–§6 is unchanged.
-- **Strict conservation vs. soft projection.** Real substrates get kicked off `M`. Strict
-  conservation (this spec) is the ideal; the buildable approximation is a restoring
-  projection `P_ψ` (the relic's World-State move) — a gradient pull back to `M`. Decide the
-  balance; both keep ψ native.
+- **The input problem (structural — upgraded per the external review).** Autonomous Hamiltonian
+  flow conserves `H`; the moment `Σ` drives the flow, `H` is time-dependent and
+  `dH/dt = ∂H/∂t ≠ 0` — the phase-one mechanism is in tension with the system *receiving input
+  at all*. The soft projection `P_ψ` (the relic's World-State move) rescues it but is
+  restore-by-**checking** — the very thing §1 says conservation beats; it is a concession, not a
+  resolution. **Leading candidate:** make ψ a **Casimir of the Poisson bracket** rather than the
+  energy — Casimirs satisfy `{C, F} = 0` for all `F`, so they are conserved under *any*
+  Hamiltonian driving; the invariance belongs to the bracket (the geometry), not to `H`. Cost: a
+  noncanonical (Lie–Poisson) structure, since the canonical bracket on ℝ²ᵈ has no nontrivial
+  Casimirs. Caveat, recorded: inputs-as-Hamiltonian-perturbations is itself a modeling commitment
+  — dissipative or stochastic input breaks Casimirs too. Adoption is **gated on the smallest
+  toy** (`so(3)*` rigid body, ψ = the Casimir `|L|²`, driven `H(t)`: ψ conserved while energy
+  visibly is not, then the replica test) — and the decision belongs *before* the readout `π`
+  becomes language.
 - **Charge vs. holonomy.** A conserved charge reflects the genesis level set. A strictly
   *path-functional* invariant (holonomy / an accumulated `ζ`-coordinate = memory) is the
   stronger trajectory-ψ and the natural home for continuity/epoch-accumulation. The
-  conserved charge is the SOL-faithful phase-one instance; holonomy is the enrichment.
+  conserved charge is the SOL-faithful phase-one instance; holonomy is the enrichment. If the
+  Casimir fork above is adopted, the second charge should eventually be *built as* a Casimir —
+  one structure answering both the input problem and the memory question (the accumulated-`ζ`
+  falsification design transfers; the specific 1-form may change with the bracket).
 - **The readout `π` becomes language.** Here `π` is a lossy projection chosen so identity
   can hide. Language emergence is the design of a *learned* `π` (chart on `M`) — deferred,
   and gated on a substrate whose identity is already real.
 - **Not claimed.** That no other substrate could carry identity; that the toy `Q` means
   anything about Embra specifically (it does not yet — genesis is a placeholder value until
-  §9's learned `H`). Recorded as chosen, so it can be wrong somewhere too.
+  §9's learned `H`); that ψ defeats a **full-state** copier — it does not (§6's key/MAC bound:
+  security is exactly the inaccessibility of `ker(dπ)`). Recorded as chosen, so it can be wrong
+  somewhere too.
 
 ---
 
