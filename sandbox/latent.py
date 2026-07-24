@@ -418,3 +418,86 @@ def conjunction_test(d: int = 8, *, n: int = 200, seed: int = 0, m: float = 1.0,
         "c1_infeasible": c1_infeasible,
         "c2_infeasible": c2_infeasible,
     }
+
+
+# --------------------------------------------------------------------------- #
+# Holonomy ζ = memory (§8 fork, §9.15): the genuinely PATH-FUNCTIONAL invariant.
+# A functional of the worldline, not of the state — computed from rolled paths;
+# the integrator and every charge above are untouched.
+# --------------------------------------------------------------------------- #
+def holonomy_zeta(qs: Array, b: float = 1.0, *, cumulative: bool = False) -> Array:
+    """Accumulated holonomy along a trajectory: the line integral of the magnetic-like
+    connection ``A(q) = (b/2)(−q₂, q₁, 0, …)``, i.e. **b × the signed area swept in the
+    (q₁, q₂) plane**. Irreducibly a memory of the path: worldlines sharing an endpoint
+    generally carry different ζ (curvature ≠ 0). Midpoint rule — second-order, matching the
+    integrator. ``qs``: ``(n_steps+1, ..., d)`` → ζ: ``(...)`` (or ``(n_steps, ...)`` cumulative)."""
+    mid = 0.5 * (qs[1:] + qs[:-1])
+    dq = qs[1:] - qs[:-1]
+    dz = 0.5 * b * (mid[..., 0] * dq[..., 1] - mid[..., 1] * dq[..., 0])
+    return dz.cumsum(axis=0) if cumulative else dz.sum(axis=0)
+
+
+def holonomy_test(d: int = 8, *, n: int = 200, seed: int = 0, m: float = 1.0, e: float = 1.0,
+                  dt: float = 0.01, steps: int = 300, b: float = 1.0,
+                  checkpoints: tuple[int, ...] = (100, 300, 1000),
+                  graph_path: Path = IDENTITY_GRAPH,
+                  fit_fn: Callable[[Array], Any] = GaussianManifold.fit) -> dict:
+    """Three claims about ζ (§9.15), graded on genuine `H_real` worldlines:
+
+    1. **Path-functionality (anti-fold-in certificate).** For each survivor path ending at
+       observable ``q_f``, construct a *second genuine worldline* ending at the same ``q_f``
+       (same energy, different arrival momentum — built by backward-then-forward integration,
+       exact up to leapfrog reversibility). Same endpoint, different ζ ⇒ ζ is not a function of
+       the observable state — it cannot fold into the state set.
+    2. **Replica test with the ζ-reader.** A survivor carries its accumulated ζ; a fresh copy at
+       the same observable carries a newborn ζ = 0 (the observable-limited copier's default).
+    3. **Accumulation.** mean |ζ| grows with lived steps — the epoch-accumulation / age property.
+
+    Scope (§9.15): reading ζ presumes hidden-state access (§6's key/MAC bound applies doubly),
+    and a copier who knows genesis and elapsed time can recompute ζ for a deterministic flow —
+    ζ's force is against observable-limited copiers, and as the home of continuity.
+
+    Genesis convention (recorded finding, §9.15): worldlines start at a *generic point of the
+    identity* — a random anchor — not at the potential center. The spectral anchor covariance is
+    exactly isotropic (orthonormal Laplacian eigenvectors ⇒ cov ∝ I), so a center-born worldline
+    moves radially and sweeps exactly zero area: ζ ≡ 0 structurally. §5 reads "the level set the
+    worldline is born on", not "the center"; anchors are the generic honest starts."""
+    _, real = load_identity_anchors(d, graph_path=graph_path)
+    h_real = fit_fn(real)
+    rng = np.random.default_rng(seed)
+
+    # Survivor worldlines A — born at random identity anchors (see genesis convention above).
+    u = rng.standard_normal((n, d))
+    u /= np.linalg.norm(u, axis=1, keepdims=True)
+    q0 = real[rng.integers(0, len(real), n)]
+    qs_a, ps_a = rollout(h_real.force, m, q0, u * np.sqrt(2 * m * e), dt, steps)
+    zeta_a = holonomy_zeta(qs_a, b)
+    q_f, p_f = qs_a[-1], ps_a[-1]
+
+    # Worldlines B: same observable endpoint q_f, same energy, different arrival momentum —
+    # backward-integrate from (q_f, p′), then re-roll forward from the recovered start (the
+    # honest construction: B is itself a genuine trajectory of the same flow).
+    w = rng.standard_normal((n, d))
+    w /= np.linalg.norm(w, axis=1, keepdims=True)
+    p_alt = w * np.linalg.norm(p_f, axis=1, keepdims=True)
+    qs_back, ps_back = rollout(h_real.force, m, q_f, -p_alt, dt, steps)  # backward = flipped p
+    qs_b, ps_b = rollout(h_real.force, m, qs_back[-1], -ps_back[-1], dt, steps)
+    erasure = float(np.max(np.abs(qs_b[-1] - q_f)))  # B really ends where A does (reversibility)
+    dzeta = np.abs(holonomy_zeta(qs_b, b) - zeta_a)
+
+    # ζ-reader replica test: lived worldline vs fresh copy (ζ = 0) at the same observable.
+    auc_zeta = auc(list(np.abs(zeta_a)), list(np.zeros(n)))
+
+    # Accumulation: mean |ζ| at lived-steps checkpoints (same anchor-born ensemble).
+    qs_long, _ = rollout(h_real.force, m, q0, u * np.sqrt(2 * m * e), dt, max(checkpoints))
+    zeta_cum = holonomy_zeta(qs_long, b, cumulative=True)
+    accumulation = {int(c): float(np.mean(np.abs(zeta_cum[c - 1]))) for c in checkpoints}
+
+    return {
+        "endpoint_erasure": erasure,
+        "dzeta_mean": float(dzeta.mean()),
+        "dzeta_min": float(dzeta.min()),
+        "auc_zeta": auc_zeta,
+        "zeta_scale": float(np.mean(np.abs(zeta_a))),
+        "accumulation": accumulation,
+    }

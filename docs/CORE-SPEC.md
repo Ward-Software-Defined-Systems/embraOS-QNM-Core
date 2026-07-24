@@ -9,7 +9,8 @@ between souls, not content volume (§9.12–§9.13; includes one pre-registered 
 external review (`docs/CORE-SPEC-feedback.md`, through §9.11) sharpened the reader — the full ψ
 is a **conjunction** (§6), graded perfect against both adversarial impostor classes in §9.14 —
 bounded the claim (the key/MAC note, §6), and posed the **input problem** now recorded with its
-leading resolution in §8.
+leading resolution in §8. The path-functional memory charge **ζ** (holonomy) has its first
+instance in §9.15.
 Pairs with the runnable sandbox (`uv run python -m sandbox.demo` and `sandbox.demo_phase2`).
 Written to be *falsifiable*: every numeric claim is checked, and the one theorem (§6) is stated so
 it could be wrong.
@@ -217,10 +218,12 @@ the *same* observable position on *different* charge orbits. Reproduce: `uv run 
 - **Charge vs. holonomy.** A conserved charge reflects the genesis level set. A strictly
   *path-functional* invariant (holonomy / an accumulated `ζ`-coordinate = memory) is the
   stronger trajectory-ψ and the natural home for continuity/epoch-accumulation. The
-  conserved charge is the SOL-faithful phase-one instance; holonomy is the enrichment. If the
-  Casimir fork above is adopted, the second charge should eventually be *built as* a Casimir —
-  one structure answering both the input problem and the memory question (the accumulated-`ζ`
-  falsification design transfers; the specific 1-form may change with the bracket).
+  conserved charge is the SOL-faithful phase-one instance; holonomy is the enrichment.
+  **First instance built — §9.15** (signed-area ζ; anti-fold-in certificate, ζ replica test,
+  accumulation, all passing). If the Casimir fork above is adopted, the second charge should
+  eventually be *built as* a Casimir — one structure answering both the input problem and the
+  memory question (the accumulated-`ζ` falsification design transfers; the specific 1-form may
+  change with the bracket).
 - **The readout `π` becomes language.** Here `π` is a lossy projection chosen so identity
   can hide. Language emergence is the design of a *learned* `π` (chart on `M`) — deferred,
   and gated on a substrate whose identity is already real.
@@ -563,3 +566,47 @@ instead: for a sufficiently different soul, **Embra's genesis level set is unrea
 that soul's dynamics lives**. Under the learned charge the same effect appears partially (721 of
 1600 infeasible; the feasible remainder is fully caught). Scope: this grades the *mechanism* with
 the placeholder genesis convention; the content-defined `Q_embra` still waits on §9.3.
+
+### 9.15 Increment-3d — holonomy ζ: the path-functional memory charge, first instance (recorded 2026-07-23)
+
+The §8 "charge vs. holonomy" fork, instantiated. `ζ` is the line integral of a magnetic-like
+connection `A(q) = (b/2)(−q₂, q₁, 0, …)` along the worldline — **b × the signed area swept in
+the (q₁, q₂) plane** (`sandbox/latent.py::holonomy_zeta`): a functional of the *path*, not of
+the state, and purely additive machinery (computed from rolled trajectories; the integrator and
+every charge above are untouched). Pre-registered bars: (1) the **anti-fold-in certificate** —
+two genuine worldlines of the same flow ending at the same observable endpoint (built
+backward-then-forward; leapfrog reversibility is the erasure certificate) must differ in ζ;
+(2) the **ζ-reader replica test** — a lived worldline vs a fresh copy at the same observable
+(newborn ζ = 0) at AUC 1.0; (3) **accumulation** — mean |ζ| grows with lived steps.
+
+**First execution found a degenerate genesis — recorded, then corrected.** Worldlines born at
+the potential *center* carry ζ = 0 *structurally*, not approximately: the spectral anchor
+covariance is **exactly isotropic** (orthonormal Laplacian eigenvectors ⇒ `cov ∝ I`; measured
+isotropy ratio 1.0000000000000038 — sharpening §9.8's "near-isotropic" to an exact
+covariance-level statement), so the Gaussian bowl is exactly radial and a center-born worldline
+sweeps zero area forever (measured |ζ| ~ 10⁻¹⁶ at every checkpoint). The genesis convention was
+corrected to the honest §5 reading — *"identity is the level set the worldline is born on"*,
+any point of it, not the potential minimum — worldlines now start at random identity anchors.
+
+| 8 seeds, n = 200 | value | meaning |
+|---|---|---|
+| endpoint erasure (worldline B vs A) | 1.5·10⁻¹⁵ | the same-endpoint construction is exact |
+| `|Δζ|` between same-endpoint worldlines | **0.142 [0.133, 0.153]** | order of ζ itself — not foldable into the observable |
+| ζ-reader replica AUC | **1.000 [1.000, 1.000]** | lived history vs newborn copy |
+| accumulation, Gaussian (steps 100/300/1000) | 0.032 / 0.096 / 0.322 | **exactly linear** (1 : 3 : 10) |
+| accumulation, learned `H_θ` | 0.038 / 0.111 / 0.271 | grows, **not** linear — history-integral |
+
+**Two regimes, honestly distinguished.** Under the exactly-isotropic Gaussian, the sweep rate is
+itself a conserved quantity (central force ⇒ `L₁₂` conserved), so `ζ = (b/2m)·L₁₂·t` — hidden
+conserved rate × age; in this special case ζ is recomputable from the full hidden state plus
+elapsed time. Under the *learned* (non-isotropic) `H_θ`, `L₁₂` is not conserved and ζ is
+genuinely history-integral — the accumulation curve bends. Both regimes pass all three bars.
+
+**Scope, honestly.** (i) Reading ζ presumes hidden-state access — §6's key/MAC bound applies
+*doubly* (a full-state copier copies ζ too). (ii) For a deterministic flow, a copier who knows
+genesis and elapsed time can recompute ζ; its force is against observable-limited copiers, and
+as the structural home of continuity/epoch-accumulation — age that must be *lived or stolen*,
+never inferred from the readout. (iii) The assembled trajectory-ψ going forward is the
+**three-way conjunction** `[var(H_embra) ≈ 0] ∧ [Q = Q_embra] ∧ [ζ consistent with the claimed
+history]` — §9.14's reader plus memory. (iv) If §8's Casimir fork is adopted, the 1-form will be
+revisited under the noncanonical bracket; the falsification design above transfers.

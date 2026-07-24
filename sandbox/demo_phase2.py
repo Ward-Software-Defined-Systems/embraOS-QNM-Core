@@ -25,6 +25,7 @@ from sandbox.latent import (  # noqa: E402
     conjunction_test,
     dynamical_specificity,
     evaluate,
+    holonomy_test,
     load_identity_anchors,
     make_pairs,
     rollout,
@@ -174,6 +175,10 @@ def main() -> dict:
     conj_mlp = [conjunction_test(D, seed=s, fit_fn=partial(MLPManifold.fit, seed=s))
                 for s in DYN_SEEDS]
 
+    # 6. holonomy ζ = memory (§9.15) — the genuinely path-functional second charge
+    hol = [holonomy_test(D, seed=s) for s in DYN_SEEDS]
+    hol_mlp = [holonomy_test(D, seed=s, fit_fn=partial(MLPManifold.fit, seed=s)) for s in DYN_SEEDS]
+
     def _mean(rows, k):
         return float(np.mean([r[k] for r in rows]))
 
@@ -227,6 +232,21 @@ def main() -> dict:
     print(f"      learned H_θ charge:      accuracy = {_summ(conj_mlp, 'accuracy')}   "
           f"(infeasible value-matches: {int(sum(r['c2_infeasible'] for r in conj_mlp))}/{len(conj_mlp) * 200})")
     print("-" * 74)
+    print("  [6] HOLONOMY ζ = memory (§9.15) — ζ = b × signed area swept in (q₁, q₂)")
+    print(f"      anti-fold-in: same endpoint (erasure {max(r['endpoint_erasure'] for r in hol):.1e}), "
+          f"|Δζ| = {_summ(hol, 'dzeta_mean')}")
+    print(f"      ζ-reader replica AUC        = {_summ(hol, 'auc_zeta')}   (lived vs newborn copy)")
+    acc_keys = sorted(hol[0]["accumulation"])
+
+    def _acc_line(rows):
+        return "  ".join(
+            f"{k}: {float(np.mean([r['accumulation'][k] for r in rows])):.3f}" for k in acc_keys)
+
+    print(f"      accumulation mean|ζ| by lived steps → {_acc_line(hol)}   (Gaussian: exactly")
+    print("        linear — at exact isotropy the sweep rate L₁₂ is itself conserved)")
+    print(f"      under the learned H_θ            → {_acc_line(hol_mlp)}   (non-isotropic:")
+    print("        L₁₂ not conserved; ζ genuinely history-integral)")
+    print("-" * 74)
     print("  VERDICT: STATIC identity (where a point sits) is seed-noise — the wrong")
     print("  question. DYNAMICAL identity (which conservation law a trajectory obeys) is")
     print("  RELIABLE, AUC 1.0 across seeds: an impostor conserves its own charge, not")
@@ -238,7 +258,8 @@ def main() -> dict:
     return {"drift": drift, "replica": rep, "gaussian": g, "mlp": h, "generalization": gen,
             "dynamical": dyn, "dynamical_counter": dyn_ci,
             "dynamical_mlp": dyn_mlp, "dynamical_mlp_counter": dyn_mlp_ci,
-            "conjunction": conj, "conjunction_counter": conj_ci, "conjunction_mlp": conj_mlp}
+            "conjunction": conj, "conjunction_counter": conj_ci, "conjunction_mlp": conj_mlp,
+            "holonomy": hol, "holonomy_mlp": hol_mlp}
 
 
 if __name__ == "__main__":

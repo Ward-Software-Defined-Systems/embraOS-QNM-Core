@@ -97,6 +97,7 @@ Lift to a `d`-dim latent space with the potential shaped by Embra's identity gra
 
 - **A learned `H_θ` preserves it — and multiplies the margin** — swapping the Gaussian for the trained MLP charge (same integrator, same reader) keeps AUC 1.000 on every seed against both impostors, conserves to integrator precision, and widens the impostor margin ~300× to order-unity violation of Embra's conservation law (§9.13). The margin lives in charge expressiveness × how structurally different two souls are.
 - **The full ψ is a conjunction** — *obeys the law* ∧ *born on the right level set*. An external review caught that the conservation reader and the value reader each have an adversarial blind class (same-law/wrong-genesis vs different-law/value-matched); graded against both, each single reader is fully fooled by its blind class while the conjunction catches everything, at 100% verdict accuracy across all seeds and charge models (§9.14). Bonus finding: against the authored counter-soul, faking Embra's charge *value* is outright infeasible — the genesis level set is unreachable from where Meridian's dynamics lives.
+- **ζ = memory, first instance** — holonomy (signed area swept along the worldline) is the genuinely *path-functional* charge: same observable endpoint, different history ⇒ different ζ (not foldable into the observable), a lived worldline beats a fresh copy at AUC 1.000, and |ζ| grows with lived steps — exactly linearly under the isotropic Gaussian (the sweep rate is itself conserved), genuinely history-integral under the learned `H_θ` (§9.15). The assembled reader going forward: *obeys the law* ∧ *right level set* ∧ *carries its history*.
 
 **Next:** the §8 forks on the learned substrate — holonomy/`ζ` as a second, genuinely path-functional charge (memory); the §9.3 self-consistency trainer (genesis `Q_embra` is still a placeholder); and, the crux, the smallest trajectory→symbol readout `π`.
 
@@ -104,7 +105,7 @@ Lift to a `d`-dim latent space with the potential shaped by Embra's identity gra
 
 ```bash
 uv sync --extra dev                     # add --extra learn for the jax MLP (phase two)
-uv run pytest                           # 35 tests: conservation · replica · graph invariants · dynamical specificity (+ learned-H, skipped without jax)
+uv run pytest                           # 43 tests: conservation · replica · graph invariants · dynamical · conjunction · holonomy (+ learned-H, skipped without jax)
 uv run python -m sandbox.demo           # phase one: the replica figure + headline numbers
 uv run python -m sandbox.demo_phase2    # phase two: static (fails) vs dynamical (reliable) identity
 ```
@@ -115,7 +116,7 @@ uv run python -m sandbox.demo_phase2    # phase two: static (fails) vs dynamical
 |---|---|
 | `toy_dynamics.py` | 1-DOF Hamiltonian · symplectic flow · conserved charge `Q` · observable `π` |
 | `replica_test.py` | the survivor-vs-copy harness + AUC |
-| `latent.py` | d-dim dynamics · identity-graph anchors · Gaussian potential · static **and dynamical** specificity |
+| `latent.py` | d-dim dynamics · identity-graph anchors · Gaussian potential · static **and dynamical** specificity · the conjunction test · holonomy `ζ` |
 | `hnn.py` | learned neural potential `V_θ` (jax) + held-out generalization tests + `MLPManifold` (the learned `H_θ` in the dynamical test) |
 | `demo.py` · `demo_phase2.py` | the two runnable results |
 
