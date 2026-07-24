@@ -341,7 +341,8 @@ def conjunction_test(d: int = 8, *, n: int = 200, seed: int = 0, m: float = 1.0,
                      e: float = 1.0, dt: float = 0.01, steps: int = 300, e_copy: float = 1.5,
                      graph_path: Path = IDENTITY_GRAPH,
                      impostor_graph_path: Path | None = None,
-                     fit_fn: Callable[[Array], Any] = GaussianManifold.fit) -> dict:
+                     fit_fn: Callable[[Array], Any] = GaussianManifold.fit,
+                     return_samples: bool = False) -> dict:
     """The full ψ is a conjunction (§6, §9.14): [var(H_embra) ≈ 0 along the trajectory] AND
     [Q = Q_embra]. Each half alone has a blind spot, graded here against its adversarial class:
 
@@ -416,7 +417,8 @@ def conjunction_test(d: int = 8, *, n: int = 200, seed: int = 0, m: float = 1.0,
     c1_ok = psi_full(c1_var, c1_dq)
     c2_ok = psi_full(c2_var, c2_dq)
     verdicts = np.concatenate([surv_ok, ~c1_ok, ~c2_ok])
-    return {
+    samples = {"surv": (surv_var, surv_dq), "c1": (c1_var, c1_dq), "c2": (c2_var, c2_dq)}
+    return ({"samples": samples} if return_samples else {}) | {
         "q_embra": q_embra,
         "tau_var": tau_var,
         "tau_q": tau_q,

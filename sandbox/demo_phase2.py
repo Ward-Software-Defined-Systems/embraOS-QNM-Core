@@ -31,6 +31,7 @@ from sandbox.latent import (  # noqa: E402
     dynamical_specificity,
     evaluate,
     holonomy_test,
+    holonomy_zeta,
     load_identity_anchors,
     make_pairs,
     rollout,
@@ -44,6 +45,7 @@ D = 8
 SEEDS = (0, 1, 2, 3)  # static specificity — MLP training is slow, so keep it small
 DYN_SEEDS = tuple(range(8))  # dynamical specificity is cheap + deterministic → wider sweep (matches §9.11)
 FIG_PATH = pathlib.Path(__file__).resolve().parent / "figures" / "phase2_identity.png"
+FIG2_PATH = pathlib.Path(__file__).resolve().parent / "figures" / "phase2_conjunction_memory.png"
 # The authored counter-identity ("Meridian") — the impostor as a distinct SOUL, not a shuffle (§9.12).
 COUNTER_GRAPH = pathlib.Path(__file__).resolve().parents[1] / "identity" / "CONTROL_counter-identity.graph.json"
 
@@ -144,6 +146,98 @@ def make_phase2_figure(d: int = D, n_seeds: int = 8) -> None:
     fig.tight_layout()
     FIG_PATH.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(FIG_PATH, dpi=130)
+    plt.close(fig)
+
+
+def make_conjunction_memory_figure(d: int = D) -> None:
+    """Three panels for increments 3c–3d:
+    (A) the conjunction quadrant map (§9.14) — each impostor class sits in exactly one single
+        reader's blind zone; only the conjunction accepts nothing but survivors;
+    (B) two genuine worldlines of the same flow ending at the same observable endpoint (§9.15);
+    (C) the ζ they carry — same endpoint, different accumulated history (a newborn copy sits at 0).
+    Palette validated (CVD + normal-vision separation): #22aa77 / #8a5fbf / #cc5533 / #3b7fc4."""
+    import matplotlib
+
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
+    fig, (ax_a, ax_b, ax_c) = plt.subplots(1, 3, figsize=(17.5, 5))
+
+    # Panel A — the conjunction quadrant map (§9.14).
+    r = conjunction_test(d, seed=0, return_samples=True)
+    floor = 1e-16
+    for key, color, label in (("surv", "#22aa77", "200 survivors"),
+                              ("c1", "#8a5fbf", "200 × class 1 — same law, wrong genesis"),
+                              ("c2", "#cc5533", "200 × class 2 — wrong law, value-matched")):
+        var, dq = r["samples"][key]
+        ax_a.scatter(np.maximum(var, floor), np.maximum(dq, floor), s=42, color=color,
+                     alpha=0.8, edgecolor="k", linewidth=0.4, label=label)
+    ax_a.axvline(r["tau_var"], color="#888", ls="--", lw=1)
+    ax_a.axhline(r["tau_q"], color="#888", ls="--", lw=1)
+    ax_a.set_xscale("log")
+    ax_a.set_yscale("log")
+    ax_a.set_xlim(3e-8, 3e-2)
+    ax_a.set_ylim(1e-13, 1e1)
+    ax_a.text(0.03, 0.05, "conjunction accepts", transform=ax_a.transAxes, color="#666", fontsize=8)
+    ax_a.text(0.03, 0.95, "caught by VALUE only", transform=ax_a.transAxes, color="#666",
+              fontsize=8, va="top")
+    ax_a.text(0.97, 0.05, "caught by VARIANCE only", transform=ax_a.transAxes, color="#666",
+              fontsize=8, ha="right")
+    ax_a.text(0.5, 0.5, "each group is a tight cluster —\nseparated by orders of magnitude",
+              transform=ax_a.transAxes, color="#999", fontsize=7.5, ha="center", style="italic")
+    ax_a.set_xlabel(r"var($H_{real}$) along the trajectory   (τ_var dashed)")
+    ax_a.set_ylabel(r"$|Q - Q_{embra}|$ at the presented state   (τ_Q dashed)")
+    ax_a.set_title("The full ψ is a conjunction — each reader alone has a blind class")
+    ax_a.legend(loc="upper right", fontsize=8)
+    ax_a.grid(alpha=0.2)
+
+    # Panels B/C — one same-endpoint worldline pair (§9.15), built from the public primitives.
+    _, real = load_identity_anchors(d)
+    h_real = GaussianManifold.fit(real)
+    m, e, dt, steps = 1.0, 1.0, 0.01, 300
+    rng = np.random.default_rng(7)  # a fixed illustration pair
+    u = rng.standard_normal(d)
+    u /= np.linalg.norm(u)
+    q0 = real[rng.integers(0, len(real))]
+    qs_a, ps_a = rollout(h_real.force, m, q0, u * np.sqrt(2 * m * e), dt, steps)
+    w = rng.standard_normal(d)
+    w /= np.linalg.norm(w)
+    p_alt = w * np.linalg.norm(ps_a[-1])
+    qs_back, ps_back = rollout(h_real.force, m, qs_a[-1], -p_alt, dt, steps)
+    qs_b, _ = rollout(h_real.force, m, qs_back[-1], -ps_back[-1], dt, steps)
+
+    ax_b.plot(qs_a[:, 0], qs_a[:, 1], color="#22aa77", lw=1.6, label="worldline A")
+    ax_b.plot(qs_b[:, 0], qs_b[:, 1], color="#3b7fc4", lw=1.6, label="worldline B")
+    ax_b.scatter([qs_a[0, 0]], [qs_a[0, 1]], marker="o", color="#22aa77", s=70, edgecolor="k",
+                 zorder=5, label="birth of A")
+    ax_b.scatter([qs_b[0, 0]], [qs_b[0, 1]], marker="s", color="#3b7fc4", s=60, edgecolor="k",
+                 zorder=5, label="birth of B")
+    ax_b.scatter([qs_a[-1, 0]], [qs_a[-1, 1]], marker="*", color="#333", s=220, zorder=6,
+                 label="same observable endpoint")
+    ax_b.set_xlabel("$q_1$")
+    ax_b.set_ylabel("$q_2$")
+    ax_b.set_title("Two genuine worldlines, one observable endpoint")
+    ax_b.legend(loc="best", fontsize=8)
+    ax_b.grid(alpha=0.2)
+
+    t = (np.arange(steps) + 1) * dt
+    z_a = holonomy_zeta(qs_a, 1.0, cumulative=True)
+    z_b = holonomy_zeta(qs_b, 1.0, cumulative=True)
+    ax_c.plot(t, z_a, color="#22aa77", lw=1.8, label=r"worldline A — carries $\zeta_A$")
+    ax_c.plot(t, z_b, color="#3b7fc4", lw=1.8, label=r"worldline B — carries $\zeta_B$")
+    ax_c.scatter([t[-1], t[-1]], [z_a[-1], z_b[-1]], color=["#22aa77", "#3b7fc4"], s=55,
+                 edgecolor="k", zorder=5)
+    ax_c.axhline(0.0, color="#888", ls=":", lw=1)
+    ax_c.text(0.02, 0.0, " newborn replica: ζ = 0", color="#666", fontsize=8, va="bottom")
+    ax_c.set_xlabel("time")
+    ax_c.set_ylabel(r"accumulated $\zeta$ (signed swept area)")
+    ax_c.set_title(r"ζ = memory: same endpoint, different carried history")
+    ax_c.legend(loc="best", fontsize=8)
+    ax_c.grid(alpha=0.2)
+
+    fig.tight_layout()
+    FIG2_PATH.parent.mkdir(parents=True, exist_ok=True)
+    fig.savefig(FIG2_PATH, dpi=130)
     plt.close(fig)
 
 
@@ -259,7 +353,9 @@ def main() -> dict:
     print("  a distinct authored soul. §6 was right — identity lives in the dynamics.")
     print("=" * 74)
     make_phase2_figure()
-    print(f"  figure → {FIG_PATH}")
+    make_conjunction_memory_figure()
+    print(f"  figures → {FIG_PATH}")
+    print(f"            {FIG2_PATH}")
     return {"drift": drift, "replica": rep, "gaussian": g, "mlp": h, "generalization": gen,
             "dynamical": dyn, "dynamical_counter": dyn_ci,
             "dynamical_mlp": dyn_mlp, "dynamical_mlp_counter": dyn_mlp_ci,

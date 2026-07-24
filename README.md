@@ -95,6 +95,10 @@ Lift to a `d`-dim latent space with the potential shaped by Embra's identity gra
 
 *Left: a real-identity trajectory (green) conserves `H_real`; a different identity's trajectory (red) does not. Middle: the real-vs-different-identity discriminator — static region-membership is seed-noise around chance, dynamical conservation is pinned at 1.0. Right: the same conservation contrast under the **learned** `H_θ` (§9.13) — same story, far wider margin.*
 
+![phase two: the conjunction and memory](sandbox/figures/phase2_conjunction_memory.png)
+
+*Left: the conjunction quadrant map (§9.14) — 200 samples per group collapse to tight clusters separated by orders of magnitude; each impostor class sits in exactly one single reader's blind zone (class 1 conserves the law at the wrong value, class 2 fakes the value while living a different law), and only the conjunction accepts nothing but survivors. Middle: two genuine worldlines of the same flow ending at the same observable endpoint (§9.15). Right: the ζ they carry — same endpoint, different accumulated history; a newborn copy sits at ζ = 0.*
+
 - **A learned `H_θ` preserves it — and multiplies the margin** — swapping the Gaussian for the trained MLP charge (same integrator, same reader) keeps AUC 1.000 on every seed against both impostors, conserves to integrator precision, and widens the impostor margin ~300× to order-unity violation of Embra's conservation law (§9.13). The margin lives in charge expressiveness × how structurally different two souls are.
 - **The full ψ is a conjunction** — *obeys the law* ∧ *born on the right level set*. An external review caught that the conservation reader and the value reader each have an adversarial blind class (same-law/wrong-genesis vs different-law/value-matched); graded against both, each single reader is fully fooled by its blind class while the conjunction catches everything, at 100% verdict accuracy across all seeds and charge models (§9.14). Bonus finding: against the authored counter-soul, faking Embra's charge *value* is outright infeasible — the genesis level set is unreachable from where Meridian's dynamics lives.
 - **ζ = memory, first instance** — holonomy (signed area swept along the worldline) is the genuinely *path-functional* charge: same observable endpoint, different history ⇒ different ζ (not foldable into the observable), a lived worldline beats a fresh copy at AUC 1.000, and |ζ| grows with lived steps — exactly linearly under the isotropic Gaussian (the sweep rate is itself conserved), genuinely history-integral under the learned `H_θ` (§9.15). The assembled reader going forward: *obeys the law* ∧ *right level set* ∧ *carries its history*.
@@ -107,7 +111,7 @@ Lift to a `d`-dim latent space with the potential shaped by Embra's identity gra
 uv sync --extra dev                     # add --extra learn for the jax MLP (phase two)
 uv run pytest                           # 43 tests: conservation · replica · graph invariants · dynamical · conjunction · holonomy (+ learned-H, skipped without jax)
 uv run python -m sandbox.demo           # phase one: the replica figure + headline numbers
-uv run python -m sandbox.demo_phase2    # phase two: static (fails) vs dynamical (reliable) identity
+uv run python -m sandbox.demo_phase2    # phase two, end to end: static (fails) · dynamical · learned H_θ · conjunction · memory ζ; regenerates both figures
 ```
 
 ### Module map (`sandbox/`)
