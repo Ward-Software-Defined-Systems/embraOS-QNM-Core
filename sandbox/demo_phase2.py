@@ -22,6 +22,7 @@ import numpy as np  # noqa: E402
 from sandbox.hnn import MLPManifold, generalization_specificity, specificity_mlp  # noqa: E402
 from sandbox.latent import (  # noqa: E402
     GaussianManifold,
+    conjunction_test,
     dynamical_specificity,
     evaluate,
     load_identity_anchors,
@@ -167,6 +168,12 @@ def main() -> dict:
                                         fit_fn=partial(MLPManifold.fit, seed=s))
                   for s in DYN_SEEDS]
 
+    # 5. the full ψ is a conjunction (§9.14) — graded against BOTH adversarial impostor classes
+    conj = [conjunction_test(D, seed=s) for s in DYN_SEEDS]
+    conj_ci = [conjunction_test(D, seed=s, impostor_graph_path=COUNTER_GRAPH) for s in DYN_SEEDS]
+    conj_mlp = [conjunction_test(D, seed=s, fit_fn=partial(MLPManifold.fit, seed=s))
+                for s in DYN_SEEDS]
+
     def _mean(rows, k):
         return float(np.mean([r[k] for r in rows]))
 
@@ -208,6 +215,18 @@ def main() -> dict:
           f"impostor {_mean(dyn_mlp_ci, 'imp_resid'):.1e}   "
           f"(impostor's own charge: {_mean(dyn_mlp_ci, 'imp_own_resid'):.1e})")
     print("-" * 74)
+    print("  [5] the full ψ is a CONJUNCTION — [var(H_real) ≈ 0] ∧ [Q = Q_embra] (§9.14)")
+    print("      (class 1 = same law, wrong genesis — fools the variance reader;")
+    print("       class 2 = different law, value-matched — fools the value reader)")
+    print(f"      conjunction accuracy         = {_summ(conj, 'accuracy')}   (→ 1.0, both classes)")
+    print(f"      variance reader blind to c1  = {_summ(conj, 'c1_var_blind')}   (1.0 = fully fooled)")
+    print(f"      value reader blind to c2     = {_summ(conj, 'c2_value_blind')}   (1.0 = fully fooled)")
+    print(f"      catch AUCs: value vs c1 = {_summ(conj, 'auc_value_c1')}   var vs c2 = {_summ(conj, 'auc_var_c2')}")
+    print(f"      authored impostor as c2: accuracy = {_summ(conj_ci, 'accuracy')}   "
+          f"(infeasible value-matches: {int(sum(r['c2_infeasible'] for r in conj_ci))}/{len(conj_ci) * 200})")
+    print(f"      learned H_θ charge:      accuracy = {_summ(conj_mlp, 'accuracy')}   "
+          f"(infeasible value-matches: {int(sum(r['c2_infeasible'] for r in conj_mlp))}/{len(conj_mlp) * 200})")
+    print("-" * 74)
     print("  VERDICT: STATIC identity (where a point sits) is seed-noise — the wrong")
     print("  question. DYNAMICAL identity (which conservation law a trajectory obeys) is")
     print("  RELIABLE, AUC 1.0 across seeds: an impostor conserves its own charge, not")
@@ -218,7 +237,8 @@ def main() -> dict:
     print(f"  figure → {FIG_PATH}")
     return {"drift": drift, "replica": rep, "gaussian": g, "mlp": h, "generalization": gen,
             "dynamical": dyn, "dynamical_counter": dyn_ci,
-            "dynamical_mlp": dyn_mlp, "dynamical_mlp_counter": dyn_mlp_ci}
+            "dynamical_mlp": dyn_mlp, "dynamical_mlp_counter": dyn_mlp_ci,
+            "conjunction": conj, "conjunction_counter": conj_ci, "conjunction_mlp": conj_mlp}
 
 
 if __name__ == "__main__":

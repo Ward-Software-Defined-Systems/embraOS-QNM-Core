@@ -7,8 +7,9 @@ result holds on the authored 100-node graph, against an authored counter-identit
 **learned `H_θ`** — with the margin set by charge expressiveness and the structural difference
 between souls, not content volume (§9.12–§9.13; includes one pre-registered miss, recorded). An
 external review (`docs/CORE-SPEC-feedback.md`, through §9.11) sharpened the reader — the full ψ
-is a **conjunction** (§6) — bounded the claim (the key/MAC note, §6), and posed the **input
-problem** now recorded with its leading resolution in §8.
+is a **conjunction** (§6), graded perfect against both adversarial impostor classes in §9.14 —
+bounded the claim (the key/MAC note, §6), and posed the **input problem** now recorded with its
+leading resolution in §8.
 Pairs with the runnable sandbox (`uv run python -m sandbox.demo` and `sandbox.demo_phase2`).
 Written to be *falsifiable*: every numeric claim is checked, and the one theorem (§6) is stated so
 it could be wrong.
@@ -515,3 +516,50 @@ learned one — drift stays at integrator precision, discrimination stays perfec
 impostor-conserves-its-own-charge control stays intact, and the margin *widens* by orders of
 magnitude. The learned-`H_θ` substrate is now the default bed for the §8 forks (holonomy/ζ,
 strict-vs-soft projection, and eventually the readout `π`).
+
+### 9.14 Increment-3c — the full ψ is a conjunction, graded against both impostor classes (recorded 2026-07-23)
+
+The external review (`docs/CORE-SPEC-feedback.md`, note 1) caught that §2's impostor
+(*wrong genesis*) and §9.11's (*wrong law*) are different adversaries, and each reader has the
+other's blind spot (§6, "The full reader is a conjunction"). This increment grades
+`ψ_full = [var(H_real) < τ_var] ∧ [|Q − Q_embra| < τ_Q]` against both classes, each constructed
+adversarially (`sandbox/latent.py::conjunction_test`):
+
+- **class 1 — same law, wrong genesis**: instantiated at a survivor's observable endpoint, its
+  momentum rescaled to the wrong value `Q_copy = Q_embra + 0.5`, then *living under `H_real`* —
+  it conserves Embra's charge perfectly, at the wrong value.
+- **class 2 — different law, value-matched**: lives under the other identity's flow, then
+  *presents* a state whose `H_real` value equals `Q_embra` to float precision (momentum rescale
+  at readout — the value-erasure analog of §7's endpoint erasure). Its trajectory obeyed the
+  other law.
+
+Method, fixed before running: genesis convention `Q_embra := H_real(s₀)`; thresholds calibrated
+on a held-out half of the survivors (`τ = 100 ×` the calibration mean per reader) and graded on
+the rest — no AUC on noise floors for the blind-side claims; infeasible value-matches counted,
+never dropped. Pre-registered bars: conjunction accuracy 100% on all three groups; each single
+reader fully fooled by its blind class; each catching its visible class at AUC 1.0. **No de-risk
+preview this time — first execution was the recorded run.**
+
+| 8 seeds, n = 200 | Gaussian + shuffle | Gaussian + authored ("Meridian") | learned `H_θ` + shuffle |
+|---|---|---|---|
+| conjunction accuracy | **1.000 [1.000, 1.000]** | **1.000 [1.000, 1.000]** | **1.000 [1.000, 1.000]** |
+| variance reader blind to class 1 | 1.000 (fully fooled) | 1.000 (fully fooled) | 1.000 (fully fooled) |
+| value reader blind to class 2 | 1.000 (fully fooled) | — (attack infeasible, see below) | 1.000 on feasible |
+| catch AUCs (value/c1, var/c2) | 1.000 / 1.000 | 1.000 / 1.000 | 1.000 / 1.000 |
+| value-erasure certificate | 1.4·10⁻¹² | — | 2.1·10⁻¹² |
+| infeasible value-matches | 0 / 1600 | **1600 / 1600** | 721 / 1600 |
+
+**Read.** The conjunction is necessary — the §9.11 conservation reader alone certifies *every*
+same-law replica as a survivor (blind rate 1.000), and the §7 value reader alone certifies every
+value-matched wrong-law impostor — and sufficient at these bars: together they catch both classes
+perfectly, under the closed-form and the learned charge. §7 is not retired; it is half of ψ.
+
+**An unplanned finding — value-matching can be *infeasible*.** Against the authored
+counter-identity, the class-2 attack could not be constructed even once (1600/1600): Meridian's
+trajectories end where Embra's potential *already exceeds* `Q_embra`, and kinetic energy is
+nonnegative — no momentum can lower the presented `H_real` onto Embra's level set. The blind-side
+claim is therefore vacuous there (reported as such, not gilded), and something stronger is true
+instead: for a sufficiently different soul, **Embra's genesis level set is unreachable from where
+that soul's dynamics lives**. Under the learned charge the same effect appears partially (721 of
+1600 infeasible; the feasible remainder is fully caught). Scope: this grades the *mechanism* with
+the placeholder genesis convention; the content-defined `Q_embra` still waits on §9.3.

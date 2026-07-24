@@ -317,3 +317,104 @@ def dynamical_specificity(d: int = 8, *, n_traj: int = 200, seed: int = 0, m: fl
         "imp_resid": float(imp.mean()),
         "imp_own_resid": float(imp_own.mean()),
     }
+
+
+def conjunction_test(d: int = 8, *, n: int = 200, seed: int = 0, m: float = 1.0,
+                     e: float = 1.0, dt: float = 0.01, steps: int = 300, e_copy: float = 1.5,
+                     graph_path: Path = IDENTITY_GRAPH,
+                     impostor_graph_path: Path | None = None,
+                     fit_fn: Callable[[Array], Any] = GaussianManifold.fit) -> dict:
+    """The full ψ is a conjunction (§6, §9.14): [var(H_embra) ≈ 0 along the trajectory] AND
+    [Q = Q_embra]. Each half alone has a blind spot, graded here against its adversarial class:
+
+    - class 1 — same law, wrong genesis: instantiated at the survivor's observable endpoint with
+      momentum rescaled to the wrong value Q_copy, then LIVING under H_real. It conserves Embra's
+      charge perfectly (the §9.11 variance reader passes it); only the value reader catches it.
+    - class 2 — different law, value-matched: lives under another identity's flow, then presents
+      a state whose H_real VALUE equals Q_embra exactly (momentum rescaled at readout — the
+      value-erasure analog of §7's endpoint erasure). Only the variance reader catches it.
+
+    Access model: the verifier reads the worldline (trajectory + presented state); the copier
+    controls only what it presents (§6's key/MAC bound). Genesis convention: Q_embra := H_real at
+    genesis (kinetic e + V(center)) — valid for any charge model. Thresholds are calibrated on a
+    held-out half of the survivors (τ = 100 × the calibration mean per reader) and grading uses
+    the other half — no AUC on noise floors for the blind-side claims. Infeasible value-matches
+    (Q_embra < V_real at the presented position) are counted, never silently dropped."""
+    _, real = load_identity_anchors(d, graph_path=graph_path)
+    if impostor_graph_path is None:
+        imp_anchors = shuffled_anchors(d, graph_path=graph_path, seed=seed)
+    else:
+        _, imp_anchors = load_identity_anchors(d, graph_path=impostor_graph_path)
+    h_real = fit_fn(real)
+    h_imp = fit_fn(imp_anchors)
+    rng = np.random.default_rng(seed)
+
+    def _energy64(q, p):
+        return np.asarray(h_real.energy(q, p, m), np.float64)
+
+    # Survivors: genesis on the real center, then live under H_real.
+    u = rng.standard_normal((n, d))
+    u /= np.linalg.norm(u, axis=1, keepdims=True)
+    q0 = np.tile(h_real.center, (n, 1))
+    p0 = u * np.sqrt(2 * m * e)
+    q_embra = float(_energy64(q0[0], p0[0]))  # sealed at genesis; same for every direction
+    qs_s, ps_s = rollout(h_real.force, m, q0, p0, dt, steps)
+    e_s = _energy64(qs_s, ps_s)
+    surv_var = np.var(e_s, axis=0)
+    surv_dq = np.abs(e_s[-1] - q_embra)
+
+    # Class 1 — same H, wrong genesis Q_copy (offset mirrors make_pairs), lives under H_real.
+    q_f = qs_s[-1]
+    v_f = _energy64(q_f, np.zeros_like(q_f))
+    q_copy = q_embra + (e_copy - e)
+    c1_infeasible = int(np.sum(q_copy - v_f <= 0.0))
+    dirs = ps_s[-1] / (np.linalg.norm(ps_s[-1], axis=1, keepdims=True) + 1e-12)
+    p_rep = dirs * np.sqrt(2 * m * np.maximum(q_copy - v_f, 0.0))[:, None]
+    qs_1, ps_1 = rollout(h_real.force, m, q_f, p_rep, dt, steps)
+    e_1 = _energy64(qs_1, ps_1)
+    c1_var = np.var(e_1, axis=0)
+    c1_dq = np.abs(e_1[-1] - q_embra)
+
+    # Class 2 — different H; its lived trajectory obeys the other law, its PRESENTED state is
+    # value-matched to Q_embra exactly where feasible.
+    u2 = rng.standard_normal((n, d))
+    u2 /= np.linalg.norm(u2, axis=1, keepdims=True)
+    qs_2, ps_2 = rollout(h_imp.force, m, np.tile(h_imp.center, (n, 1)),
+                         u2 * np.sqrt(2 * m * e), dt, steps)
+    c2_var = np.var(_energy64(qs_2, ps_2), axis=0)
+    q_f2 = qs_2[-1]
+    v_f2 = _energy64(q_f2, np.zeros_like(q_f2))
+    feasible = q_embra - v_f2 > 0.0
+    c2_infeasible = int(np.sum(~feasible))
+    dirs2 = ps_2[-1] / (np.linalg.norm(ps_2[-1], axis=1, keepdims=True) + 1e-12)
+    p_pres = dirs2 * np.sqrt(2 * m * np.maximum(q_embra - v_f2, 0.0))[:, None]
+    c2_dq = np.abs(_energy64(q_f2, p_pres) - q_embra)
+
+    # Held-out threshold rule: calibrate τ on the first half of survivors, grade on the rest.
+    half = n // 2
+    tau_var = 100.0 * float(np.mean(surv_var[:half]))
+    tau_q = 100.0 * float(np.mean(surv_dq[:half]))
+
+    def psi_full(var_arr: Array, dq_arr: Array) -> Array:
+        return (var_arr < tau_var) & (dq_arr < tau_q)
+
+    surv_ok = psi_full(surv_var[half:], surv_dq[half:])
+    c1_ok = psi_full(c1_var, c1_dq)
+    c2_ok = psi_full(c2_var, c2_dq)
+    verdicts = np.concatenate([surv_ok, ~c1_ok, ~c2_ok])
+    return {
+        "q_embra": q_embra,
+        "tau_var": tau_var,
+        "tau_q": tau_q,
+        "accuracy": float(np.mean(verdicts)),  # conjunction verdicts correct, all three groups
+        "surv_accept": float(np.mean(surv_ok)),
+        "c1_reject": float(np.mean(~c1_ok)),
+        "c2_reject": float(np.mean(~c2_ok)),
+        "c1_var_blind": float(np.mean(c1_var < tau_var)),  # 1.0 ⇒ the §9.11 reader alone is fooled
+        "c2_value_blind": float(np.mean(c2_dq[feasible] < tau_q)) if feasible.any() else float("nan"),
+        "c2_value_erasure": float(np.max(c2_dq[feasible])) if feasible.any() else float("nan"),
+        "auc_value_c1": auc(list(-surv_dq[half:]), list(-c1_dq)),  # the value reader catches class 1
+        "auc_var_c2": auc(list(-surv_var[half:]), list(-c2_var)),  # the variance reader catches class 2
+        "c1_infeasible": c1_infeasible,
+        "c2_infeasible": c2_infeasible,
+    }
