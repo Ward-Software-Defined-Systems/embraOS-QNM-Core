@@ -444,7 +444,8 @@ the Gaussian charge sees only mean+covariance, and second-order statistics of sp
 lens) than the 22-node shuffle looked like Embra-22.
 
 **The authored counter-identity is a different story.** Against a genuinely different *authored*
-soul — the control fixture `CONTROL_counter-identity.graph.json` ("Meridian", 100 nodes /
+soul — the authored counter-identity `Meridian_IDENTITY-SOUL.graph.json` (né
+`CONTROL_counter-identity.graph.json`; reviewed and promoted 2026-07-25, byte-identical) ("Meridian", 100 nodes /
 349 edges, its own categories, relation vocabulary, and mesh+ring topology; content-free control,
 not Embra) — the same three bars pass, and the margin is ~**30× the shuffle's**:
 

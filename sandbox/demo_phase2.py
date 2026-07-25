@@ -47,7 +47,7 @@ DYN_SEEDS = tuple(range(8))  # dynamical specificity is cheap + deterministic �
 FIG_PATH = pathlib.Path(__file__).resolve().parent / "figures" / "phase2_identity.png"
 FIG2_PATH = pathlib.Path(__file__).resolve().parent / "figures" / "phase2_conjunction_memory.png"
 # The authored counter-identity ("Meridian") — the impostor as a distinct SOUL, not a shuffle (§9.12).
-COUNTER_GRAPH = pathlib.Path(__file__).resolve().parents[1] / "identity" / "CONTROL_counter-identity.graph.json"
+COUNTER_GRAPH = pathlib.Path(__file__).resolve().parents[1] / "identity" / "Meridian_IDENTITY-SOUL.graph.json"
 
 
 def _summ(rows: list[dict], key: str) -> str:
