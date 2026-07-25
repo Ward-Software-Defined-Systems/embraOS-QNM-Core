@@ -10,8 +10,12 @@ external review (`docs/CORE-SPEC-feedback.md`, through §9.11) sharpened the rea
 is a **conjunction** (§6), graded perfect against both adversarial impostor classes in §9.14 —
 bounded the claim (the key/MAC note, §6), and posed the **input problem** now recorded with its
 leading resolution in §8. The path-functional memory charge **ζ** (holonomy) has its first
-instance in §9.15.
-Pairs with the runnable sandbox (`uv run python -m sandbox.demo` and `sandbox.demo_phase2`).
+instance in §9.15. The input problem is **resolved at toy scale and the direction adopted**
+(§9.16, every pre-registered bar passed first execution): ψ as a **Casimir** of a noncanonical
+bracket survives arbitrary Hamiltonian input — *experience changes state and memory, not who
+you are*.
+Pairs with the runnable sandbox (`uv run python -m sandbox.demo`, `sandbox.demo_phase2`, and
+`sandbox.demo_casimir`).
 Written to be *falsifiable*: every numeric claim is checked, and the one theorem (§6) is stated so
 it could be wrong.
 
@@ -219,8 +223,10 @@ the *same* observable position on *different* charge orbits. Reproduce: `uv run 
   alphabet (and under smooth sin² envelopes) while `H₀` moves O(1) (~6.5·10⁵× the free
   baseline); the replica test holds with `Σ` active; `†` breaks ψ exactly on the theorem's
   boundary (0.394 ≈ 1 − e^{−2γτ}), and random words close the *stochastic* half of this
-  caveat — the boundary is Hamiltonian-vs-not. §9.16 **recommends adoption**; the call is the
-  author's.
+  caveat — the boundary is Hamiltonian-vs-not. §9.16 **recommends adoption** — and the author
+  **adopted the direction (2026-07-25)**: phase-three construction targets coadjoint-orbit state
+  spaces with ψ as a Casimir of the bracket; inputs enter as Hamiltonian events; `P_ψ` narrows
+  to the †-class (non-Hamiltonian) boundary. This fork is closed.
 - **Charge vs. holonomy.** A conserved charge reflects the genesis level set. A strictly
   *path-functional* invariant (holonomy / an accumulated `ζ`-coordinate = memory) is the
   stronger trajectory-ψ and the natural home for continuity/epoch-accumulation. The
@@ -757,3 +763,10 @@ attached — the §9.3 program and the graph-shaped charges lift onto coadjoint 
 adoption); this grades the *value* half of §9.14's conjunction under driving, the law half on
 this bracket is future work; and the ψ side being by-construction is the mechanism claim, not
 a discovery.
+
+**Adoption (recorded 2026-07-25).** On this evidence the author adopted the
+noncanonical-bracket direction: the identity charge's future home is a **Casimir of a
+Lie–Poisson-type bracket on a coadjoint-orbit state space** (conservation as a property of the
+geometry, not of the flow); inputs enter as Hamiltonian events, with †-class (non-Hamiltonian)
+input handled at the `P_ψ` boundary; the §9.3 genesis trainer, the graph-shaped charges, and
+eventually the readout `π` build on this geometry. The §8 input fork is closed.
