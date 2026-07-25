@@ -629,3 +629,82 @@ radii where Embra's stiffer potential already exceeds `Q_embra` (½·33.59·(2/1
 the summary sharpens: **the closed-form Gaussian charge on this embedding reads exactly one
 scalar of identity; everything richer lives in the learned `H_θ` (§9.13), and the §9.3 trainer
 inherits that as a requirement, not a hope.**
+
+### 9.16 Increment 4 — the so(3)* Casimir toy: does identity survive input? (pre-registered 2026-07-25; results pending)
+
+**The question.** §8 records the input problem as structural — driven `H(t)` breaks energy
+conservation, so the phase-one mechanism is in tension with `Σ` ever arriving — and names ψ as a
+**Casimir of a Lie–Poisson bracket** the leading resolution, *adoption gated on this toy*. This
+increment also introduces `Σ` for real: a **discrete input alphabet** of Hamiltonian events
+(symbols IN; language OUT remains the deferred π crux — the §9.14 lesson about not blurring
+questions applies).
+
+**The toy.** State `L ∈ ℝ³` on `so(3)*`, bracket `{F,G}(L) = −L·(∇F×∇G)`, flow `L̇ = L × ∇H`
+(the textbook Euler top for `H₀ = ½ΣLᵢ²/Iᵢ`). ψ = the Casimir `|L|²` — conserved under *any*
+Hamiltonian `H`, because `L̇ ⊥ L` is a property of the bracket, not of `H`. Integrator:
+RKMK2/explicit-midpoint on the rotation group — **every step applies one rotation to `L`**, so ψ
+is exact by construction (never renormalized; the float drift is the honest report). Input:
+symbols are Hamiltonian perturbations applied *additively* (`H₀ + H_σ` — the automaton keeps
+being itself while perturbed), in words with silence gaps. Default alphabet |Σ| = 3 —
+`x = kick(ε·e₁)` (H = a·L), `y = kick(ε·e₂)` (the pair embeds nonabelian `so(3)`:
+`{a·L, b·L} = −(a×b)·L` — word order must matter), `s = twist(ε′·e₁)` (H = ½(a·L)², a
+*non-isometric* flow — the symbol that makes the claim non-trivial, since latitudes shear rather
+than rotate rigidly). The harness is alphabet-parametric (symbols are declarative data; an
+authored ~22-symbol alphabet is planned content). Out-of-alphabet control `†`: radial
+contraction — **provably outside the entire Hamiltonian class of this bracket** (every
+Lie–Poisson flow preserves `|L|²`), so it marks the exact §8 class boundary, and is deliberately
+not expressible as a Symbol.
+
+**Preconditions, recorded.** Anisotropy `I = (1, 2, 3)` is *theorem-level*, not hygiene: with
+isotropic inertia, `H₀` is a function of ψ (conserved under any driving; the free flow freezes)
+and bar 1 below is unsatisfiable — the §9.15 isotropy lesson, one level up. Guard test: free
+flow from a generic start moves.
+
+**Pinned constants (bars are sized against these):** `ψ_embra = R² = 1` · `EPS_KICK = 0.5`,
+`EPS_TWIST = 1.0` · `dt = 0.01` · `τ_event = τ_gap = 0.5` · 8 seeds × 25 random words × length
+16, fresh seeded genesis direction per word · ζ checkpoints at 4/8/16 events · `ψ_copy = 1.5`.
+
+**Pre-registered bars (fixed before the first execution; the first execution is the recorded
+run — no de-risk preview):**
+
+1. **ψ survives every word; energy visibly does not.** Max over all steps of all 200 words of
+   `||L|²/R² − 1| < 10⁻¹⁰` (float floor expected ~10⁻¹³), while the median *along-trajectory*
+   `H₀` range per word `> 0.1` (range, not endpoint — endpoint deltas have a return-fluke trap
+   on a bounded sphere) AND `> 100×` the free-evolution `H₀`-range baseline. Bookkeeping
+   certificate: per constant event window, `|Δ(H₀+H_σ)| < 0.1 ×` the median event `|ΔH₀|` —
+   the energy change is driving physics, not integrator error. Sub-bar (smooth `∂H/∂t ≠ 0`,
+   not just rectangular switching): ψ drift `< 10⁻¹⁰` under a sin²-envelope word. Stated
+   plainly: the ψ side is by-construction — that IS the mechanism claim.
+2. **Non-commutativity certificate:** "xy" vs "yx", same genesis, identical schedules:
+   `‖ΔL‖ > 0.01` with both ψ drifts under bar 1 — *experience differs, identity doesn't*.
+3. **The §2 replica test with Σ active.** `π(L) = L₃`; the survivor lives a word on
+   `ψ_embra`; the replica copies `L₃` bit-exactly but sits on `ψ_copy` (transverse rescale —
+   feasibility exact, `R_copy > R_embra ≥ |L₃|` strict, unlike §9.14's class 2; measure-zero
+   transverse-zero case guarded by placement). ψ-reader AUC **1.0**; endpoint reader exactly
+   **0.5** (bit-exact ties); erasure `= 0.0`; margin (no AUC-on-floors): min replica
+   `|ψ − ψ_embra| > 10⁶ ×` max survivor deviation. The rescale is the *maximally charitable
+   copier* — the hidden transverse direction is granted free; it is caught on the sphere radius
+   alone. Scope: this is the *value* half of the §9.14 conjunction under driving; the law half
+   on this bracket is future work.
+4. **ζ under driving** — swept solid angle of `u = L/|L|` (the sphere's natural holonomy;
+   gauge `p₀` = genesis direction — identity data; every comparison shares a genesis; closed
+   loops are `p₀`-independent, tested). Floors on every claim (§9.14's noise-floor lesson):
+   `|ζ(xy) − ζ(yx)| > 0.01` (memory is order-sensitive); lived-vs-newborn AUC **1.0** AND min
+   lived `|ζ| > 10⁻⁶` AND median `> 10⁻²`; median `|ζ|` strictly increasing at 4/8/16-event
+   checkpoints. **Antipode certificate** (the excess formula's branch trap is certified, not
+   designed away): max per-step `|dE| < 0.5` across recorded runs, min `|u + p₀|` reported; a
+   trip is a recorded finding. Sanity: small AND near-antipodal caps `= 2π(1−cos θ)`,
+   orientation flip, closed-loop gauge-independence.
+5. **The † boundary, recorded as a theorem:** paired runs — the same word, same seed,
+   with/without one dissipative event (`γ = 0.5`): relative ψ change `> 0.01` with (expect
+   ≈ 0.39), `< 10⁻¹⁰` without. The random Σ-words already close the *stochastic* half of §8's
+   caveat: the boundary is Hamiltonian-vs-not, not deterministic-vs-stochastic.
+
+**Decision rule.** All bars pass ⇒ this section records the Casimir mechanism as *viable at toy
+scale* and recommends adoption for the §8 input fork (the adoption call is the author's, on the
+evidence). Any miss is recorded and localized first. Recorded either way: on `so(3)*` the
+conjunction's components split by robustness — the Casimir *value* (which sphere) is
+input-proof; *law-obeying* (`H`-conservation) is exactly what input breaks; ζ is the memory
+arm.
+
+**Results: pending — this pre-registration is committed before the first line of toy code.**
