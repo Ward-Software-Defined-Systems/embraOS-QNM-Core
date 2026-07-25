@@ -23,11 +23,14 @@ guaranteed; the *quality* is authored.
 |---|---|---|---|
 | `kick(a)` | `H = a·L` | **reorients** — rigid rotation of `L` about the axis `a`, rate `|a|` | axis direction + amplitude |
 | `twist(a)` | `H = ½(a·L)²` | **shears** — latitudes about `a` rotate at rate ∝ `(a·L)`: layered, non-rigid | axis direction + amplitude |
-| `quad(A)` *(on request)* | `H = ½LᵀAL` | **reshapes** — a full modified-inertia event (kick/twist are special cases) | a symmetric 3×3 matrix |
+| `quad(A)` | `H = ½LᵀAL` | **reshapes** — the rotation axis is the state-dependent `A·L`: a modified-*inertia* event | a symmetric 3×3 matrix + amplitude |
 
-`quad(A)` is a five-line addition the moment one of your 22 wants it. Anything smooth beyond
-these is also legal via a custom `grad_h` callable — still a Hamiltonian, just not from a
-constructor.
+All three are implemented (`lie_poisson.kick`/`twist`/`quad`). The family nests: `twist(a)` is
+the rank-1 special case `quad(a·aᵀ)`, and the identity's own free dynamics is itself
+`quad(diag(1, ½, ⅓))` — so a quad event literally perturbs the automaton's *sense of inertia*.
+Only the symmetric part of `A` enters `H` (the constructor symmetrizes, so a slightly
+asymmetric authored matrix is handled consistently). Anything smooth beyond these is also
+legal via a custom `grad_h` callable — still a Hamiltonian, just not from a constructor.
 
 ## The row format
 
@@ -35,7 +38,11 @@ One symbol = one row:
 
 ```
 name · kind ∈ {kick, twist} · axis (3 numbers, any direction) · amplitude · duration (optional)
+name · quad               · matrix A (symmetric 3×3 — six numbers: A₁₁ A₂₂ A₃₃ A₁₂ A₁₃ A₂₃) · amplitude · duration (optional)
 ```
+
+(For quad rows I wire `quad(amplitude · A)` — same one-source-of-truth convention as folding
+amplitude into a kick/twist axis.)
 
 Worked examples (the current default three, plus illustrative extensions):
 
@@ -49,6 +56,9 @@ Worked examples (the current default three, plus illustrative extensions):
 | `x̄` | kick | (−1, 0, 0) | 0.5 | — | the **inverse** of `x` — negated axis undoes it |
 | `d` | kick | (1, 1, 0)/√2 | 0.5 | — | a diagonal-axis reorientation |
 | `t` | twist | (0, 1, 0) | 1.0 | 1.0 | a *long* shear (duration override) |
+| `w` | quad | diag(0.4, 0.9, 1.5) | 1.0 | — | reshape: the world's inertia felt differently along each axis |
+| `c` | quad | A₁₂ = A₂₁ = 1 (else 0), i.e. `H = L₁L₂` | 1.0 | — | cross-coupling: axes 1 and 2 shear *into each other* |
+| `g` | quad | diag(1, ½, ⅓) | −0.5 | — | a *drag* on the identity's own inertia (negative multiple of `H₀`'s matrix — partially "suspends the self") |
 
 Semantic freedom: **axis = where in `L`-space the event acts · kind = its character (reorient /
 shear / reshape) · amplitude = intensity · duration = dwell.** Negated axes give you inverse
@@ -70,8 +80,16 @@ some of your 22 come in do/undo pairs.
   dynamically almost indistinguishable — words differing only in them will barely separate in
   state or ζ. The validation battery (below) measures this pairwise, so near-duplicates are
   caught, not guessed.
-- **Mix kinds.** Twists (non-isometric) enrich the dynamics in a way kicks alone cannot; a few
-  `quad`-style reshapers would add a third character if wanted.
+- **Mix kinds.** Twists (non-isometric) enrich the dynamics in a way kicks alone cannot;
+  quads add the third character (state-dependent rotation axes — reshaped inertia).
+- **The silent-quad trap (the isotropy lesson, third appearance).** An isotropic
+  `quad(c·I)` does *exactly nothing*: `H = c|L|²/2` is a function of ψ itself, so the flow
+  freezes for the event's whole duration — a legal but dead symbol. The same lesson that
+  collapsed the Gaussian charge (§9.15) and that made anisotropic inertia a theorem-level
+  precondition (§9.16) applies to authored matrices: keep `A`'s **eigenvalues distinct** (or
+  at least not all equal). Near-isotropic `A` = near-silent symbol; the battery's
+  energy-visibility check flags both. Eigenvalue scale: order-unity, like the other
+  amplitudes.
 - **No zero axes / zero amplitudes** (a symbol that does nothing is legal but pointless — and
   the battery will flag it as a duplicate of silence).
 
@@ -93,5 +111,6 @@ iterable (edit rows, re-run in seconds) — the bars on the *mechanism* never mo
 ## Handing it over
 
 Any form works: a markdown table like the above, JSON, or a Python list. On arrival I wire it
-as `make_authored_alphabet()` (and add `quad(A)` / a JSON loader if your rows call for them),
-run the battery, and record. Symbols are data; iteration is cheap.
+as `make_authored_alphabet()` (adding a JSON loader if your format calls for it — `kick`,
+`twist`, and `quad` are all implemented and tested), run the battery, and record. Symbols are
+data; iteration is cheap.

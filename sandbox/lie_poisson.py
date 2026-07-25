@@ -130,6 +130,24 @@ def twist(a: Array, name: str = "twist") -> Symbol:
     return Symbol(name, grad_h=g, h=lambda L: 0.5 * np.sum(np.asarray(L, float) * a, axis=-1) ** 2)
 
 
+def quad(A: Array, name: str = "quad") -> Symbol:
+    """H = ½·LᵀAL — a **reshape** event (modified inertia): the flow rotates L about the
+    state-dependent axis ``A·L``. ``twist(a)`` is the rank-1 special case ``quad(a·aᵀ)``, and
+    the free ``H₀`` is itself ``quad(diag(1/I))`` — a quad event literally perturbs the
+    automaton's sense of inertia. Only the symmetric part of ``A`` enters ``H``, so the
+    constructor symmetrizes (keeps ∇H consistent for any authored input). Authoring warning:
+    an isotropic ``A = c·I`` is a SILENT symbol — H becomes a function of ψ, the flow freezes,
+    the event does nothing (the isotropy lesson at symbol level; the validation battery flags
+    it — see docs/ALPHABET-AUTHORING.md)."""
+    A = np.asarray(A, float)
+    A = 0.5 * (A + A.T)
+    return Symbol(
+        name,
+        grad_h=lambda L: np.asarray(L, float) @ A,
+        h=lambda L: 0.5 * np.sum(np.asarray(L, float) * (np.asarray(L, float) @ A), axis=-1),
+    )
+
+
 def make_default_alphabet(eps_kick: float = EPS_KICK, eps_twist: float = EPS_TWIST) -> dict[str, Symbol]:
     """|Σ| = 3: two non-commuting kicks ({a·L, b·L} = −(a×b)·L — word order matters) and one
     twist (non-isometric). An authored alphabet is a bigger dict of the same constructors."""

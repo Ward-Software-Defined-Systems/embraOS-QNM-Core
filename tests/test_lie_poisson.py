@@ -19,12 +19,14 @@ from sandbox.lie_poisson import (
     grad_h0,
     h0,
     make_default_alphabet,
+    quad,
     replica_under_driving,
     rkmk2_step,
     rotate,
     run_word,
     run_words_batched,
     solid_angle_zeta,
+    twist,
     word_order_test,
     zeta_memory_test,
 )
@@ -117,6 +119,42 @@ def test_batched_matches_run_word():
     for w in range(4):
         single = run_word([symbols[k] for k in idx[w]], L0[w])
         assert np.array_equal(batched[:, w], single)
+
+
+def test_quad_generalizes_twist_and_symmetrizes():
+    """twist(a) is the rank-1 special case quad(a·aᵀ); and only sym(A) enters H, so an
+    asymmetric authored matrix is handled consistently (symmetrized on construction)."""
+    rng = np.random.default_rng(5)
+    a = rng.standard_normal(3)
+    L = rng.standard_normal((50, 3))
+    assert np.allclose(quad(np.outer(a, a)).grad_h(L), twist(a).grad_h(L), atol=1e-12)
+    assert np.allclose(quad(np.outer(a, a)).h(L), twist(a).h(L), atol=1e-12)
+    m = rng.standard_normal((3, 3))
+    assert np.allclose(quad(m).grad_h(L), quad(0.5 * (m + m.T)).grad_h(L), atol=1e-15)
+
+
+def test_quad_event_conserves_casimir_moves_energy():
+    """The Casimir theorem covers the new kind too: a word containing quad events keeps ψ at
+    the float floor while remaining energy-visible."""
+    A = np.array([[0.4, 0.6, 0.0], [0.6, 0.7, 0.0], [0.0, 0.0, 1.2]])
+    alphabet = make_default_alphabet()
+    word = [alphabet["x"], quad(A, "q"), alphabet["s"], quad(A, "q")]
+    rng = np.random.default_rng(6)
+    u = rng.standard_normal(3)
+    traj = run_word(word, u / np.linalg.norm(u))
+    assert np.max(np.abs(casimir(traj) - 1.0)) < 1e-12
+    e = h0(traj)
+    assert (e.max() - e.min()) / e[0] > 0.05
+
+
+def test_isotropic_quad_is_silent():
+    """quad(c·I): H = c·|L|²/2 is a function of ψ ⇒ L̇ = c·L×L = 0 — the event does exactly
+    nothing (the §9.15/§9.16 isotropy lesson, at symbol level). The authoring doc warns for it;
+    the validation battery's energy-visibility check flags it."""
+    silent = quad(np.eye(3), "iso")
+    L = np.array([0.6, -0.3, 0.7])
+    step = rkmk2_step(lambda q: silent.grad_h(q), L, 0.01)
+    assert np.allclose(step, L, atol=1e-15)  # rotation about L itself: identity, exactly
 
 
 # --------------------------------------------------------------------------- #
