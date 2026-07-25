@@ -214,7 +214,13 @@ the *same* observable position on *different* charge orbits. Reproduce: `uv run 
   — dissipative or stochastic input breaks Casimirs too. Adoption is **gated on the smallest
   toy** (`so(3)*` rigid body, ψ = the Casimir `|L|²`, driven `H(t)`: ψ conserved while energy
   visibly is not, then the replica test) — and the decision belongs *before* the readout `π`
-  becomes language.
+  becomes language. **Gate outcome (§9.16, 2026-07-25): every pre-registered bar passed on the
+  first execution** — ψ exact (1.6·10⁻¹⁴) under 200 random words of a discrete Hamiltonian
+  alphabet (and under smooth sin² envelopes) while `H₀` moves O(1) (~6.5·10⁵× the free
+  baseline); the replica test holds with `Σ` active; `†` breaks ψ exactly on the theorem's
+  boundary (0.394 ≈ 1 − e^{−2γτ}), and random words close the *stochastic* half of this
+  caveat — the boundary is Hamiltonian-vs-not. §9.16 **recommends adoption**; the call is the
+  author's.
 - **Charge vs. holonomy.** A conserved charge reflects the genesis level set. A strictly
   *path-functional* invariant (holonomy / an accumulated `ζ`-coordinate = memory) is the
   stronger trajectory-ψ and the natural home for continuity/epoch-accumulation. The
@@ -707,4 +713,47 @@ conjunction's components split by robustness — the Casimir *value* (which sphe
 input-proof; *law-obeying* (`H`-conservation) is exactly what input breaks; ζ is the memory
 arm.
 
-**Results: pending — this pre-registration is committed before the first line of toy code.**
+**Results (recorded 2026-07-25 — the first execution; every pre-registered bar passed):**
+
+| bar | pre-registered | measured |
+|---|---|---|
+| 1 · ψ under 200 words (max, ALL steps) | < 10⁻¹⁰ | **1.6·10⁻¹⁴** |
+| 1 · median along-word `H₀` range | > 0.1 | **0.383** |
+| 1 · driven/free range ratio | > 100 | **6.5·10⁵** |
+| 1 · bookkeeping `max|Δ(H₀+H_σ)|` | < 0.1× median event `|ΔH₀|` | 5.3·10⁻⁷ vs 9.4·10⁻³ (**5.7·10⁻⁵×**) |
+| 1 · ψ under a sin²-envelope word | < 10⁻¹⁰ | **5.6·10⁻¹⁵** |
+| 2 · `‖ΔL(xy, yx)‖` (both ψ-exact) | > 0.01 | **0.130** (ψ drifts ~2·10⁻¹⁵) |
+| 3 · replica ψ-AUC / endpoint-AUC / erasure | 1.0 / 0.5 / 0 | **1.000 / 0.500 exactly / 0.0 bit-exact** |
+| 3 · margin (min replica dev / max survivor dev) | > 10⁶ | **3.1·10¹³** (0 placements needed) |
+| 4 · `|ζ(xy) − ζ(yx)|` | > 0.01 | **0.087** |
+| 4 · lived-vs-newborn AUC · min · median | 1.0 · >10⁻⁶ · >10⁻² | **1.000 · 0.0081 · 2.003** |
+| 4 · median `|ζ|` at 4/8/16 events | strictly increasing | **0.129 / 0.675 / 2.003** |
+| 5 · ψ change with / without one `†` | > 0.01 / < 10⁻¹⁰ | **0.394 / 0.0 exactly** |
+
+The `†` measurement lands on the closed-form prediction to three digits
+(`1 − e^{−2γτ} = 0.3935`), and the ψ floor sits where the float analysis put it. Two
+**first-execution findings, recorded:** (i) the pre-registered "closed loops are
+p₀-independent" sanity holds **mod 4π** — the two sides of a closed curve partition the sphere
+(the θ = 2.8 cap's on-path gauge lands exactly 4π from the center gauge); wording sharpened, no
+bar affected (every pre-registered ζ comparison is an open path in a shared gauge). (ii) The
+**antipode certificate tripped**, exactly as its own clause anticipated: 1 of 200 words passes
+within 0.0101 of its genesis antipode (single-step excess 1.116 > 0.5); its ζ (3.82) sits inside
+the healthy population and the median/AUC bars are unaffected by construction — which is why
+medians were pre-registered. Recorded, not re-drawn.
+
+**Read, and the gate decision.** On this bracket, identity survives input *by construction*:
+ψ is exact under arbitrary words of non-commuting, non-isometric Hamiltonian events — including
+smoothly modulated ones — while the identity's own law (`H₀`-conservation) is destroyed by the
+same input, and the boundary of the guarantee is exactly where the theorem says (`†`,
+non-Hamiltonian, breaks ψ on cue; the random words already close the *stochastic* half of §8's
+caveat). The §2 replica test holds with `Σ` active, and ζ records the words lived — order
+included — while ψ certifies the sphere the worldline was born on. **The conjunction's
+components split by robustness: value (Casimir) is input-proof; law (`H`-conservation) is
+input-fragile; memory (ζ) accumulates through input.** Per the §9.16 decision rule the
+mechanism is **viable at toy scale** and this log **recommends adopting** the
+Casimir-of-the-bracket direction for the §8 input fork (the adoption call is the author's).
+Scope, honestly: `d = 3`, the inertia triple is a placeholder identity (content not yet
+attached — the §9.3 program and the graph-shaped charges lift onto coadjoint orbits *after*
+adoption); this grades the *value* half of §9.14's conjunction under driving, the law half on
+this bracket is future work; and the ψ side being by-construction is the mechanism claim, not
+a discovery.
