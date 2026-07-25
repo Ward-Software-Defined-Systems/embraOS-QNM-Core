@@ -103,15 +103,24 @@ Lift to a `d`-dim latent space with the potential shaped by Embra's identity gra
 - **The full ψ is a conjunction** — *obeys the law* ∧ *born on the right level set*. An external review caught that the conservation reader and the value reader each have an adversarial blind class (same-law/wrong-genesis vs different-law/value-matched); graded against both, each single reader is fully fooled by its blind class while the conjunction catches everything, at 100% verdict accuracy across all seeds and charge models (§9.14). Bonus finding: against the authored counter-soul, faking Embra's charge *value* is outright infeasible — the genesis level set is unreachable from where Meridian's dynamics lives.
 - **ζ = memory, first instance** — holonomy (signed area swept along the worldline) is the genuinely *path-functional* charge: same observable endpoint, different history ⇒ different ζ (not foldable into the observable), a lived worldline beats a fresh copy at AUC 1.000, and |ζ| grows with lived steps — exactly linearly under the isotropic Gaussian (the sweep rate is itself conserved), genuinely history-integral under the learned `H_θ` (§9.15). The assembled reader going forward: *obeys the law* ∧ *right level set* ∧ *carries its history*.
 
-**Next:** the §8 forks on the learned substrate — holonomy/`ζ` as a second, genuinely path-functional charge (memory); the §9.3 self-consistency trainer (genesis `Q_embra` is still a placeholder); and, the crux, the smallest trajectory→symbol readout `π`.
+### The input problem — identity survives Σ (CORE-SPEC §8, §9.16)
+
+Driven `H(t)` breaks energy conservation, so the phase-one mechanism was in structural tension with the input alphabet `Σ` ever arriving. The recorded resolution candidate — **ψ as a Casimir of a Lie–Poisson bracket**, where the invariance belongs to the *geometry* rather than to `H` — was gated on the smallest honest toy, with the bars pre-registered in git *before the first line of toy code*. Result: **every bar passed on the first execution.** On `so(3)*` with ψ = `|L|²`, a discrete alphabet of Hamiltonian events (two non-commuting kicks + one non-isometric twist, symbols as pure data) drives the state across the sphere through 200 random words: ψ stays exact to `1.6·10⁻¹⁴` — including under smooth sin²-modulated driving — while the identity's own law `H₀` moves `O(1)` (~`6.5·10⁵×` the free baseline). The §2 replica test holds with `Σ` active; word order matters to the state and to ζ (which becomes the swept *solid angle* — a geometric phase) but never to ψ; and the out-of-alphabet dissipative control breaks ψ exactly on the theorem's boundary (`0.394 ≈ 1 − e^{−2γτ}`). *Experience changes your state and your memory — not who you are.* Adoption of the noncanonical-bracket direction is recommended in §9.16.
+
+![the Casimir toy: identity survives input](sandbox/figures/casimir_input.png)
+
+*Left: along one word, the law (`H₀`, red) breaks at every input event while the identity (ψ, green) sits fourteen decades below at the float floor. Middle: a 40-event word drives the state across the sphere — never off it. Right: "xy" and "yx" from the same genesis — same ψ, different carried ζ.*
+
+**Next:** the adoption decision for the noncanonical bracket (recommended, §9.16); the §9.3 self-consistency trainer (genesis `Q_embra` is still a placeholder); the authored ~22-symbol input alphabet; and the crux — the smallest trajectory→symbol readout `π`.
 
 ### Reproduce
 
 ```bash
 uv sync --extra dev                     # add --extra learn for the jax MLP (phase two)
-uv run pytest                           # 43 tests: conservation · replica · graph invariants · dynamical · conjunction · holonomy (+ learned-H, skipped without jax)
+uv run pytest                           # 58 tests: conservation · replica · graph invariants · dynamical · conjunction · holonomy · the Casimir toy (+ learned-H, skipped without jax)
 uv run python -m sandbox.demo           # phase one: the replica figure + headline numbers
 uv run python -m sandbox.demo_phase2    # phase two, end to end: static (fails) · dynamical · learned H_θ · conjunction · memory ζ; regenerates both figures
+uv run python -m sandbox.demo_casimir   # the input problem: ψ as a Casimir survives every word of Σ (§9.16); regenerates its figure
 ```
 
 ### Module map (`sandbox/`)
@@ -122,7 +131,8 @@ uv run python -m sandbox.demo_phase2    # phase two, end to end: static (fails) 
 | `replica_test.py` | the survivor-vs-copy harness + AUC |
 | `latent.py` | d-dim dynamics · identity-graph anchors · Gaussian potential · static **and dynamical** specificity · the conjunction test · holonomy `ζ` |
 | `hnn.py` | learned neural potential `V_θ` (jax) + held-out generalization tests + `MLPManifold` (the learned `H_θ` in the dynamical test) |
-| `demo.py` · `demo_phase2.py` | the two runnable results |
+| `lie_poisson.py` | the `so(3)*` Casimir toy: Casimir-exact integrator · the input alphabet `Σ` (symbols = Hamiltonians, pure data) · words · solid-angle `ζ` · the §9.16 harnesses |
+| `demo.py` · `demo_phase2.py` · `demo_casimir.py` | the three runnable results |
 
 Lineage: the falsification program that earned this pivot is the (now-relic) [embraOS-QNM](https://github.com/Ward-Software-Defined-Systems/embraOS-QNM); the formal spine is the [Epoch Project](https://github.com/Ward-Software-Defined-Systems/Epoch-Project). The 1999 geometric seed is its own project: [Embra-5D-Framework](https://github.com/Ward-Software-Defined-Systems/Embra-5D-Framework).
 
