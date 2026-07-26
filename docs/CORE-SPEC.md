@@ -6,7 +6,7 @@
 result holds on the authored 100-node graph, against an authored counter-identity, and under a
 **learned `H_θ`** — with the margin set by charge expressiveness and the structural difference
 between souls, not content volume (§9.12–§9.13; includes one pre-registered miss, recorded). An
-external review (`docs/CORE-SPEC-feedback.md`, through §9.11) sharpened the reader — the full ψ
+external review (2026-07-19, through §9.11; in git history at `cb82553`) sharpened the reader — the full ψ
 is a **conjunction** (§6), graded perfect against both adversarial impostor classes in §9.14 —
 bounded the claim (the key/MAC note, §6), and posed the **input problem** now recorded with its
 leading resolution in §8. The path-functional memory charge **ζ** (holonomy) has its first
@@ -154,8 +154,8 @@ collapses to a function of what is readable → replica-blind. The four relic re
 generic *because there was no conserved `ker(dπ)` charge to read*, not because nothing was
 hidden. The fix is architectural: build `S` with one. That is this core.
 
-**The full reader is a conjunction.** The external review (`docs/CORE-SPEC-feedback.md`, note 1)
-caught a quiet shift: §2's impostor is a *wrong-genesis* copy; §9.11's is a *wrong-law* flow —
+**The full reader is a conjunction.** The external review (2026-07-19, note 1; in git history
+at `cb82553`) caught a quiet shift: §2's impostor is a *wrong-genesis* copy; §9.11's is a *wrong-law* flow —
 and each reader has the other's blind spot. A replica re-instantiated on the **same core** (same
 `H`, wrong genesis) evolves under Embra's own law, so it conserves `H_embra` *perfectly* — at the
 wrong value `Q_copy`; the §9.11 conservation reader passes it. A trajectory of a **different
@@ -551,7 +551,7 @@ confirmation.
 
 ### 9.14 Increment-3c — the full ψ is a conjunction, graded against both impostor classes (recorded 2026-07-23)
 
-The external review (`docs/CORE-SPEC-feedback.md`, note 1) caught that §2's impostor
+The external review (2026-07-19, note 1; in git history at `cb82553`) caught that §2's impostor
 (*wrong genesis*) and §9.11's (*wrong law*) are different adversaries, and each reader has the
 other's blind spot (§6, "The full reader is a conjunction"). This increment grades
 `ψ_full = [var(H_real) < τ_var] ∧ [|Q − Q_embra| < τ_Q]` against both classes, each constructed
