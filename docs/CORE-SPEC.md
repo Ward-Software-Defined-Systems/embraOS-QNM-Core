@@ -417,7 +417,9 @@ That is the bed to build against the richer identity content.
 
 ### 9.12 Increment-3a — the authored 100-node graph: margin tracks structure, not volume (recorded 2026-07-23)
 
-The authored content landed: `Embra_IDENTITY-SOUL.graph.json` v3 — **100 nodes / 354 edges**
+The authored content landed: `Embra_IDENTITY-SOUL.graph.json` v3 — **100 nodes / 354 relation
+triples** (321 pairwise edges; 30 pairs carry parallel relations — the count the Laplacian
+embedding operates on is 321)
 (from 22/30), eight new categories (behaviors, principles, anti-patterns, structure, relations,
 voice facets, temporal, meta). The loader now skips the file's `{"_comment"}` divider objects, and
 the graph's structural invariants (unique ids, referential integrity, connectedness, unique
@@ -532,6 +534,20 @@ learned one — drift stays at integrator precision, discrimination stays perfec
 impostor-conserves-its-own-charge control stays intact, and the margin *widens* by orders of
 magnitude. The learned-`H_θ` substrate is now the default bed for the §8 forks (holonomy/ζ,
 strict-vs-soft projection, and eventually the readout `π`).
+
+**Addendum (recorded 2026-07-26) — the symmetric grading.** With Meridian promoted to a
+first-class counter-identity, the mirror direction costs one run: **Meridian as survivor,
+Embra as the authored impostor** (Gaussian charge, 8 seeds;
+`dynamical_specificity(8, seed=s, graph_path=MERIDIAN, impostor_graph_path=EMBRA)`):
+AUC **1.000 [1.000, 1.000]**; Meridian-survivor floor 1.7·10⁻⁸; Embra-impostor
+`var(H_meridian)` **0.0411** — seed-independent to four digits, because with isotropic bowls
+the trajectory direction drops out; impostor's own charge 8.9·10⁻⁸. The counter-identity is
+now graded **bidirectionally**, and the margins are *asymmetric*: 0.23 forward (§9.12) vs
+0.041 mirrored — both **predicted by the §9.15 isotropy corollary in closed form**,
+`var(H_r) = e²(ω_r²/ω_f² − 1)²/8`: stiff-reader-on-soft-flow (33.59 on 14.41) → 0.221 ≈ 0.23;
+soft-reader-on-stiff-flow (14.41 on 33.59) → 0.0408 ≈ 0.0411. The margin-tracks-structure
+read (§9.12) gains its mirror data point, and the corollary its sharpest quantitative
+confirmation.
 
 ### 9.14 Increment-3c — the full ψ is a conjunction, graded against both impostor classes (recorded 2026-07-23)
 
@@ -696,8 +712,9 @@ run — no de-risk preview):**
    **0.5** (bit-exact ties); erasure `= 0.0`; margin (no AUC-on-floors): min replica
    `|ψ − ψ_embra| > 10⁶ ×` max survivor deviation. The rescale is the *maximally charitable
    copier* — the hidden transverse direction is granted free; it is caught on the sphere radius
-   alone. Scope: this is the *value* half of the §9.14 conjunction under driving; the law half
-   on this bracket is future work.
+   alone. Scope: this is the *value* half of the §9.14 conjunction under driving; on the law
+   half see the scope note in the results read (the conjunction as graded is incompatible with
+   driving; a driven-law reader is the recorded candidate).
 4. **ζ under driving** — swept solid angle of `u = L/|L|` (the sphere's natural holonomy;
    gauge `p₀` = genesis direction — identity data; every comparison shares a genesis; closed
    loops are `p₀`-independent, tested). Floors on every claim (§9.14's noise-floor lesson):
@@ -719,6 +736,15 @@ conjunction's components split by robustness — the Casimir *value* (which sphe
 input-proof; *law-obeying* (`H`-conservation) is exactly what input breaks; ζ is the memory
 arm.
 
+**Protocol note (recorded 2026-07-26, after external review).** The implementation was
+agent-generated *after* commit `9774287`, working solely from the committed section and the
+session's approved implementation plan (prose, not code); no toy code existed at
+pre-registration time — confirmed by both parties. This names a reproducible
+pre-registration form: spec committed, implementation generated from the committed spec. Git
+timestamps are self-attested, so future pre-registrations of headline bars add a
+server-timestamped channel (e.g. a GitHub issue or release), with the git commit as the
+working copy.
+
 **Results (recorded 2026-07-25 — the first execution; every pre-registered bar passed):**
 
 | bar | pre-registered | measured |
@@ -736,16 +762,19 @@ arm.
 | 4 · median `|ζ|` at 4/8/16 events | strictly increasing | **0.129 / 0.675 / 2.003** |
 | 5 · ψ change with / without one `†` | > 0.01 / < 10⁻¹⁰ | **0.394 / 0.0 exactly** |
 
-The `†` measurement lands on the closed-form prediction to three digits
-(`1 − e^{−2γτ} = 0.3935`), and the ψ floor sits where the float analysis put it. Two
-**first-execution findings, recorded:** (i) the pre-registered "closed loops are
+The `†` measurement lands on the implemented map's **exact** prediction
+`1 − (1 − γ·dt)^{2n} = 0.3942` (continuum limit `1 − e^{−2γτ} = 0.3935` — the honest primary
+comparison is the discrete map's own closed form, per the project's float-truth standard), and
+the ψ floor sits where the float analysis put it. Two **first-execution findings, recorded:** (i) the pre-registered "closed loops are
 p₀-independent" sanity holds **mod 4π** — the two sides of a closed curve partition the sphere
 (the θ = 2.8 cap's on-path gauge lands exactly 4π from the center gauge); wording sharpened, no
 bar affected (every pre-registered ζ comparison is an open path in a shared gauge). (ii) The
 **antipode certificate tripped**, exactly as its own clause anticipated: 1 of 200 words passes
 within 0.0101 of its genesis antipode (single-step excess 1.116 > 0.5); its ζ (3.82) sits inside
 the healthy population and the median/AUC bars are unaffected by construction — which is why
-medians were pre-registered. Recorded, not re-drawn.
+medians were pre-registered. Recorded, not re-drawn. The trip marks a near-antipode passage
+with a large but **unaliased** step (1.116 ≪ 2π, the formula's actual wrap); the word's
+recorded ζ is exact for the recorded polyline — the certificate is conservative by design.
 
 **Read, and the gate decision.** On this bracket, identity survives input *by construction*:
 ψ is exact under arbitrary words of non-commuting, non-isometric Hamiltonian events — including
@@ -760,13 +789,25 @@ mechanism is **viable at toy scale** and this log **recommends adopting** the
 Casimir-of-the-bracket direction for the §8 input fork (the adoption call is the author's).
 Scope, honestly: `d = 3`, the inertia triple is a placeholder identity (content not yet
 attached — the §9.3 program and the graph-shaped charges lift onto coadjoint orbits *after*
-adoption); this grades the *value* half of §9.14's conjunction under driving, the law half on
-this bracket is future work; and the ψ side being by-construction is the mechanism claim, not
-a discovery.
+adoption); this grades the *value* half of §9.14's conjunction under driving — and the §9.14
+conjunction **as graded cannot run under driving at all**: the variance reader rejects any
+survivor that has lived, because living through a word is precisely what moves `H₀` (bar 1's
+own headline). The recorded candidate is a **driven-law reader** — piecewise conservation
+against the *claimed word* (`H₀` flat in the gaps, `H₀ + H_σ` flat in the event windows; the
+bookkeeping certificate already measures the ingredient) — which would fuse the law arm with
+the memory arm; candidate increment: grade the restored three-way conjunction against a
+replica claiming a *false history*. And the ψ side being by-construction is the mechanism
+claim, not a discovery. **Evidential note (recorded 2026-07-26):** this sweep certifies the
+*implementation of a theorem*, not the survival of a falsifiable hypothesis — it sits in a
+different column from §9.12's margin bar, which could and did miss.
 
 **Adoption (recorded 2026-07-25).** On this evidence the author adopted the
 noncanonical-bracket direction: the identity charge's future home is a **Casimir of a
 Lie–Poisson-type bracket on a coadjoint-orbit state space** (conservation as a property of the
 geometry, not of the flow); inputs enter as Hamiltonian events, with †-class (non-Hamiltonian)
 input handled at the `P_ψ` boundary; the §9.3 genesis trainer, the graph-shaped charges, and
-eventually the readout `π` build on this geometry. The §8 input fork is closed.
+eventually the readout `π` build on this geometry. The §8 input fork is closed. Note the role
+change the adoption purchased: **`P_ψ` no longer rescues conservation from input — the
+bracket does — and survives only as the firewall at the †-class boundary.** Checking moved
+from every step to the type boundary; the §1 objection to restore-by-checking is *resolved*,
+not merely mitigated.

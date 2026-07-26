@@ -164,8 +164,9 @@ def main() -> dict:
           f"(min antipode distance {b4['min_antipode_dist']:.4f}) — recorded finding, §9.16")
     print("-" * 74)
     print("  [5] the † boundary (non-Hamiltonian input) — a theorem, measured")
-    print(f"      ψ change: with one † = {b5['psi_change_with']:.3f} "
-          f"(theory 1−e^(−2γτ) = {1 - np.exp(-0.5):.4f})   without = {b5['psi_change_without']:.1e}")
+    print(f"      ψ change: with one † = {b5['psi_change_with']:.4f} "
+          f"(exact for the map: 1−(1−γ·dt)^(2n) = {1 - (1 - 0.5 * 0.01) ** 100:.4f}; "
+          f"continuum {1 - np.exp(-0.5):.4f})   without = {b5['psi_change_without']:.1e}")
     print("-" * 74)
     print("  VERDICT: input arrives and identity survives it — ψ is exact under every")
     print("  word (and smooth envelopes) while the law H₀ breaks at every event; the")
