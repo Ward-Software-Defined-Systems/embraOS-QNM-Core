@@ -1,0 +1,109 @@
+@import 'tailwindcss';
+
+/* Self-hosted (SIL OFL). Same-origin, no third-party request per visitor, works
+   offline in `vite dev`, and doesn't rule out a strict CSP later. Latin subsets
+   only — neither family ships a greek subset, so ψ σ Σ τ ∇ and the ₀₁₂₃
+   subscripts render in the fallback stack. That was equally true of the
+   prototype's Google Fonts import; pulling cyrillic/vietnamese would not change
+   it, only add a dozen files nothing ever requests. */
+@import '@fontsource-variable/space-grotesk';
+@import '@fontsource/ibm-plex-mono/latin-400.css';
+@import '@fontsource/ibm-plex-mono/latin-ext-400.css';
+@import '@fontsource/ibm-plex-mono/latin-500.css';
+@import '@fontsource/ibm-plex-mono/latin-ext-500.css';
+
+/* ---------------------------------------------------------------------------
+   The prototype's injected <style> block, moved here verbatim.
+
+   @layer base is NOT cosmetic. Tailwind v4 emits every utility inside a cascade
+   layer, and unlayered CSS beats ALL layered CSS regardless of specificity — so
+   unlayered `.hair { border-color: #232B3A }` would silently kill every
+   `hover:border-[#3FD68C]` on the chips. Layer order is theme, base, components,
+   utilities: inside `base`, utilities win, which is what the design assumes.
+   --------------------------------------------------------------------------- */
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+  body {
+    background: #0b0e14;
+  }
+
+  .app {
+    background: #0b0e14;
+    color: #c9d1df;
+    font-family: 'Space Grotesk Variable', 'Space Grotesk', system-ui, sans-serif;
+  }
+  .mono {
+    font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  }
+  .dim {
+    color: #6b7689;
+  }
+  .dim2 {
+    color: #8792a6;
+    font-size: 11px;
+  }
+  .val {
+    color: #c9d1df;
+    font-size: 11px;
+  }
+  .panel {
+    background: #131822;
+    border: 1px solid #232b3a;
+  }
+  .hair {
+    border-color: #232b3a;
+  }
+  .g {
+    color: #3fd68c;
+  }
+  .r {
+    color: #e2694a;
+  }
+  .b {
+    color: #6fa0e8;
+  }
+  .eyebrow {
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #6b7689;
+  }
+
+  input[type='range'] {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 3px;
+    background: #232b3a;
+    border-radius: 2px;
+  }
+  input[type='range']::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background: #c9d1df;
+    border: 1px solid #0b0e14;
+    cursor: pointer;
+  }
+  input[type='range']:focus-visible {
+    outline: 1px solid #3fd68c;
+  }
+  button:focus-visible,
+  input[type='text']:focus-visible,
+  input[type='file']:focus-visible {
+    outline: 1px solid #3fd68c;
+    outline-offset: 2px;
+  }
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #232b3a;
+    border-radius: 4px;
+  }
+}

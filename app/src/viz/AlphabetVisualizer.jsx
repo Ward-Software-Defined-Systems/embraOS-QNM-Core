@@ -434,7 +434,8 @@ export default function AlphabetVisualizer() {
 
     three.current = { renderer, scene, camera, sphereGeo, spherePos, arrowGeo, arrowPts, particles, pArr, pGeo, trailGeo, trail, genesisDot };
 
-    // custom orbit (OrbitControls is unavailable in this three build)
+    // custom orbit — ~20 lines, no addon import. (npm's three DOES ship
+    // addons/controls/OrbitControls; swap it in if touch pinch-zoom matters.)
     let drag = false, px = 0, py = 0;
     const el = renderer.domElement;
     const down = (e) => { drag = true; px = e.clientX; py = e.clientY; };
@@ -589,23 +590,6 @@ export default function AlphabetVisualizer() {
 
   return (
     <div className="app w-full h-screen flex flex-col overflow-hidden">
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
-        .app { background:#0B0E14; color:#C9D1DF; font-family:'Space Grotesk',system-ui,sans-serif; }
-        .mono { font-family:'IBM Plex Mono',ui-monospace,monospace; }
-        .dim { color:#6B7689; } .dim2 { color:#8792a6; font-size:11px; }
-        .val { color:#C9D1DF; font-size:11px; }
-        .panel { background:#131822; border:1px solid #232B3A; }
-        .hair { border-color:#232B3A; }
-        .g { color:#3FD68C; } .r { color:#E2694A; } .b { color:#6FA0E8; }
-        .eyebrow { font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:#6B7689; }
-        input[type=range]{ -webkit-appearance:none; height:3px; background:#232B3A; border-radius:2px; }
-        input[type=range]::-webkit-slider-thumb{ -webkit-appearance:none; width:11px; height:11px; border-radius:50%; background:#C9D1DF; border:1px solid #0B0E14; cursor:pointer; }
-        input[type=range]:focus-visible{ outline:1px solid #3FD68C; }
-        button:focus-visible, input[type=text]:focus-visible{ outline:1px solid #3FD68C; outline-offset:2px; }
-        ::-webkit-scrollbar{ width:8px; } ::-webkit-scrollbar-thumb{ background:#232B3A; border-radius:4px; }
-      `}</style>
-
       <header className="flex items-center justify-between px-4 py-2 border-b hair shrink-0">
         <div className="flex items-baseline gap-3">
           <span className="font-semibold tracking-tight" style={{ fontSize: 15 }}>Σ₀ on the sphere</span>

@@ -1,0 +1,30 @@
+/**
+ * For more details on how to configure Wrangler, refer to:
+ * https://developers.cloudflare.com/workers/wrangler/configuration/
+ */
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "qnm-alphabet",
+	"main": "worker/index.ts",
+	"compatibility_date": "2026-07-27",
+	"assets": {
+		"not_found_handling": "single-page-application"
+	},
+	"observability": {
+		"enabled": true
+	},
+	"upload_source_maps": true
+
+	/**
+	 * No `routes` — this deploys to the free <name>.<subdomain>.workers.dev URL.
+	 * A custom domain is one entry when wanted (the zone must be on this account):
+	 *   "routes": [ { "pattern": "alphabet.wsds.ai", "custom_domain": true } ]
+	 *
+	 * No `assets.directory` / `assets.binding` / `account_id` on purpose: the Vite
+	 * plugin generates dist/qnm_alphabet/wrangler.json with "directory": "../client"
+	 * injected, and writes .wrangler/deploy/config.json pointing a bare
+	 * `wrangler deploy` at that generated config rather than this source one.
+	 *
+	 * No `nodejs_compat`: the Worker imports nothing from node.
+	 */
+}
