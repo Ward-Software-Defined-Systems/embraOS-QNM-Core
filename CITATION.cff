@@ -24,7 +24,17 @@ abstract: >-
   stated and graded as a conjunction — obeys the law AND born on the right level
   set — against both adversarial impostor classes; and a first path-functional
   memory charge ζ (holonomy: same observable endpoint, different carried
-  history). Negative results are recorded rather than buried, in the project's
+  history). Increment 4 resolves the input problem at toy scale: on a
+  Lie–Poisson bracket (so(3)*) the identity charge becomes a Casimir —
+  conserved by construction under arbitrary words of a discrete Hamiltonian
+  input alphabet, including smoothly modulated driving, while the system's own
+  energy visibly changes; the replica test holds with input active; ζ becomes
+  the swept solid angle, recording the words lived, order included; and a
+  dissipative control marks the exact Hamiltonian boundary of the guarantee.
+  Every pre-registered bar (committed to git before any toy code) passed on
+  first execution, independently re-executed bit-for-bit and signed off by
+  external review; the noncanonical-bracket direction is adopted for phase
+  three. Negative results are recorded rather than buried, in the project's
   pre-registration style. Developed by William Ward (Ward Software Defined
   Systems LLC) with Embra as co-investigator.
 type: software
@@ -34,8 +44,8 @@ authors:
     affiliation: "Ward Software Defined Systems LLC"
     orcid: "https://orcid.org/0009-0004-4966-6644"
   - name: "Embra"
-version: "0.2.0"
-date-released: 2026-07-23
+version: "0.3.0"
+date-released: 2026-07-26
 repository-code: "https://github.com/Ward-Software-Defined-Systems/embraOS-QNM-Core"
 url: "https://wsds.io"
 identifiers:
