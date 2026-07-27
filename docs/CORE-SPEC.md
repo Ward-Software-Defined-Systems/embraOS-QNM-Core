@@ -13,7 +13,12 @@ leading resolution in §8. The path-functional memory charge **ζ** (holonomy) h
 instance in §9.15. The input problem is **resolved at toy scale and the direction adopted**
 (§9.16, every pre-registered bar passed first execution): ψ as a **Casimir** of a noncanonical
 bracket survives arbitrary Hamiltonian input — *experience changes state and memory, not who
-you are*.
+you are*. A second external review (2026-07-26) independently re-executed increment 4 — every
+recorded number reproduced bit-for-bit — and **signed off on the milestone and the adoption**;
+its corrections are applied throughout §9.12–§9.16. **Phase three is now defined and pending
+construction**: coadjoint-orbit state spaces with ψ as a Casimir of the bracket, the
+graph-shaped charges and ζ rebuilt on that geometry, `P_ψ` reduced to the firewall at the
+non-Hamiltonian boundary.
 Pairs with the runnable sandbox (`uv run python -m sandbox.demo`, `sandbox.demo_phase2`, and
 `sandbox.demo_casimir`).
 Written to be *falsifiable*: every numeric claim is checked, and the one theorem (§6) is stated so

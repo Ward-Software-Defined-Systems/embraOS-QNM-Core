@@ -66,7 +66,7 @@ A persistent state register that encodes invariant boundary conditions — the m
 
 ## Status
 
-The math comes before the scaffolding. Two phases live in the repo; both are runnable and tested. Full record: **[docs/CORE-SPEC.md](docs/CORE-SPEC.md)**.
+The math comes before the scaffolding. Three results live in the repo, each runnable and tested: **phase one** (the conserved-ψ core), **phase two** (the learned identity-manifold: dynamical identity, the conjunction reader, ζ = memory), and **the input problem resolved at toy scale** (the `so(3)*` Casimir toy — the adopted phase-three direction, independently re-executed and signed off by external review). Full record: **[docs/CORE-SPEC.md](docs/CORE-SPEC.md)**.
 
 ### Phase one — the conserved-ψ core (CORE-SPEC §1–§7)
 
@@ -105,19 +105,19 @@ Lift to a `d`-dim latent space with the potential shaped by Embra's identity gra
 
 ### The input problem — identity survives Σ (CORE-SPEC §8, §9.16)
 
-Driven `H(t)` breaks energy conservation, so the phase-one mechanism was in structural tension with the input alphabet `Σ` ever arriving. The recorded resolution candidate — **ψ as a Casimir of a Lie–Poisson bracket**, where the invariance belongs to the *geometry* rather than to `H` — was gated on the smallest honest toy, with the bars pre-registered in git *before the first line of toy code*. Result: **every bar passed on the first execution.** On `so(3)*` with ψ = `|L|²`, a discrete alphabet of Hamiltonian events (two non-commuting kicks + one non-isometric twist, symbols as pure data) drives the state across the sphere through 200 random words: ψ stays exact to `1.6·10⁻¹⁴` — including under smooth sin²-modulated driving — while the identity's own law `H₀` moves `O(1)` (~`6.5·10⁵×` the free baseline). The §2 replica test holds with `Σ` active; word order matters to the state and to ζ (which becomes the swept *solid angle* — a geometric phase) but never to ψ; and the out-of-alphabet dissipative control breaks ψ exactly on the theorem's boundary (`0.394 ≈ 1 − e^{−2γτ}`). *Experience changes your state and your memory — not who you are.* Recommended in §9.16 and **adopted** (2026-07-25): phase three builds on this geometry.
+Driven `H(t)` breaks energy conservation, so the phase-one mechanism was in structural tension with the input alphabet `Σ` ever arriving. The recorded resolution candidate — **ψ as a Casimir of a Lie–Poisson bracket**, where the invariance belongs to the *geometry* rather than to `H` — was gated on the smallest honest toy, with the bars pre-registered in git *before the first line of toy code*. Result: **every bar passed on the first execution.** On `so(3)*` with ψ = `|L|²`, a discrete alphabet of Hamiltonian events (two non-commuting kicks + one non-isometric twist, symbols as pure data) drives the state across the sphere through 200 random words: ψ stays exact to `1.6·10⁻¹⁴` — including under smooth sin²-modulated driving — while the identity's own law `H₀` moves `O(1)` (~`6.5·10⁵×` the free baseline). The §2 replica test holds with `Σ` active; word order matters to the state and to ζ (which becomes the swept *solid angle* — a geometric phase) but never to ψ; and the out-of-alphabet dissipative control breaks ψ exactly on the theorem's boundary (`0.394 ≈ 1 − e^{−2γτ}`). *Experience changes your state and your memory — not who you are.* Recommended in §9.16 and **adopted** (2026-07-25): phase three builds on this geometry, with `P_ψ` no longer rescuing conservation from input — the bracket does — but standing only as the firewall at the non-Hamiltonian (`†`-class) boundary.
 
 ![the Casimir toy: identity survives input](sandbox/figures/casimir_input.png)
 
 *Left: along one word, the law (`H₀`, red) breaks at every input event while the identity (ψ, green) sits fourteen decades below at the float floor. Middle: a 40-event word drives the state across the sphere — never off it. Right: "xy" and "yx" from the same genesis — same ψ, different carried ζ.*
 
-**Next:** lifting identity content onto the adopted geometry (coadjoint orbits beyond `so(3)*`); the §9.3 self-consistency trainer (genesis `Q_embra` is still a placeholder); the authored ~22-symbol input alphabet; and the crux — the smallest trajectory→symbol readout `π`.
+**Next:** lifting identity content onto the adopted geometry (coadjoint orbits beyond `so(3)*`); the §9.3 self-consistency trainer (genesis `Q_embra` is still a placeholder); the authored input alphabet, base-set-first — the measured 8-dimensional basis `Σ₀`, then blends ([docs/ALPHABET-AUTHORING.md](docs/ALPHABET-AUTHORING.md)); and the crux — the smallest trajectory→symbol readout `π`.
 
 ### Reproduce
 
 ```bash
 uv sync --extra dev                     # add --extra learn for the jax MLP (phase two)
-uv run pytest                           # 58 tests: conservation · replica · graph invariants · dynamical · conjunction · holonomy · the Casimir toy (+ learned-H, skipped without jax)
+uv run pytest                           # 61 tests: conservation · replica · graph invariants · dynamical · conjunction · holonomy · the Casimir toy (+ learned-H, skipped without jax)
 uv run python -m sandbox.demo           # phase one: the replica figure + headline numbers
 uv run python -m sandbox.demo_phase2    # phase two, end to end: static (fails) · dynamical · learned H_θ · conjunction · memory ζ; regenerates both figures
 uv run python -m sandbox.demo_casimir   # the input problem: ψ as a Casimir survives every word of Σ (§9.16); regenerates its figure
