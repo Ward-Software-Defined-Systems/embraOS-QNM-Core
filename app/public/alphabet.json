@@ -1,0 +1,72 @@
+{
+  "_comment": "An authored input alphabet Σ for the so(3)* toy. Every row IS a Hamiltonian H_σ = amp · ( a·L + ½ LᵀAL ), given as coefficients over the pinned base Σ₀ = {k₁ k₂ k₃ | c₁₂ c₁₃ c₂₃ | d₁ d₂}. Source: docs/ALPHABET-AUTHORING.md §9 'Handing it over' — v1's surviving symbols re-encoded, plus authored illustrations. This is EXAMPLE CONTENT and a schema reference, not the authored alphabet. Edit this file and refresh the browser, or drop your own file onto the page.",
+
+  "schema": "embraos.alphabet/1",
+  "substrate": "so(3)*",
+  "basis": ["k1", "k2", "k3", "c12", "c13", "c23", "d1", "d2"],
+
+  "symbols": [
+    { "_comment": "=== v1's surviving symbols, re-encoded (§3 worked mappings) ===" },
+
+    {
+      "name": "x",
+      "sigma0": { "k1": 1 },
+      "amp": 0.5,
+      "reading": "v1's kick, re-encoded — reorient about e₁"
+    },
+    {
+      "name": "X",
+      "sigma0": { "k1": 1 },
+      "amp": 1.5,
+      "reading": "intensity variant of x (case distinguishes, per §4 naming)"
+    },
+    {
+      "name": "s",
+      "sigma0": { "d1": 0.793, "d2": 0.196 },
+      "amp": 1.0,
+      "reading": "v1's twist about e₁ — silent residue dropped; item 9 confirms"
+    },
+    {
+      "name": "g",
+      "sigma0": { "d1": 1 },
+      "amp": -0.245,
+      "reading": "v1's self-drag, trimmed to pure d₁ (§3)"
+    },
+
+    { "_comment": "=== authored illustrations ===" },
+
+    {
+      "name": "m",
+      "sigma0": { "k1": 0.6, "c23": 0.4 },
+      "amp": 1.0,
+      "reading": "an authored blend: reorient about e₁ while coupling axes 2↔3"
+    },
+    {
+      "name": "p",
+      "sigma0": { "c12": 1 },
+      "amp": 1.0,
+      "reading": "cross-couple 1↔2 — registered pair with n"
+    },
+    {
+      "name": "n",
+      "sigma0": { "c12": 1 },
+      "amp": -1.0,
+      "reading": "p's semantic opposite (negated amp; NOT an inverse — §3)"
+    },
+    {
+      "name": "t",
+      "sigma0": { "k2": 1 },
+      "amp": 1.0,
+      "dur": 1.0,
+      "reading": "long reorient — duration runs per-word only until the §4 upgrade"
+    }
+  ],
+
+  "pairs": [
+    {
+      "do": "p",
+      "undo": "n",
+      "note": "semantic opposites, not inverses; item 9 reports the actual return distance"
+    }
+  ]
+}

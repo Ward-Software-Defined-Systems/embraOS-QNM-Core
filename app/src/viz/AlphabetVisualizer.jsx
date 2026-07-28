@@ -1,97 +1,24 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 
+import {
+  DT, SIGMA0_GROUPS, SIGMA0_LABEL, TAU_EVENT, ZERO,
+  add3, buildSymbol, cross, dot, fibSphere, gradH0, h0, norm3, rkmk2, scale3,
+} from "../core/lie.ts";
+import {
+  BLEND, buildTimeline, emptyAlphabet, formatCoeffs, scanWord, toJsonRow, totalSteps, wordOf,
+} from "../core/alphabet.ts";
+import {
+  DEFAULT_URL, clearStored, fetchDefault, parseText, readStored, writeStored,
+} from "../loadAlphabet.ts";
+import AlphabetPanel, { CHIP } from "../ui/AlphabetPanel.tsx";
+
 // ============================================================================
-// Physics core — ported from sandbox/lie_poisson.py (so(3)* Lie–Poisson toy).
-// State L on the sphere psi = |L|^2 = 1. Flow: Ldot = L x gradH.
-// Integrator: RKMK2 (one rotation per step) => psi exact, never renormalized.
+// The physics — Σ₀, buildSymbol, the RKMK2 step — lives in ../core/lie.ts, and
+// the alphabet schema and word machinery in ../core/alphabet.ts. Both are shared
+// with the loader and the tests; a claim this file makes about ψ is a claim
+// those tests check. What stays here is rendering.
 // ============================================================================
-const SQ78 = Math.sqrt(78), SQ26 = Math.sqrt(26);
-const D1 = [7 / SQ78, -2 / SQ78, -5 / SQ78];   // traceless part of diag(1/I), unit Frobenius
-const D2 = [1 / SQ26, -4 / SQ26, 3 / SQ26];    // traceless diagonal, perp to D1
-const INERTIA = [1, 2, 3];
-
-const dot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
-const cross = (a, b) => [
-  a[1] * b[2] - a[2] * b[1],
-  a[2] * b[0] - a[0] * b[2],
-  a[0] * b[1] - a[1] * b[0],
-];
-const add3 = (a, b) => [a[0] + b[0], a[1] + b[1], a[2] + b[2]];
-const scale3 = (a, s) => [a[0] * s, a[1] * s, a[2] * s];
-const norm3 = (a) => Math.sqrt(dot(a, a));
-
-const gradH0 = (L) => [L[0] / INERTIA[0], L[1] / INERTIA[1], L[2] / INERTIA[2]];
-const h0 = (L) =>
-  0.5 * (L[0] * L[0] / INERTIA[0] + L[1] * L[1] / INERTIA[1] + L[2] * L[2] / INERTIA[2]);
-
-// A blend over the base set S0 = {k1 k2 k3 | c12 c13 c23 | d1 d2}, times amplitude.
-function buildSymbol(p) {
-  const A = [
-    [p.d1 * D1[0] + p.d2 * D2[0], p.c12, p.c13],
-    [p.c12, p.d1 * D1[1] + p.d2 * D2[1], p.c23],
-    [p.c13, p.c23, p.d1 * D1[2] + p.d2 * D2[2]],
-  ];
-  const a = [p.k1, p.k2, p.k3];
-  const m = p.amp;
-  return {
-    grad: (L) => [
-      m * (a[0] + A[0][0] * L[0] + A[0][1] * L[1] + A[0][2] * L[2]),
-      m * (a[1] + A[1][0] * L[0] + A[1][1] * L[1] + A[1][2] * L[2]),
-      m * (a[2] + A[2][0] * L[0] + A[2][1] * L[1] + A[2][2] * L[2]),
-    ],
-    h: (L) => {
-      const AL = [
-        A[0][0] * L[0] + A[0][1] * L[1] + A[0][2] * L[2],
-        A[1][0] * L[0] + A[1][1] * L[1] + A[1][2] * L[2],
-        A[2][0] * L[0] + A[2][1] * L[1] + A[2][2] * L[2],
-      ];
-      return m * (dot(a, L) + 0.5 * dot(L, AL));
-    },
-  };
-}
-
-// Rodrigues rotation of x by rotation-vector v (sinc form, small-angle guard) —
-// exactly norm-preserving: this is the mechanism that makes psi structural.
-function rotate(v, x) {
-  const th = norm3(v);
-  let sa, sb;
-  if (th < 1e-8) {
-    sa = 1 - (th * th) / 6;
-    sb = 0.5 - (th * th) / 24;
-  } else {
-    sa = Math.sin(th) / th;
-    sb = (1 - Math.cos(th)) / (th * th);
-  }
-  const c = Math.cos(th);
-  const cv = cross(v, x);
-  const vd = dot(v, x);
-  return [
-    x[0] * c + cv[0] * sa + v[0] * vd * sb,
-    x[1] * c + cv[1] * sa + v[1] * vd * sb,
-    x[2] * c + cv[2] * sa + v[2] * vd * sb,
-  ];
-}
-
-// One explicit-midpoint step on the rotation group. Ldot = L x w = -w x L,
-// so the rotation vector is -w*dt.
-function rkmk2(gradFn, L, dt) {
-  const Lh = rotate(scale3(gradFn(L), -0.5 * dt), L);
-  return rotate(scale3(gradFn(Lh), -dt), L);
-}
-
-// Fibonacci sphere sampler (for the flow-arrow field).
-function fibSphere(n) {
-  const pts = [];
-  const ga = Math.PI * (3 - Math.sqrt(5));
-  for (let i = 0; i < n; i++) {
-    const y = 1 - (2 * i + 1) / n;
-    const r = Math.sqrt(Math.max(0, 1 - y * y));
-    const th = ga * i;
-    pts.push([Math.cos(th) * r, y, Math.sin(th) * r]);
-  }
-  return pts;
-}
 
 // Diverging colormap (cool -> parchment -> warm), posterized so the bands read
 // as level sets — which on the sphere ARE the streamlines of the generator.
@@ -115,43 +42,39 @@ function heatColor(t) {
   return [r * line, g * line, b * line];
 }
 
-// The base set and the letter alphabet for the word console.
-const ZERO = { k1: 0, k2: 0, k3: 0, c12: 0, c13: 0, c23: 0, d1: 0, d2: 0, amp: 1 };
-const BASE_LETTERS = {
-  x: { ...ZERO, k1: 1 }, y: { ...ZERO, k2: 1 }, z: { ...ZERO, k3: 1 },
-  u: { ...ZERO, c12: 1 }, v: { ...ZERO, c13: 1 }, w: { ...ZERO, c23: 1 },
-  d: { ...ZERO, d1: 1 }, e: { ...ZERO, d2: 1 },
-};
-const LETTER_LABEL = {
-  x: "k\u2081", y: "k\u2082", z: "k\u2083",
-  u: "c\u2081\u2082", v: "c\u2081\u2083", w: "c\u2082\u2083",
-  d: "d\u2081", e: "d\u2082", q: "blend",
-};
+// The blend the sliders hold: a point in \u03a3\u2080 plus an amplitude. BASE_LETTERS used
+// to live here, mapping letters onto \u03a3\u2080 directions \u2014 that was the category error.
+// \u03a3\u2080 is the coordinate system; the alphabet is authored content and now arrives
+// from JSON. The eight preset chips derive from the pinned base, so there is no
+// hand-maintained list to drift out of step with it.
+const BLANK = { ...ZERO, amp: 1 };
 const PRESETS = [
-  { name: "k\u2081", p: { ...ZERO, k1: 1 } },
-  { name: "k\u2082", p: { ...ZERO, k2: 1 } },
-  { name: "k\u2083", p: { ...ZERO, k3: 1 } },
-  { name: "c\u2081\u2082", p: { ...ZERO, c12: 1 } },
-  { name: "c\u2081\u2083", p: { ...ZERO, c13: 1 } },
-  { name: "c\u2082\u2083", p: { ...ZERO, c23: 1 } },
-  { name: "d\u2081", p: { ...ZERO, d1: 1 } },
-  { name: "d\u2082", p: { ...ZERO, d2: 1 } },
-  { name: "x (v1)", p: { ...ZERO, k1: 1, amp: 0.5 } },
-  { name: "s (v1)", p: { ...ZERO, d1: 0.793, d2: 0.196 } },
-  { name: "g (v1, trimmed)", p: { ...ZERO, d1: -0.245 } },
-  { name: "clear", p: { ...ZERO } },
+  ...SIGMA0_GROUPS.flatMap((g) => g.keys).map((k) => ({
+    name: SIGMA0_LABEL[k],
+    p: { ...BLANK, [k]: 1 },
+  })),
+  // Historical reference points \u2014 these ARE \u00a79's x, s and g, kept as one-click
+  // blends so they stay reachable whichever alphabet happens to be loaded.
+  { name: "x (v1)", p: { ...BLANK, k1: 1, amp: 0.5 } },
+  { name: "s (v1)", p: { ...BLANK, d1: 0.793, d2: 0.196 } },
+  { name: "g (v1, trimmed)", p: { ...BLANK, d1: -0.245 } },
+  { name: "clear", p: { ...BLANK } },
 ];
 
-const DT = 0.01, TAU = 0.5, STEPS = Math.round(TAU / DT); // the pinned schedule
+// The trail buffer starts here and grows to fit the word actually being played \u2014
+// per-symbol `dur` makes a fixed cap reachable, and the old code responded by
+// silently not drawing the rest of the trajectory.
+const TRAIL_INIT = 6000;
+const TRAIL_MAX = 120000;
 
 export default function AlphabetVisualizer() {
   const mountRef = useRef(null);
   const sparkRef = useRef(null);
   const three = useRef({});          // three.js objects
   const sim = useRef(null);          // word-playback state
-  const paramsRef = useRef({ ...ZERO, amp: 1 });
+  const paramsRef = useRef(BLANK);
 
-  const [params, setParams] = useState({ ...ZERO, amp: 1 });
+  const [params, setParams] = useState(BLANK);
   const [idleAdditive, setIdleAdditive] = useState(true);
   const [showArrows, setShowArrows] = useState(true);
   const [showParticles, setShowParticles] = useState(
@@ -159,7 +82,7 @@ export default function AlphabetVisualizer() {
       window.matchMedia &&
       window.matchMedia("(prefers-reduced-motion: reduce)").matches)
   );
-  const [word, setWord] = useState("xuzdw");
+  const [word, setWord] = useState("");
   const [playing, setPlaying] = useState(false);
   const [nowPlaying, setNowPlaying] = useState(null);
   const [silent, setSilent] = useState(false);
@@ -167,14 +90,92 @@ export default function AlphabetVisualizer() {
   const [h0Range, setH0Range] = useState(null);
   const [speed, setSpeed] = useState(3);
 
+  // ---------- the loaded alphabet ----------
+  const [alphabet, setAlphabet] = useState(() => emptyAlphabet(DEFAULT_URL));
+  const [diagnostics, setDiagnostics] = useState([]);
+  const [sourceLabel, setSourceLabel] = useState("loading…");
+  const [isDefault, setIsDefault] = useState(true);
+  const [copied, setCopied] = useState(false);
+
   const flagsRef = useRef({ idleAdditive, showArrows, showParticles, playing, speed });
   useEffect(() => {
     flagsRef.current = { idleAdditive, showArrows, showParticles, playing, speed };
   }, [idleAdditive, showArrows, showParticles, playing, speed]);
 
+  const applyResult = useCallback((res, label, dflt) => {
+    setDiagnostics(res.diagnostics);
+    if (res.fatal) {
+      setSourceLabel(`${label} — rejected`);
+      return false;
+    }
+    setAlphabet(res.alphabet);
+    setSourceLabel(label);
+    setIsDefault(dflt);
+    // The prototype booted with "xuzdw" — Σ₀ letters, which are unknown to any
+    // authored alphabet. Seed from whatever actually loaded instead.
+    setWord((w) => w || res.alphabet.symbols.slice(0, 5).map((s) => s.name).join(""));
+    return true;
+  }, []);
+
+  const onLoadText = useCallback((name, text) => {
+    const res = parseText(text, name);
+    if (applyResult(res, `${name} (local)`, false)) writeStored({ name, text });
+  }, [applyResult]);
+
+  const onReset = useCallback(() => {
+    clearStored();
+    void fetchDefault().then((r) => applyResult(r, DEFAULT_URL, true));
+  }, [applyResult]);
+
+  useEffect(() => {
+    const stored = readStored();
+    let extra = [];
+    if (stored) {
+      const res = parseText(stored.text, stored.name);
+      if (applyResult(res, `${stored.name} (local)`, false)) return;
+      // Don't strand the app on a file that has since been broken — fall back,
+      // but say so rather than quietly swapping the content underneath.
+      clearStored();
+      extra = [...res.diagnostics, {
+        level: "warn", where: stored.name,
+        message: "the remembered local file no longer parses; it has been forgotten and the bundled default loaded instead.",
+      }];
+    }
+    void fetchDefault().then((r) =>
+      applyResult({ ...r, diagnostics: [...extra, ...r.diagnostics] }, DEFAULT_URL, true));
+  }, [applyResult]);
+
+  // Drop a file anywhere on the page — the path that matters on the deployed URL,
+  // where public/alphabet.json is not yours to edit.
+  useEffect(() => {
+    const over = (e) => e.preventDefault();
+    const drop = (e) => {
+      e.preventDefault();
+      const f = e.dataTransfer?.files?.[0];
+      if (f) void f.text().then((t) => onLoadText(f.name, t));
+    };
+    window.addEventListener("dragover", over);
+    window.addEventListener("drop", drop);
+    return () => {
+      window.removeEventListener("dragover", over);
+      window.removeEventListener("drop", drop);
+    };
+  }, [onLoadText]);
+
+  // ---------- the word, checked against the loaded alphabet ----------
+  const scan = useMemo(
+    () => scanWord(word, new Set(alphabet.byName.keys())),
+    [word, alphabet]
+  );
+  const names = useMemo(() => wordOf(scan), [scan]);
+  const unknown = useMemo(
+    () => [...new Set(scan.filter((t) => !t.ok).map((t) => t.ch))],
+    [scan]
+  );
+
   // ---------- the displayed generator (idle vs playback phase) ----------
   const idleGenerator = () => {
-    const sym = buildSymbol(paramsRef.current);
+    const sym = buildSymbol(paramsRef.current, paramsRef.current.amp);
     if (flagsRef.current.idleAdditive) {
       return { grad: (L) => add3(gradH0(L), sym.grad(L)), h: (L) => h0(L) + sym.h(L) };
     }
@@ -230,27 +231,34 @@ export default function AlphabetVisualizer() {
   };
 
   // ---------- word playback ----------
-  const buildTimeline = (letters) => {
-    const tl = [{ phase: "gap", steps: STEPS, letter: null }];
-    for (const ch of letters) {
-      const p = ch === "q" ? { ...paramsRef.current } : BASE_LETTERS[ch];
-      tl.push({ phase: "event", steps: STEPS, letter: ch, sym: buildSymbol(p) });
-      tl.push({ phase: "gap", steps: STEPS, letter: null });
-    }
-    return tl;
+
+  // Grow the trail to fit the word. Per-symbol `dur` makes the old fixed 6000
+  // reachable, and the guard there was `if (trailN < MAXT)` — i.e. the trajectory
+  // simply stopped being drawn, with nothing said.
+  const ensureTrailCapacity = (n) => {
+    const t = three.current;
+    const need = Math.min(TRAIL_MAX, n + 8);
+    if (!t.trailGeo || need <= t.maxT) return;
+    t.trailGeo.setAttribute("position", new THREE.BufferAttribute(new Float32Array(need * 3), 3));
+    t.trailGeo.setAttribute("color", new THREE.BufferAttribute(new Float32Array(need * 3), 3));
+    t.maxT = need;
   };
 
   const startWord = () => {
-    const letters = word.toLowerCase().split("").filter((c) => BASE_LETTERS[c] || c === "q");
-    if (letters.length === 0) return;
+    if (names.length === 0) return;
     const t = three.current;
     const finished = sim.current && !sim.current.active;
     if (!sim.current || finished) {
       let g = [Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1];
       const nrm = norm3(g) || 1;
       g = scale3(g, 1 / nrm);
+      const timeline = buildTimeline(names, alphabet.byName, () => ({
+        coeffs: paramsRef.current,
+        amp: paramsRef.current.amp,
+      }));
+      ensureTrailCapacity(totalSteps(timeline));
       sim.current = {
-        active: true, genesis: g, L: g, timeline: buildTimeline(letters),
+        active: true, genesis: g, L: g, timeline,
         seg: 0, stepInSeg: 0, trailN: 0, maxDrift: 0,
         h0hist: [], phasehist: [], h0min: Infinity, h0max: -Infinity,
       };
@@ -260,7 +268,7 @@ export default function AlphabetVisualizer() {
         t.genesisDot.visible = true;
       }
       applyPhaseField(sim.current.timeline[0]);
-      setNowPlaying({ phase: "gap", letter: null });
+      setNowPlaying({ phase: "gap", name: null });
     }
     setPlaying(true);
   };
@@ -315,7 +323,7 @@ export default function AlphabetVisualizer() {
     for (let i = 0; i < n; i++) {
       const xx = (i / (n - 1)) * W;
       const yy = H - 4 - ((s.h0hist[i] - lo) / span) * (H - 8);
-      i === 0 ? ctx.moveTo(xx, yy) : ctx.lineTo(xx, yy);
+      if (i === 0) ctx.moveTo(xx, yy); else ctx.lineTo(xx, yy);
     }
     ctx.stroke();
     ctx.strokeStyle = "#3FD68C";
@@ -414,11 +422,11 @@ export default function AlphabetVisualizer() {
     );
     scene.add(particles);
 
-    // hero trail (the word being lived): blue in gaps, law-red in events
-    const MAXT = 6000;
+    // hero trail (the word being lived): blue in gaps, law-red in events.
+    // Capacity grows per word — see ensureTrailCapacity.
     const trailGeo = new THREE.BufferGeometry();
-    trailGeo.setAttribute("position", new THREE.BufferAttribute(new Float32Array(MAXT * 3), 3));
-    trailGeo.setAttribute("color", new THREE.BufferAttribute(new Float32Array(MAXT * 3), 3));
+    trailGeo.setAttribute("position", new THREE.BufferAttribute(new Float32Array(TRAIL_INIT * 3), 3));
+    trailGeo.setAttribute("color", new THREE.BufferAttribute(new Float32Array(TRAIL_INIT * 3), 3));
     trailGeo.setDrawRange(0, 0);
     const trail = new THREE.Line(
       trailGeo,
@@ -432,7 +440,7 @@ export default function AlphabetVisualizer() {
     genesisDot.visible = false;
     scene.add(genesisDot);
 
-    three.current = { renderer, scene, camera, sphereGeo, spherePos, arrowGeo, arrowPts, particles, pArr, pGeo, trailGeo, trail, genesisDot };
+    three.current = { renderer, scene, camera, sphereGeo, spherePos, arrowGeo, arrowPts, particles, pArr, pGeo, trailGeo, trail, genesisDot, maxT: TRAIL_INIT };
 
     // custom orbit — ~20 lines, no addon import. (npm's three DOES ship
     // addons/controls/OrbitControls; swap it in if touch pinch-zoom matters.)
@@ -507,7 +515,7 @@ export default function AlphabetVisualizer() {
           s.phasehist.push(sg.phase === "event" ? 1 : 0);
           if (hv < s.h0min) s.h0min = hv;
           if (hv > s.h0max) s.h0max = hv;
-          if (s.trailN < MAXT) {
+          if (s.trailN < three.current.maxT) {
             tpos.set([s.L[0] * 1.002, s.L[1] * 1.002, s.L[2] * 1.002], s.trailN * 3);
             tcol.set(sg.phase === "event" ? [0.89, 0.41, 0.29] : [0.42, 0.62, 0.92], s.trailN * 3);
             s.trailN++;
@@ -520,11 +528,11 @@ export default function AlphabetVisualizer() {
             if (!nx) {
               s.active = false;
               setPlaying(false);
-              setNowPlaying({ phase: "done", letter: null });
+              setNowPlaying({ phase: "done", name: null });
               break;
             }
             applyPhaseField(nx);
-            setNowPlaying({ phase: nx.phase, letter: nx.letter });
+            setNowPlaying({ phase: nx.phase, name: nx.name });
           }
         }
         trailGeo.attributes.position.needsUpdate = true;
@@ -562,17 +570,6 @@ export default function AlphabetVisualizer() {
 
   // ---------- UI ----------
   const setP = (key, val) => setParams((p) => ({ ...p, [key]: val }));
-  const blendString = () => {
-    const terms = [];
-    const push = (v, name) => {
-      if (Math.abs(v) > 1e-9)
-        terms.push(`${terms.length && v > 0 ? "+ " : v < 0 ? "− " : ""}${Math.abs(v).toFixed(2)}·${name}`);
-    };
-    push(params.k1, "k₁"); push(params.k2, "k₂"); push(params.k3, "k₃");
-    push(params.c12, "c₁₂"); push(params.c13, "c₁₃"); push(params.c23, "c₂₃");
-    push(params.d1, "d₁"); push(params.d2, "d₂");
-    return terms.length ? terms.join(" ") : "0 (no Hσ)";
-  };
 
   const renderSlider = (id, label) => (
     <div className="flex items-center gap-2 py-0.5" key={id}>
@@ -586,7 +583,21 @@ export default function AlphabetVisualizer() {
     </div>
   );
 
-  const chip = "px-2 py-1 rounded border text-xs mono transition-colors";
+  // Closes the authoring loop: tune the sliders, copy, paste into your file.
+  const copyRow = () => {
+    const text = toJsonRow(params, params.amp);
+    const fallback = () => window.prompt("copy this row into your alphabet file:", text);
+    if (!navigator.clipboard) return void fallback();
+    navigator.clipboard.writeText(text).then(
+      () => { setCopied(true); setTimeout(() => setCopied(false), 1400); },
+      fallback
+    );
+  };
+
+  const onAppend = useCallback((ns) => setWord((w) => w + ns.join("")), []);
+  const onSolo = useCallback((row) => setParams({ ...BLANK, ...row.coeffs, amp: row.amp }), []);
+
+  const chip = CHIP;
 
   return (
     <div className="app w-full h-screen flex flex-col overflow-hidden">
@@ -618,7 +629,14 @@ export default function AlphabetVisualizer() {
           {nowPlaying && nowPlaying.phase !== "done" && (
             <div className="absolute top-3 right-3 panel rounded px-2 py-1 text-xs mono">
               {nowPlaying.phase === "event" ? (
-                <span className="r">event · {nowPlaying.letter} ({LETTER_LABEL[nowPlaying.letter]})</span>
+                <span className="r">
+                  event · {nowPlaying.name}
+                  {nowPlaying.name === BLEND
+                    ? " (your live blend)"
+                    : alphabet.byName.get(nowPlaying.name)?.reading
+                      ? ` — ${alphabet.byName.get(nowPlaying.name).reading}`
+                      : ""}
+                </span>
               ) : (
                 <span className="b">free flow (gap)</span>
               )}
@@ -636,7 +654,7 @@ export default function AlphabetVisualizer() {
           </div>
         </div>
 
-        <aside className="w-[340px] shrink-0 border-l hair overflow-y-auto px-4 py-3 flex flex-col gap-4">
+        <aside className="w-[380px] shrink-0 border-l hair overflow-y-auto px-4 py-3 flex flex-col gap-4">
           <section>
             <div className="eyebrow mb-1.5">Presets</div>
             <div className="flex flex-wrap gap-1.5">
@@ -654,12 +672,12 @@ export default function AlphabetVisualizer() {
 
           <section>
             <div className="eyebrow mb-1">Blend — Hσ over Σ₀</div>
-            <div className="dim2 mb-1">ℓ=1 · reorient</div>
-            {renderSlider("k1", "k₁")}{renderSlider("k2", "k₂")}{renderSlider("k3", "k₃")}
-            <div className="dim2 mt-1.5 mb-1">ℓ=2 · cross-couple</div>
-            {renderSlider("c12", "c₁₂")}{renderSlider("c13", "c₁₃")}{renderSlider("c23", "c₂₃")}
-            <div className="dim2 mt-1.5 mb-1">ℓ=2 · reshape (d₁ = the self direction)</div>
-            {renderSlider("d1", "d₁")}{renderSlider("d2", "d₂")}
+            {SIGMA0_GROUPS.map((grp, i) => (
+              <div key={grp.group}>
+                <div className={"dim2 mb-1" + (i ? " mt-1.5" : "")}>{grp.group}</div>
+                {grp.keys.map((k) => renderSlider(k, SIGMA0_LABEL[k]))}
+              </div>
+            ))}
             <div className="flex items-center gap-2 py-0.5 mt-1.5">
               <span className="w-8 shrink-0 text-right mono dim2">amp</span>
               <input type="range" min={0} max={2} step={0.05} value={params.amp}
@@ -667,8 +685,15 @@ export default function AlphabetVisualizer() {
               <span className="w-11 shrink-0 mono val">{params.amp.toFixed(2)}</span>
             </div>
             <div className="mono text-xs mt-2 px-2 py-1.5 panel rounded leading-relaxed">
-              <span className="dim">Hσ = </span>{params.amp.toFixed(2)}·({blendString()})
+              <span className="dim">Hσ = </span>{params.amp.toFixed(2)}·({formatCoeffs(params)})
             </div>
+            <button
+              className={chip + " hair hover:border-[#3FD68C] hover:text-[#3FD68C] mt-1.5"}
+              onClick={copyRow}
+              title="a ready-to-paste schema row for this blend"
+            >
+              {copied ? "copied ✓" : "copy as JSON row"}
+            </button>
           </section>
 
           <section>
@@ -689,12 +714,24 @@ export default function AlphabetVisualizer() {
             </div>
           </section>
 
+          <AlphabetPanel
+            alphabet={alphabet}
+            diagnostics={diagnostics}
+            sourceLabel={sourceLabel}
+            isDefault={isDefault}
+            onAppend={onAppend}
+            onSolo={onSolo}
+            onLoadText={onLoadText}
+            onReset={onReset}
+          />
+
           <section>
             <div className="eyebrow mb-1.5">Word console</div>
             <div className="flex gap-1.5 mb-1.5">
               <input
                 type="text" value={word} spellCheck={false}
-                onChange={(e) => setWord(e.target.value.toLowerCase().replace(/[^xyzuvwdeq]/g, ""))}
+                autoCapitalize="off" autoCorrect="off" autoComplete="off"
+                onChange={(e) => setWord(e.target.value)}
                 className="mono flex-1 px-2 py-1 rounded panel text-sm"
                 aria-label="word over the alphabet"
               />
@@ -705,6 +742,15 @@ export default function AlphabetVisualizer() {
               )}
               <button className={chip + " hair hover:border-[#6FA0E8]"} onClick={resetWord}>reset</button>
             </div>
+            {/* Unknown characters are shown, not swallowed. The old input silently
+                ate any keystroke outside its hard-coded letter set, which is hostile
+                when discovering which symbols your alphabet actually defines. */}
+            {unknown.length > 0 && (
+              <div className="text-xs mb-1.5 leading-snug" style={{ color: "#E2694A" }}>
+                not in this alphabet, will be skipped:{" "}
+                <span className="mono">{unknown.join(" ")}</span>
+              </div>
+            )}
             <div className="flex items-center gap-2 py-0.5">
               <span className="w-8 shrink-0 text-right mono dim2">spd</span>
               <input type="range" min={1} max={10} step={1} value={speed}
@@ -712,9 +758,11 @@ export default function AlphabetVisualizer() {
               <span className="w-11 shrink-0 mono val">{speed}×</span>
             </div>
             <div className="dim2 leading-relaxed mt-1">
-              letters: x y z → k₁ k₂ k₃ · u v w → c₁₂ c₁₃ c₂₃ · d e → d₁ d₂ · q → your blend.
-              Schedule: gap–event–gap, τ = 0.5, dt = 0.01. Genesis: <span className="g">green dot</span>.
-              Reset, then play, for a fresh genesis.
+              {alphabet.symbols.length} symbol{alphabet.symbols.length === 1 ? "" : "s"} loaded — click a
+              chip above or type their names. Case matters: x and X are different symbols.{" "}
+              <span className="mono">{BLEND}</span> = your live blend.
+              Schedule: gap–event–gap, τ = {TAU_EVENT}, dt = {DT} (a row's dur overrides τ).
+              Genesis: <span className="g">green dot</span>. Reset, then play, for a fresh genesis.
             </div>
             <canvas ref={sparkRef} width={300} height={64} className="w-full mt-2 rounded panel" />
             <div className="dim2 mt-1">
