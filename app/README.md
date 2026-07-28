@@ -1,5 +1,7 @@
 # Σ₀ on the sphere — an alphabet authoring aid
 
+**Live: https://qnm-sigma.wsds.ai**
+
 An interactive visualizer for the `so(3)*` Lie–Poisson toy of `sandbox/lie_poisson.py`, built to
 make authoring an input alphabet Σ (`docs/ALPHABET-AUTHORING.md`) a matter of editing a file and
 looking at the result.
@@ -99,5 +101,7 @@ This is an authoring aid, not the battery. The authoritative checks are the Pyth
 Cloudflare Workers with static assets (not Pages), via `@cloudflare/vite-plugin`. `npm run build`
 writes `dist/client/` (the assets) and `dist/qnm_alphabet/` (the worker plus a generated
 `wrangler.json` with `"directory": "../client"` injected); `.wrangler/deploy/config.json` points a
-bare `wrangler deploy` at that generated config. `wrangler.jsonc` has no `routes`, so it deploys to
-`workers.dev`; a custom domain is one entry when wanted.
+bare `wrangler deploy` at that generated config. The custom domain `qnm-sigma.wsds.ai` is declared
+in `wrangler.jsonc` so a clean checkout reproduces the routing, and `workers_dev` is set explicitly
+to `false` — declaring `routes` flips that default silently, so the workers.dev URL is retired
+rather than accidentally so.

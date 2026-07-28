@@ -7,6 +7,10 @@
 	"name": "qnm-alphabet",
 	"main": "worker/index.ts",
 	"compatibility_date": "2026-07-27",
+	"routes": [
+		{ "pattern": "qnm-sigma.wsds.ai", "custom_domain": true }
+	],
+	"workers_dev": false,
 	"assets": {
 		"not_found_handling": "single-page-application"
 	},
@@ -16,9 +20,12 @@
 	"upload_source_maps": true
 
 	/**
-	 * No `routes` — this deploys to the free <name>.<subdomain>.workers.dev URL.
-	 * A custom domain is one entry when wanted (the zone must be on this account):
-	 *   "routes": [ { "pattern": "alphabet.wsds.ai", "custom_domain": true } ]
+	 * The custom domain is declared here rather than left in the dashboard, so a
+	 * deploy from a clean checkout reproduces the routing.
+	 *
+	 * `workers_dev` is stated explicitly because adding `routes` silently flips
+	 * its default to false — qnm-alphabet.<subdomain>.workers.dev now 404s. Set
+	 * it to true to bring that URL back alongside the custom domain.
 	 *
 	 * No `assets.directory` / `assets.binding` / `account_id` on purpose: the Vite
 	 * plugin generates dist/qnm_alphabet/wrangler.json with "directory": "../client"
