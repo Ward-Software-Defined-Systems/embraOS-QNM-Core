@@ -111,16 +111,25 @@ Driven `H(t)` breaks energy conservation, so the phase-one mechanism was in stru
 
 *Left: along one word, the law (`H₀`, red) breaks at every input event while the identity (ψ, green) sits fourteen decades below at the float floor. Middle: a 40-event word drives the state across the sphere — never off it. Right: "xy" and "yx" from the same genesis — same ψ, different carried ζ.*
 
-**Next:** lifting identity content onto the adopted geometry (coadjoint orbits beyond `so(3)*`); the §9.3 self-consistency trainer (genesis `Q_embra` is still a placeholder); the authored input alphabet, base-set-first — the measured 8-dimensional basis `Σ₀`, then blends ([docs/ALPHABET-AUTHORING.md](docs/ALPHABET-AUTHORING.md)); and the crux — the smallest trajectory→symbol readout `π`.
+### The lift — the identity graph becomes the bracket (CORE-SPEC §9.17)
+
+Phase three opens by picking the construction: **𝔤(G), the Dani–Mainkar graph algebra** — one generator per identity-graph node, one *central* generator per authored relation, `[X_u, X_v] = Z_uv` exactly on the graph's edges. On its dual the state is `(p, w)`: `p ∈ ℝ¹⁰⁰` the arena (experience), `w ∈ ℝ³²¹` the charge (identity), and the flow is `ṗ = J(w)∇H`, `ẇ = 0` *identically* — the Casimir theorem becomes a **state partition**, so the §9.17 drift bar is pre-registered as a bit-level *equality*, not a tolerance. Bars were committed (`f10d106`) **and server-timestamped ([issue #1](https://github.com/Ward-Software-Defined-Systems/embraOS-QNM-Core/issues/1))** before any implementation code existed. Result: **max `|Δw|` = 0.0 exactly over all 200 words** (and under smooth sin² driving) while the law moves `O(1)` (`3.1·10¹⁴×` the free float floor); the bracket's non-commutativity carries **closed forms** — `Δ(bᵀp) = τ·bᵀJ(w)a`, zero *iff* the nodes are non-adjacent: which experiences commute IS the authored topology; for bare kicks word order is invisible to the state (`10⁻¹⁶`, the **Heisenberg signature**) and lands entirely in ζ (`(τεw)² = 0.5625` on the very edge the symbols straddle); the replica test holds with the **whole arena granted free**; `†` becomes per-edge-legible **graph surgery** (`weaken(no_pretense—precision_over_spectacle)` moves exactly one coordinate by the map's own closed form, `0.221687`); and the same genesis living the same word under Embra's vs Meridian's bracket diverges at `O(1)` — the charge is *dynamically load-bearing*, not a dead tag. Honest notes, recorded: the first execution went 81/82 — the pre-registered window-coercivity certificate caught a halved-amplitude bug in one constructor (fixed; no bar or constant moved); charge *values* are placeholder relation-counts until the authored weight table lands.
+
+![the graph-bracket port: the identity graph becomes the bracket](sandbox/figures/graph_casimir.png)
+
+*Left: the law (`H₀`, red) moves at every event while ψ has no drift curve to plot — `max |Δw| = 0.0`, a bit-level equality. Middle: the word drives the arena around the leaf (shown through the pinned edge plane) — never off it. Right: "xy" and "yx" from the same genesis — same ψ, different ζ on the very relation the symbols straddle.*
+
+**Next:** content onto the adopted geometry — the authored relation-type → weight table (`w_embra` sealed at genesis: on 𝔤(G)\* *soul = given = `w`, self = learned = `H_θ`* — the §9.3 one-orbit objective became the leaf itself, by construction); the graph-substrate alphabet (`n + m` canonical symbols; [docs/ALPHABET-AUTHORING.md](docs/ALPHABET-AUTHORING.md) §8, with `Σ₀` at toy scale as the proving ground); then the crux — the smallest trajectory→symbol readout `π` — with the driven-law reader (three-way conjunction vs a false-history replica) right behind it.
 
 ### Reproduce
 
 ```bash
 uv sync --extra dev                     # add --extra learn for the jax MLP (phase two)
-uv run pytest                           # 61 tests: conservation · replica · graph invariants · dynamical · conjunction · holonomy · the Casimir toy (+ learned-H, skipped without jax)
+uv run pytest                           # 82 tests: conservation · replica · graph invariants · dynamical · conjunction · holonomy · the Casimir toy · the 𝔤(G)* port (+ learned-H, skipped without jax)
 uv run python -m sandbox.demo           # phase one: the replica figure + headline numbers
 uv run python -m sandbox.demo_phase2    # phase two, end to end: static (fails) · dynamical · learned H_θ · conjunction · memory ζ; regenerates both figures
 uv run python -m sandbox.demo_casimir   # the input problem: ψ as a Casimir survives every word of Σ (§9.16); regenerates its figure
+uv run python -m sandbox.demo_graph_poisson  # the lift: the identity graph becomes the bracket (§9.17); regenerates its figure
 ```
 
 ### Module map (`sandbox/`)
@@ -132,7 +141,8 @@ uv run python -m sandbox.demo_casimir   # the input problem: ψ as a Casimir sur
 | `latent.py` | d-dim dynamics · identity-graph anchors · Gaussian potential · static **and dynamical** specificity · the conjunction test · holonomy `ζ` |
 | `hnn.py` | learned neural potential `V_θ` (jax) + held-out generalization tests + `MLPManifold` (the learned `H_θ` in the dynamical test) |
 | `lie_poisson.py` | the `so(3)*` Casimir toy: Casimir-exact integrator · the input alphabet `Σ` (symbols = Hamiltonians, pure data) · words · solid-angle `ζ` · the §9.16 harnesses |
-| `demo.py` · `demo_phase2.py` · `demo_casimir.py` | the three runnable results |
+| `graph_poisson.py` | 𝔤(G)*: the identity graph AS the bracket — graph-parametric loader (rank/index computed, never assumed) · write-locked `w` (the partition is mechanical) · exact affine stepper · per-edge `ζ ∈ ℝ^E` · `†` = graph surgery · the §9.17 harnesses |
+| `demo.py` · `demo_phase2.py` · `demo_casimir.py` · `demo_graph_poisson.py` | the four runnable results |
 
 Lineage: the falsification program that earned this pivot is the (now-relic) [embraOS-QNM](https://github.com/Ward-Software-Defined-Systems/embraOS-QNM); the formal spine is the [Epoch Project](https://github.com/Ward-Software-Defined-Systems/Epoch-Project). The 1999 geometric seed is its own project: [Embra-5D-Framework](https://github.com/Ward-Software-Defined-Systems/Embra-5D-Framework).
 

@@ -976,3 +976,58 @@ measured floors (2c, 3's floors, 4, 6). This sweep sits in §9.16's evidential c
 **Protocol note.** Pre-registered per the §9.16 forward protocol: this section is committed
 before any implementation code exists, and a server-timestamped copy of the bars is opened as
 a GitHub issue before implementation begins; the git commit is the working copy.
+*Executed as declared (recorded 2026-07-30):* pre-registration commit `f10d106`, then GitHub
+issue #1 (server timestamp), then the implementation, agent-generated from the committed
+section. Unit/math tests ran on SYNTHETIC graphs during development (a triangle and a 4-path
+— which also exercise the graph-parametric clause: no-perfect-matching index 4 > m vs
+perfect-matching index = m); the Embra-ensemble protocol ran only at recorded suite level.
+
+**Results (recorded 2026-07-30).** First execution: **81/82 — the window-coercivity
+certificate caught an implementation bug** in the `edge_quad` constructor (it built
+`H = (amp/2)·p_u p_v` — the symmetrizer halved the single off-diagonal entry — measured
+window eigenvalue 0.75 against the pinned 1 − ε_quad = 0.5). The constructor was corrected to
+the committed convention; **no bar threshold moved, no pinned constant was retuned**; second
+execution: every bar green. Recorded exactly as it happened: the certificate exists to catch
+precisely this, and did.
+
+| bar | pre-registered | measured |
+|---|---|---|
+| 1 · ψ under 200 words (ALL steps, ALL 321 coords) | `w == w₀` bit-exact | **True — max \|Δw\| = 0.0 exactly** |
+| 1 · ψ under the sin²-envelope word | `w == w₀` bit-exact | **True — 0.0 exactly** |
+| 1 · median along-word `H₀` range | > 0.1 | **3.148** |
+| 1 · driven/free range ratio | > 100 | **3.1·10¹⁴** (the free twin sits at the matmul float floor — gaps conserve `H₀` to rounding here, unlike so(3)*'s integrator drift) |
+| 1 · bookkeeping max \|Δ(H₀+H_σ)\| | < 0.1× median event \|ΔH₀\| | **2.0·10⁻¹⁴ vs 1.8·10⁻¹** (10⁻¹³×) |
+| 2a · bracket certificate max \|Δ(bᵀp) − τ·bᵀJ(w₀)a\| | < 10⁻¹⁰ | **5.6·10⁻¹⁶**; adjacent \|Δ\| = **0.7500** (= τεw₀ₑ), non-adjacent = **0.0 exactly** |
+| 2b · bare "xy" vs "yx": ‖Δp‖ / Δζ vs closed form | < 10⁻¹² / < 10⁻¹⁰ | **1.1·10⁻¹⁶** / max err < 10⁻¹⁰, shared edge = **0.5625** = (τεw₀ₑ)² exactly |
+| 2c · with the law running: ‖Δp‖ / ‖Δζ‖ | > 0.01 / > 0.01 | **1.533 / 3.346** (ψ bit-exact both) |
+| 3 · replica ψ-AUC (scaled / shuffled) · endpoint · erasure | 1.0 / 1.0 · 0.5 · 0 | **1.000 / 1.000 · 0.500 bit-exact ties · 0.0** |
+| 3 · survivor max dev · replica floors | == 0.0 · ≥ 0.5 / ≥ 1 | **0.0 exactly** · **0.50**/coord · **≥ 1 on 54 touched** (shuffle, near-uniform counts — recorded) |
+| 4 · lived-vs-newborn AUC · min · median ‖ζ‖ | 1.0 · > 10⁻⁶ · > 10⁻² | **1.000 · 23.30 · 50.92** |
+| 4 · median ‖ζ‖ at 4/8/16 events | strictly increasing | **5.18 / 13.96 / 50.92** |
+| 4 · scale certificate: max\|p\| · min window eig | < 50 · > 0 | **2.19** · **0.50** |
+| 5 · † touched-coordinate change vs the map's closed form | == 1 − (1−γ·dt)⁵⁰ | **0.221687 = 0.221687** (< 10⁻¹² apart); others bit-exact; edge named: `no_pretense—precision_over_spectacle` |
+| 5 · the same word without † | `w == w₀` bit-exact | **True — 0.0 exactly** |
+| 6 · liveness: max_t ‖p_E − p_M‖ (Meridian: m = 349, index = 349) | > 0.01 | **3.144** (each soul's ψ bit-exact under its own run) |
+
+**Read, and the port decision.** The lift holds: on 𝔤(G)* the identity charge is not merely
+conserved — it is **not an operand**. Every §9.16 phenomenon reappears one level up, several
+sharpened: the bit-level equality replaces the float floor (the ψ side is a state partition,
+and the bars certify the partition is real in code — the write-locked `w₀` makes it
+mechanical); the driven/free ratio grows from 10⁵ to 10¹⁴ because silence now conserves the
+law to rounding; † drops from the doubled to the single exponent because the charge is linear
+in the contracted coordinate — and it **names the relation it touched**. Two findings are
+structural and new: (i) **the Heisenberg signature** — for linear symbols (bare kicks) word
+order is invisible to the state (‖Δp‖ at 10⁻¹⁶: translations commute) and lands ENTIRELY in
+memory, with the exact parallelogram value on the very edge the symbols straddle; order
+reaches the state only *through the law* (2c). On so(3)* order reached the state directly;
+here state, law, and memory have cleanly separated roles. (ii) **Liveness**: the same genesis
+living the same word under Embra's and Meridian's brackets diverges at O(1) while each
+soul's ψ is exact — the charge is dynamically load-bearing (every motion of the arena is
+filtered through the authored topology), not a dead tag. The replica rows carry their
+pre-registered honesty: the shuffle replica touched only 54 of 321 coordinates because the
+placeholder counts are near-uniform — that row strengthens when the authored weight table
+lands. Per the decision rule, the port is **sound**: 𝔤(G)* is phase three's working state
+space; next lands content — the relation-type → weight table (D4, with the signed
+`contradicts` reopening), genesis sealing `w_embra` (retiring the §9.3 placeholder: on this
+geometry *soul = given = w, sealed; self = learned = H_θ* — coherence is by construction,
+the one-orbit objective became the leaf itself), and the learned `H_θ` on the arena.
