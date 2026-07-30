@@ -1,0 +1,80 @@
+{
+  "_comment": [
+    "Embra weight table (D4) — the authored identity content that becomes the sealed charge.",
+    "STATUS: SKELETON — every null below is William's to fill. The loader (increment 6) will",
+    "refuse a table with nulls; nothing runs on this file until it is authored.",
+    "",
+    "SEMANTICS — what these numbers ARE:",
+    "  w_e (the sealed genesis charge on edge e) = SUM over e's relation triples of",
+    "  relation_weights[relation]  (aggregation = sum, decided 2026-07-30: parallel relations",
+    "  reinforce; all-1.0 degrades exactly to the recorded placeholder counts).",
+    "  Dynamically, w_e is the bracket strength on that relation: how strongly pushes on the",
+    "  two endpoint concepts fail to commute, how fast motion transfers across the edge, what",
+    "  a replica must fake, and what dagger-class surgery has to cut.",
+    "  H0 (the law on the arena) = (1/2) * sum_v p_v^2 / node_inertias[type(v)] — heavier",
+    "  inertia = a slower, more stable concept; lighter = agile. (D5 option (a), decided",
+    "  2026-07-30.)",
+    "",
+    "AUTHORING CONSTRAINTS AND GUIDANCE (from CORE-SPEC §9.17 + GRAPH-ALGEBRA-PLANNING §4/D4):",
+    "  - node_inertias must all be > 0 (coercivity — the compactness replacement).",
+    "  - avoid exact 0 weights: a zero coordinate silences its edges (a charge no flow tests).",
+    "  - SIGNED weights are legal and native to J(w) — nothing disconnects. `contradicts` may",
+    "    carry w < 0 (this formally reopens the §9.12 pure-affinity choice; the call is yours).",
+    "  - order-unity scale recommended (overall scale only rescales time).",
+    "  - SPREAD values across types: if all types get the same number this is the placeholder",
+    "    again, and the shuffle-replica row stays weak. §9.12's lesson: margin = expressiveness",
+    "    x structural difference. Note `related_to` covers 214/354 triples — its value sets the",
+    "    bulk; the rare types (loyal_to, serves, depends_on) are where sharp values individuate.",
+    "  - `derives_form_from` mirrors the graph's exact spelling (possible typo of",
+    "    `derives_from`, 1 occurrence — renaming in the graph is number-neutral if wanted;",
+    "    this table must match whatever the graph says)."
+  ],
+  "schema": "embraos.weights/1",
+  "graph": "Embra_IDENTITY-SOUL.graph.json",
+  "status": "SKELETON — weights null, William fills",
+  "aggregation": "sum",
+  "relation_weights": {
+    "related_to": null,
+    "enables": null,
+    "refines": null,
+    "contradicts": null,
+    "has_trait": null,
+    "holds_value": null,
+    "depends_on": null,
+    "serves": null,
+    "loyal_to": null,
+    "derives_form_from": null
+  },
+  "node_inertias": {
+    "self": null,
+    "behavior": null,
+    "principle": null,
+    "anti_pattern": null,
+    "structure": null,
+    "trait": null,
+    "relation": null,
+    "voice_facet": null,
+    "temporal": null,
+    "value": null,
+    "meta": null,
+    "entity": null,
+    "soul_line": null
+  },
+  "_reference": {
+    "relation_counts": {
+      "related_to": 214, "enables": 53, "refines": 38, "contradicts": 23,
+      "has_trait": 8, "holds_value": 7, "depends_on": 7, "serves": 2,
+      "loyal_to": 1, "derives_form_from": 1
+    },
+    "node_type_counts": {
+      "behavior": 15, "principle": 12, "anti_pattern": 10, "structure": 10,
+      "trait": 8, "relation": 8, "voice_facet": 8, "temporal": 8,
+      "value": 7, "meta": 7, "entity": 3, "soul_line": 3, "self": 1
+    },
+    "notes": [
+      "Counts are reference only; the loader ignores every underscore-prefixed key.",
+      "354 relation triples over 321 distinct pairs; 30 pairs carry parallel relations and",
+      "aggregate by sum."
+    ]
+  }
+}
