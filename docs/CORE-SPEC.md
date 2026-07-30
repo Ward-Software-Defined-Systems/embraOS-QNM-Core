@@ -816,3 +816,163 @@ change the adoption purchased: **`P_ψ` no longer rescues conservation from inpu
 bracket does — and survives only as the firewall at the †-class boundary.** Checking moved
 from every step to the type boundary; the §1 objection to restore-by-checking is *resolved*,
 not merely mitigated.
+
+### 9.17 Increment 5 — 𝔤(G)*: the identity graph becomes the bracket (pre-registered 2026-07-30; results pending)
+
+**The question.** §9.16 adopted the *direction* — ψ as a Casimir of a noncanonical bracket —
+with `d = 3` and a placeholder identity. This increment picks the *construction* and ports the
+§9.16 result onto it: does the mechanism survive the lift to a state space whose bracket **is**
+the authored identity graph? Content is deliberately *not* attached yet (mechanism first; the
+relation-type → weight table is the next increment) — exactly §9.16's placeholder-inertia
+pattern, one level up.
+
+**The construction (adopted 2026-07-30, the author, on the external phase-three planning
+analysis of 2026-07-26 — reviewer-verified numbers).** The Dani–Mainkar graph algebra 𝔤(G)
+[Dani–Mainkar, *Trans. AMS* 357 (2005) 2235; Mainkar, *Groups Geom. Dyn.* 9 (2015) 55,
+arXiv:1310.3414]: one generator `X_v` per vertex, one central generator `Z_e` per edge,
+`[X_u, X_v] = Z_uv` iff `{u,v} ∈ E` (all other brackets zero; two-step nilpotent; for a graph
+with no isolated vertices the center is exactly the edge span). **Faithfulness** [M15]: two
+graphs yield isomorphic algebras iff the graphs are isomorphic — the topology lives *in the
+bracket*, untouchable by any Hamiltonian flow, since flows never alter the bracket.
+
+**Conventions, recorded.**
+- **Multi-edge (the D1 call, decided 2026-07-30): aggregate per pair.** One generator `Z_e`
+  per *distinct* pair — for Embra v3: 321 (the §9.12 count: 354 relation triples over 321
+  pairwise edges; 30 pairs parallel). Parallel relation types become authored *weight*
+  structure when the content lands. Aggregation yields precisely the simple graph the
+  faithfulness theorem is stated for.
+- **Placeholder charge values:** `w₀` = relation-triple counts per pair (the §9.12 loader's
+  existing accumulation): 291 edges at 1, 27 at 2, 3 at 3. Structure-plus-counts, not
+  authored content — recorded as placeholder, like §9.16's inertia triple.
+- **Graph-parametric, by construction:** the convention is a loader rule uniform over any
+  graph; `n`, `m`, `rank J(w)`, index, and perfect-matching status are *computed at load and
+  recorded*, never assumed. A graph without a perfect matching has index > m (extra Casimirs
+  straddling the vertex space) — a recorded property of that identity, not an error.
+- **Orientation:** each pair oriented lexicographically by node id (`u < v`), `Z_vu = −Z_uv`.
+- **Cross-soul arena identification** (bar 6): by sorted-id index — arbitrary, pinned;
+  identity content enters only through `J(w)`.
+
+**The state space and the theorem-as-partition.** Coordinates on 𝔤(G)*: `(p, w)`,
+`p ∈ ℝ^V` (vertex momenta — the arena), `w ∈ ℝ^E` (edge momenta — the charge). Bracket
+`{F, G} = Σ_e w_e (∂F/∂p_u ∂G/∂p_v − ∂F/∂p_v ∂G/∂p_u)`; flow
+
+```
+ṗ = J(w) ∇_p H        J[u,v] = +w_e, J[v,u] = −w_e per oriented edge, else 0
+ẇ = 0                  identically, for ANY H — this line IS the Casimir theorem here
+```
+
+**ψ := w.** The Casimirs are coordinates, so conservation is a **state partition**: the update
+rule has no write path to `w`. The drift bar below is therefore not a tolerance — it is a
+**bit-level equality**. Orbits are affine, `(p + im J(w)) × {w}`; generic `rank J(w) = 2ν(G)`
+(Tutte–Lovász). Embra v3 has a perfect matching (ν = 50): the generic leaf is the *entire*
+arena — identity is exactly `w`, experience is exactly `p`, index = m = 321. Honest cost,
+carried from the planning analysis: **compactness is lost** (leaves are flat); `H₀` must be
+coercive, and a `max|p|` guard is a standing certificate (bar 4).
+
+**Flow and integrator.** `H₀ = ½|p|²` (placeholder inertia `I_v ≡ 1`: coercive; *not* a
+function of `w`, so the free flow moves — §9.16's anisotropy precondition has no analog here
+because `H₀` is not a Casimir of this bracket). Events are additive (`H₀ + H_σ`), words with
+silence gaps, as in §9.16. Every window Hamiltonian at this increment is quadratic+linear, so
+each `dt` step applies the **exact** affine flow map `p ← Φp + b`,
+`Φ = exp(dt·J(w)M)` (augmented-matrix exponential, computed once per symbol) — **"one
+linear-affine map per step" is this bracket's "one rotation per step"**, and `w` is never an
+operand of the stepper. The sin²-envelope word scales the event generator per step
+(piecewise-constant per `dt`, §9.16's treatment). Along-path sampling at `dt` feeds ζ and the
+along-word `H₀` range.
+
+**Symbols — same contract.** `kick(a)`: `H = aᵀp`. `edge_quad(u, v)`: `H = amp·p_u p_v` — the
+graph-adapted quadratic (one per authored edge is the base set's forward shape). Per-window
+coercivity certificate: the eigenvalues of `M₀ + M_σ` at the pinned amplitude are
+`1 ± ε_quad > 0`. The **silent class** on this bracket is `H = f(w)` (`∇_p H ≡ 0`); recorded
+contrast with so(3)*: the isotropic quad (`H ∝ |p|²`) is *not* silent here — `|p|²` is not a
+Casimir. The **†-class** is any write to `w` — graph surgery, per-edge legible
+(weaken / sever / form); `weaken(e, γ)` is deliberately not a `Symbol`, and during a † event
+the surgery acts alone (per-step contraction of the touched coordinate; the arena holds —
+mirroring §9.16's dissipative map).
+
+**ζ ∈ ℝ^E.** Per-edge signed area swept about the genesis gauge:
+`ζ_e = ½ ∮ (x_u dx_v − x_v dx_u)` with `x = p − p₀` — memory with the same shape as identity,
+one accumulator per authored relation. Gauge = genesis `p₀` per trajectory (identity data, as
+in §9.16); every comparison shares a genesis. Closed loops are *exactly* gauge-independent on
+flat planes (no mod-4π analog — pre-registered sanity). The **scale certificate replaces the
+antipode certificate**: flat planes have no branch; the certified risk is growth, so
+`max_t |p|` is reported for every recorded run against the pinned guard, plus the per-window
+coercivity check above.
+
+**Pinned constants (bars are sized against these).** Graph = Embra v3, `w₀` = counts as
+above · `H₀ = ½|p|²` · genesis `p₀ = √2·u`, `u` uniform on `S⁹⁹` (seeded), so `H₀(p₀) = E₀ = 1`
+· `dt = 0.01` · `τ_event = τ_gap = 0.5` · 8 seeds × 25 random words × length 16 · alphabet
+|Σ| = 4, pinned by node id: `x = kick(0.5·e_np)`, `y = kick(0.5·e_pos)`,
+`z = kick(0.5·e_abnf)`, `q = edge_quad(np, pos; amp 0.5)`, where `np = no_pretense`,
+`pos = precision_over_spectacle` (adjacent — the graph's own triple-relation pair, `w₀_e = 3`)
+and `abnf = always_becoming_never_finished` (adjacent to neither) · sin² word `"xyqzxzqy"` ·
+ζ checkpoints at 4/8/16 events · `γ = 0.5`, † edge = `(np, pos)` · replica `w_copy = 1.5·w₀`
+(primary) and a seed-0 coordinate permutation of `w₀` (secondary; precondition: it touches
+≥ 1 coordinate, count recorded) · `max|p|` guard = 50 · free-evolution twin ensemble (same
+geneses, no events, same total duration) as bar 1's baseline.
+
+**Pre-registered bars (fixed before implementation; `sandbox/graph_poisson.py` does not exist
+at this commit):**
+
+1. **ψ under words — a bit-level equality.** Across all 200 words, every recorded step:
+   `w == w₀` **exactly** (`np.array_equal`; max |Δw| reported and equal to 0.0), including the
+   sin²-envelope word. Meanwhile the law visibly moves: median along-word `H₀` range `> 0.1`
+   AND `> 100×` the free-twin baseline; bookkeeping certificate per constant event window
+   `|Δ(H₀+H_σ)| < 0.1 ×` median event `|ΔH₀|`. Stated plainly (the §9.16 sentence, sharpened):
+   the ψ side is a *state partition* — this bar certifies the partition is real in code (no
+   hidden write path), not a numerical achievement.
+2. **Non-commutativity is graph-mediated — with closed forms.**
+   (a) *Bracket certificate (bare events, exact).* One bare `x` event (kick alone, no `H₀`):
+   `Δ(bᵀp) == τ·bᵀJ(w₀)(0.5·e_np)` to float (`< 10⁻¹⁰`): for `b = e_pos` (adjacent) that is
+   `|Δ| = τ·ε·w₀_e = 0.75`, sign per the pinned orientation; for `b = e_abnf` (non-adjacent)
+   it is `0` to float. *Which experiences commute is the authored topology, measured.*
+   (b) *Heisenberg signature (bare kicks, exact).* Bare `"xy"` vs `"yx"`: `‖Δp‖ < 10⁻¹²`
+   (translations commute — **state forgets bare order**) while
+   `Δζ_e == τ²[(Ja)_u(Jb)_v − (Ja)_v(Jb)_u]` to float on *every* edge, `= (τεw₀_e)² = 0.5625`
+   on the shared edge — **memory records it exactly**. Recorded contrast with so(3)*: there,
+   order reached the state directly; here, for linear symbols, order lives *only* in ζ.
+   (c) *With the law running (ensemble-grade — the §9.16 bar).* Full `"xy"` vs `"yx"` events:
+   `‖Δp‖ > 0.01` AND `‖Δζ‖ > 0.01`, `w` bit-exact in both — order reaches the state exactly
+   *through the law*.
+3. **The §2 replica test with Σ active.** Maximally charitable copier: the replica copies the
+   survivor's **entire arena** `p` bit-exactly (every observable of the arena granted free);
+   it is born on the wrong `w`. Primary: `w_copy = 1.5·w₀` — every coordinate wrong, the
+   §9.16 wrong-sphere analog. Secondary: the seed-0 shuffle — the value *multiset* granted
+   free, caught on **arrangement alone** (which relation carries which weight); with
+   near-uniform placeholder counts its touched set is small (recorded), and the row
+   strengthens with authored content. ψ-reader (score `−max_e |w_e − w₀_e|`): AUC `== 1.0`,
+   survivor deviation `== 0.0` **bit-exact**, replica deviation `≥ 0.5·min w₀ = 0.5` (primary)
+   / `≥ 1` on ≥ 1 touched coordinate (secondary). Endpoint reader exactly `0.5` (bit-exact
+   ties); erasure `== 0.0`. Margin, stated honestly: with survivor deviation identically zero
+   the §9.16 ratio is degenerate — the pre-registered form is the pair of absolutes above.
+4. **ζ under driving.** Lived-vs-newborn AUC `== 1.0` (score `‖ζ‖`; newborn `≡ 0`) with min
+   lived `‖ζ‖ > 10⁻⁶` and median `> 10⁻²`; median `‖ζ‖` strictly increasing at 4/8/16-event
+   checkpoints. Scale certificate: `max_t |p| < 50` across all recorded runs (the max is
+   reported); per-window coercivity as pinned. Sanity: closed-loop ζ is gauge-independent
+   *exactly* (flat planes — no mod-4π analog).
+5. **† = graph surgery, legible.** Paired runs — same word, same genesis, with/without one
+   `weaken(γ = 0.5)` event at the word's midpoint on the pinned edge `(np, pos)`: with — that
+   coordinate changes by exactly `1 − (1 − γ·dt)^{n_steps} = 1 − 0.995⁵⁰ = 0.22169…` relative
+   (the discrete map's own closed form, per the §9.16/C3 standard; continuum
+   `1 − e^{−γτ} = 0.2212`; the exponent is single, not doubled — the charge is *linear* in the
+   contracted coordinate, unlike so(3)*'s quadratic `|L|²`), every other coordinate bit-exact;
+   without — `w == w₀` exactly. **The ψ change names the relation touched.**
+6. **Liveness — the charge is dynamically load-bearing.** Same genesis `p₀` (index
+   identification as pinned), same word `"xyqzxzqy"` (index-mapped symbols), run under Embra's
+   `J(w₀)` and Meridian's `J(w₀ᴹ)` (its own count-aggregation; 349 edges):
+   `max_t ‖p_E(t) − p_M(t)‖ > 0.01`, each soul's `w` bit-exact under its own run. Identity is
+   not a dead tag: every motion of the arena is filtered through the authored topology — two
+   souls living the same events live different lives.
+
+**Decision rule.** All bars pass ⇒ the port is recorded as sound and 𝔤(G)* becomes the working
+state space of phase three — content lands next (the relation-type → weight table, genesis
+sealing `w_embra`, the learned `H_θ` on the arena). Any miss is recorded and localized first.
+**Evidential note (the §9.16/C2 lesson, applied in advance):** bar 1 and the exact halves of
+bars 2 and 5 certify the *implementation of theorems* (a state partition, BCH on a two-step
+algebra, a scalar contraction); the falsifiable content is implementation-level plus the
+measured floors (2c, 3's floors, 4, 6). This sweep sits in §9.16's evidential column, not
+§9.12's.
+
+**Protocol note.** Pre-registered per the §9.16 forward protocol: this section is committed
+before any implementation code exists, and a server-timestamped copy of the bars is opened as
+a GitHub issue before implementation begins; the git commit is the working copy.
