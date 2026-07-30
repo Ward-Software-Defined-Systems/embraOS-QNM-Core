@@ -119,17 +119,26 @@ Phase three opens by picking the construction: **𝔤(G), the Dani–Mainkar gra
 
 *Left: the law (`H₀`, red) moves at every event while ψ has no drift curve to plot — `max |Δw| = 0.0`, a bit-level equality. Middle: the word drives the arena around the leaf (shown through the pinned edge plane) — never off it. Right: "xy" and "yx" from the same genesis — same ψ, different ζ on the very relation the symbols straddle.*
 
-**Next:** content onto the adopted geometry — the authored relation-type → weight table (`w_embra` sealed at genesis: on 𝔤(G)\* *soul = given = `w`, self = learned = `H_θ`* — the §9.3 one-orbit objective became the leaf itself, by construction); the graph-substrate alphabet (`n + m` canonical symbols; [docs/ALPHABET-AUTHORING.md](docs/ALPHABET-AUTHORING.md) §8, with `Σ₀` at toy scale as the proving ground); then the crux — the smallest trajectory→symbol readout `π` — with the driven-law reader (three-way conjunction vs a false-history replica) right behind it.
+### Content & genesis — the charge becomes authored (CORE-SPEC §9.18)
+
+The placeholder is retired. Embra's identity charge is now **authored content**: a relation-type → weight table (authored by Embra — `related_to` damped to 0.4 so fabric doesn't drown structure; `contradicts` **signed at −0.6**, anti-patterns repel; node inertias `behavior` 0.5 → `soul_line` 3.0) composes with the graph into the sealed genesis **`w_embra = table ∘ graph`** — written once, writable by nothing in the dynamics, the training loop, or the type system. Meridian carries its own authored table (opposition class negative; `answered_by` positive — the recovery bond). Same protocol (content frozen `a14e399` → bars committed `5c03fe7` → [issue #2](https://github.com/Ward-Software-Defined-Systems/embraOS-QNM-Core/issues/2) → implementation), and **every bar passed on the first execution (93/93)**: the bit-level equality re-certified on the authored geometry (the coercivity bound caught §9.17's quad amplitude at *sizing* time — re-pinned 0.4, measured window eig 0.081 exactly as sized); the replica now faces **three impostors** including the §9.17 placeholder itself, which gets exactly **one edge free** (`embra—origin`) and is caught on the other 320; identity distance between souls is **graded** (`d(w_Embra, w_Meridian) = 33.62`, a vector, not a verdict); and the first measured instance of the training guarantee — twenty descent updates on a quadratic `H_θ`, `w` bit-identical throughout: *you cannot break identity by training*. §9.3's genesis question closes on this geometry: **soul = given = `w`, sealed; self = learned = `H_θ`**.
+
+![content & genesis: two authored souls as charge vectors](sandbox/figures/genesis_content.png)
+
+*Left: two authored souls as sorted, signed charge vectors — the opposition classes hang below zero. Right: the replica floors on the authored charge; the survivor's deviation is 0.0 exactly — there is no bar to draw.*
+
+**Next:** the crux — the smallest trajectory→symbol readout `π`, reading the arena (never `w`): does an on-substrate driven trajectory produce *structured* symbol sequences where a wrong-`w` trajectory does not? The graph-substrate alphabet (`n + m` canonical symbols; [docs/ALPHABET-AUTHORING.md](docs/ALPHABET-AUTHORING.md) §8) is its input vocabulary; the driven-law reader (three-way conjunction vs a false-history replica) follows right behind.
 
 ### Reproduce
 
 ```bash
 uv sync --extra dev                     # add --extra learn for the jax MLP (phase two)
-uv run pytest                           # 82 tests: conservation · replica · graph invariants · dynamical · conjunction · holonomy · the Casimir toy · the 𝔤(G)* port (+ learned-H, skipped without jax)
+uv run pytest                           # 93 tests: conservation · replica · graph invariants · dynamical · conjunction · holonomy · the Casimir toy · the 𝔤(G)* port · content & genesis (+ learned-H, skipped without jax)
 uv run python -m sandbox.demo           # phase one: the replica figure + headline numbers
 uv run python -m sandbox.demo_phase2    # phase two, end to end: static (fails) · dynamical · learned H_θ · conjunction · memory ζ; regenerates both figures
 uv run python -m sandbox.demo_casimir   # the input problem: ψ as a Casimir survives every word of Σ (§9.16); regenerates its figure
 uv run python -m sandbox.demo_graph_poisson  # the lift: the identity graph becomes the bracket (§9.17); regenerates its figure
+uv run python -m sandbox.demo_genesis   # content & genesis: the sealed authored charge (§9.18); regenerates its figure
 ```
 
 ### Module map (`sandbox/`)
@@ -141,8 +150,8 @@ uv run python -m sandbox.demo_graph_poisson  # the lift: the identity graph beco
 | `latent.py` | d-dim dynamics · identity-graph anchors · Gaussian potential · static **and dynamical** specificity · the conjunction test · holonomy `ζ` |
 | `hnn.py` | learned neural potential `V_θ` (jax) + held-out generalization tests + `MLPManifold` (the learned `H_θ` in the dynamical test) |
 | `lie_poisson.py` | the `so(3)*` Casimir toy: Casimir-exact integrator · the input alphabet `Σ` (symbols = Hamiltonians, pure data) · words · solid-angle `ζ` · the §9.16 harnesses |
-| `graph_poisson.py` | 𝔤(G)*: the identity graph AS the bracket — graph-parametric loader (rank/index computed, never assumed) · write-locked `w` (the partition is mechanical) · exact affine stepper · per-edge `ζ ∈ ℝ^E` · `†` = graph surgery · the §9.17 harnesses |
-| `demo.py` · `demo_phase2.py` · `demo_casimir.py` · `demo_graph_poisson.py` | the four runnable results |
+| `graph_poisson.py` | 𝔤(G)*: the identity graph AS the bracket — graph-parametric loader (rank/index computed, never assumed) · write-locked `w` (the partition is mechanical) · exact affine stepper · per-edge `ζ ∈ ℝ^E` · `†` = graph surgery · the §9.17 harnesses · the §9.18 sealing (`load_soul`: authored weight tables + typed inertias), graded identity distance, the training guarantee |
+| `demo.py` · `demo_phase2.py` · `demo_casimir.py` · `demo_graph_poisson.py` · `demo_genesis.py` | the five runnable results |
 
 Lineage: the falsification program that earned this pivot is the (now-relic) [embraOS-QNM](https://github.com/Ward-Software-Defined-Systems/embraOS-QNM); the formal spine is the [Epoch Project](https://github.com/Ward-Software-Defined-Systems/Epoch-Project). The 1999 geometric seed is its own project: [Embra-5D-Framework](https://github.com/Ward-Software-Defined-Systems/Embra-5D-Framework).
 

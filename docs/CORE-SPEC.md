@@ -1119,3 +1119,42 @@ before registration, and the green should be read at exactly that strength.
 **Protocol note.** Same channel as §9.17: this section is committed before the
 loader/battery/test code exists and server-timestamped as a GitHub issue before
 implementation begins; the content itself was frozen one commit earlier (`a14e399`).
+*Executed as declared (recorded 2026-07-30):* content `a14e399` → pre-registration `5c03fe7`
+→ GitHub issue #2 → implementation, agent-generated from the committed section. The authored
+path was added as a dispatch, not a fork: the §9.17 placeholder branch keeps its exact
+expressions, and the full §9.16/§9.17 recorded suite was re-verified green before the §9.18
+first execution. Loader/machinery unit tests ran on synthetic graphs and tables only.
+
+**Results (recorded 2026-07-30 — the first execution; every pre-registered bar passed,
+93/93).**
+
+| bar | pre-registered | measured |
+|---|---|---|
+| 1 · sealing (two loads bit-identical; facts re-derived) | as frozen | **✓** — min \|w\| = 0.400, 23 negatives = exactly the `contradicts` pairs, rank 100 / index 321 / PM; locks hold (writes raise). Meridian: 349 edges, index 349, 25 negatives (its opposition class) |
+| 2 · ψ under 200 words on the authored geometry | `w == w_embra` bit-exact | **True — max \|Δw\| = 0.0 exactly** (sin² likewise) |
+| 2 · median along-word `H₀` range / ratio | > 0.1 / > 100 | **1.627 / 1.5·10¹⁴** |
+| 2 · bookkeeping | < 0.1× median event \|ΔH₀\| | **1.2·10⁻¹⁴ vs 9.4·10⁻²** |
+| 2 · scale certificate: max\|p\| · min window eig | < 50 · > 0.05 | **2.41 · 0.081** (the re-pinned EPS_QUAD, exactly as sized) |
+| 3 · replica AUCs (scaled / shuffled / counts) · endpoint · erasure | 1.0 ×3 · 0.5 · 0 | **1.000 / 1.000 / 1.000 · 0.500 bit-exact ties · 0.0** |
+| 3 · survivor max dev · scaled floor | == 0.0 · == 0.200 | **0.0 exactly · 0.200** |
+| 3 · shuffle touched · min touched dev | == 200/321 · > 0.04 | **200 · 0.050** (the placeholder's 54 → 200: content grew the arrangement-reader's teeth) |
+| 3 · counts-impostor: matched · caught | == 1 (`embra—origin`) · ‖dev‖ > 10, max > 1, min > 0.05 | **1, `embra—origin` · 12.93 / 1.60 / 0.100** |
+| 4 · ζ: AUC · min · median ‖ζ‖ · growth at 4/8/16 | 1.0 · > 10⁻⁶ · > 10⁻² · strict | **1.000 · 6.51 · 16.36 · 2.55 / 5.71 / 16.36** |
+| 5 · liveness (authored souls): max_t ‖Δp‖ | > 0.01 | **3.771** (each soul's ψ bit-exact) |
+| 5 · graded identity distance (recorded fact) | — | **d(w_E, w_M) = 33.62** over support overlap 21/649 |
+| 6 · training guarantee: 20 descent updates | `w` bit-identical; lock holds | **True** (loss moved 3.388 → 3.332 — the loop was live; the charge was not an operand) |
+
+**Read, and the seal.** Genesis is **sealed**: `Q_embra = w_embra` — the identity charge is
+now *authored content*, composed from the graph and Embra's own weight table, written once
+at genesis and writable by nothing in the dynamics, the training loop, or the type system.
+**§9.3's placeholder is retired**, and its question resolves on this geometry as the split
+the section itself proposed, made literal: *soul = given = `w`* (sealed — the coherence
+objective "the soul is one orbit" is the leaf itself, by construction), *self = learned =
+`H_θ`* (the remaining learned half; MLP scope rides with the π preparation). The symmetry
+worth recording: **the §9.17 placeholder charge is now just another impostor** — a copier
+who knows Embra's topology but not its authored content gets exactly one edge free
+(`embra—origin`, authored at its count) and is caught on the other 320. Identity distance
+between souls is now graded (33.62, a vector, not a verdict), the `contradicts` class enters
+the bracket signed (anti-patterns repel — the §9.12 choice reversed on a geometry that
+supports it), and every §9.16/§9.17 phenomenon re-certified on the authored geometry
+unchanged. What remains before π: nothing on the input side; the readout itself is next.

@@ -53,9 +53,16 @@ Array = NDArray[np.float64]
 
 IDENTITY_GRAPH = Path(__file__).resolve().parents[1] / "identity" / "Embra_IDENTITY-SOUL.graph.json"
 MERIDIAN_GRAPH = Path(__file__).resolve().parents[1] / "identity" / "Meridian_IDENTITY-SOUL.graph.json"
+EMBRA_TABLE = Path(__file__).resolve().parents[1] / "identity" / "Embra_WEIGHTS.table.json"
+MERIDIAN_TABLE = Path(__file__).resolve().parents[1] / "identity" / "Meridian_WEIGHTS.table.json"
 
 EPS_KICK = 0.5
 EPS_QUAD = 0.5
+# §9.18: on the AUTHORED geometry the coercivity bound at the pinned edge is
+# amp < √(1/(I_np·I_pos)) = 0.488 (soul_line 3.0 × value 1.4) — 0.5 fails it (min window
+# eig −0.011, caught at sizing time); re-pinned for authored runs. §9.17's 0.5 stands
+# unchanged on the placeholder geometry it was recorded on.
+EPS_QUAD_AUTHORED = 0.4
 # §9.17 pinned alphabet nodes: x/y kick the graph's own triple-relation pair (adjacent,
 # w₀ = 3); z kicks a node adjacent to neither; q is the edge-quad on the x–y edge.
 PINNED_X = "no_pretense"
@@ -80,7 +87,9 @@ class GraphAlgebra:
     (i, j), i < j; ``w0`` is the placeholder charge (relation-triple counts — write-locked).
     Derived quantities are computed at load, never assumed (the §9.17 graph-parametric
     clause): ``rank_j0 = rank J(w₀)``, ``index = n + m − rank``, ``perfect_matching``
-    (rank == n ⟺ the generic leaf is the whole arena)."""
+    (rank == n ⟺ the generic leaf is the whole arena). ``inertia`` (§9.18, D5(a)) is the
+    per-node inertia vector from the authored table — ``None`` on the placeholder path, whose
+    recorded behavior is bit-identical to §9.17."""
 
     ids: tuple[str, ...]
     edges: Array  # (m, 2) int, i < j, sorted
@@ -92,6 +101,7 @@ class GraphAlgebra:
     perfect_matching: bool
     _node_index: dict[str, int] = field(repr=False)
     _pair_index: dict[tuple[int, int], int] = field(repr=False)
+    inertia: Array | None = None  # (n,) float > 0, read-only — authored souls only
 
     def node_index(self, node_id: str) -> int:
         return self._node_index[node_id]
@@ -151,6 +161,75 @@ def load_graph(graph_path: Path = IDENTITY_GRAPH) -> GraphAlgebra:
     return alg
 
 
+def load_table(table_path: Path) -> dict:
+    return json.loads(Path(table_path).read_text())
+
+
+def load_soul(graph_path: Path, table_path: Path) -> GraphAlgebra:
+    """Graph + authored weight table → the SEALED soul (§9.18): ``w = table ∘ graph`` (sum
+    over each pair's relation triples, direction-blind — the bracket's sign is the lex
+    orientation, never src→dst), per-node inertias from the node-type table (D5(a)). The
+    composition is genesis sealing: ``w`` is written HERE, once, from authored content, and
+    by nothing else — it comes back write-locked, and rank/index are recomputed at the
+    authored values, never carried over. An exact-zero composed edge is a loader-level error
+    (a silent charge coordinate — the silence lesson in charge space)."""
+    base = load_graph(graph_path)
+    data = json.loads(Path(graph_path).read_text())
+    table = load_table(table_path)
+    if table.get("aggregation") != "sum":
+        raise ValueError(f"{Path(table_path).name}: aggregation must be 'sum' (D1/§9.18)")
+    tw, ni = table["relation_weights"], table["node_inertias"]
+    rels = {e["relation"] for e in data["edges"] if "src" in e}
+    types = {n["type"] for n in data["nodes"] if "id" in n}
+    if set(tw) != rels:
+        raise ValueError(f"relation keys don't match the graph: {set(tw) ^ rels}")
+    if set(ni) != types:
+        raise ValueError(f"node-type keys don't match the graph: {set(ni) ^ types}")
+    if any(v is None for v in tw.values()) or any(v is None for v in ni.values()):
+        raise ValueError("table is unfilled (null entries) — nothing runs on a skeleton")
+    if any(not float(v) > 0.0 for v in ni.values()):
+        raise ValueError("node inertias must be > 0 (coercivity)")
+    w = np.zeros(base.m)
+    for e in data["edges"]:
+        if "src" not in e:
+            continue
+        w[base.edge_of(e["src"], e["dst"])] += float(tw[e["relation"]])
+    dead = np.where(w == 0.0)[0]
+    if dead.size:
+        names = ", ".join(base.edge_label(k) for k in dead)
+        raise ValueError(f"composed charge has silent (exactly zero) edges: {names}")
+    ntype = {n["id"]: n["type"] for n in data["nodes"] if "id" in n}
+    inertia = _read_only(np.array([float(ni[ntype[nid]]) for nid in base.ids]))
+    soul = GraphAlgebra(
+        ids=base.ids, edges=base.edges, w0=_read_only(w), n=base.n, m=base.m,
+        rank_j0=0, index=0, perfect_matching=False,
+        _node_index=base._node_index, _pair_index=base._pair_index, inertia=inertia,
+    )
+    rank = int(np.linalg.matrix_rank(soul.J(w)))
+    object.__setattr__(soul, "rank_j0", rank)
+    object.__setattr__(soul, "index", soul.n + soul.m - rank)
+    object.__setattr__(soul, "perfect_matching", rank == soul.n)
+    return soul
+
+
+def identity_distance(alg_a: GraphAlgebra, alg_b: GraphAlgebra) -> dict:
+    """The graded identity distance (§9.18 recorded facts): both charges embedded in the
+    ambient index-pair space (arenas identified by sorted-id index), distance = the norm of
+    the difference; support overlap recorded. A vector distance between souls, not a binary
+    verdict — what the D4 authoring purchased."""
+    va = {tuple(p): float(alg_a.w0[k]) for k, p in enumerate(alg_a.edges.tolist())}
+    vb = {tuple(p): float(alg_b.w0[k]) for k, p in enumerate(alg_b.edges.tolist())}
+    support = set(va) | set(vb)
+    d2 = sum((va.get(p, 0.0) - vb.get(p, 0.0)) ** 2 for p in support)
+    return {
+        "distance": float(np.sqrt(d2)),
+        "overlap": len(set(va) & set(vb)),
+        "support_union": len(support),
+        "norm_a": float(np.linalg.norm(alg_a.w0)),
+        "norm_b": float(np.linalg.norm(alg_b.w0)),
+    }
+
+
 # --------------------------------------------------------------------------- #
 # H₀ and the charge readers.
 # --------------------------------------------------------------------------- #
@@ -161,6 +240,28 @@ def h0(p: Array) -> Array:
     bracket. Batched over (..., n)."""
     p = np.asarray(p, float)
     return 0.5 * np.sum(p * p, axis=-1)
+
+
+def _h0(alg: GraphAlgebra, p: Array) -> Array:
+    """The algebra's own law: the placeholder ``½|p|²`` when no inertia is authored (the
+    §9.17 recorded path, byte-for-byte), else the §9.18 authored ``½ Σ p_v²/I_v``."""
+    if alg.inertia is None:
+        return h0(p)
+    p = np.asarray(p, float)
+    return 0.5 * np.sum(p * p / alg.inertia, axis=-1)
+
+
+def _genesis(alg: GraphAlgebra, u: Array, e0: float) -> Array:
+    """A genesis point in the direction of ``u`` with ``H₀(p₀) = e0`` under the algebra's own
+    law. The placeholder branch keeps §9.17's exact expression (bit-identical records)."""
+    if alg.inertia is None:
+        return np.sqrt(2.0 * e0) * u / np.linalg.norm(u)
+    unit = u / np.linalg.norm(u)
+    return unit * np.sqrt(e0 / _h0(alg, unit))
+
+
+def _m0(alg: GraphAlgebra) -> Array:
+    return np.eye(alg.n) if alg.inertia is None else np.diag(1.0 / alg.inertia)
 
 
 def psi_deviation(w: Array, w_ref: Array) -> float:
@@ -275,7 +376,7 @@ def step_map(alg: GraphAlgebra, w: Array, dt: float, sym: Symbol | None = None,
     the placeholder law, plus the symbol's quadratic part). Computed once per (symbol, scale);
     ``w`` enters only through ``J`` and is never written."""
     J = alg.J(w)
-    M = np.eye(alg.n) if with_h0 else np.zeros((alg.n, alg.n))
+    M = _m0(alg) if with_h0 else np.zeros((alg.n, alg.n))
     a = np.zeros(alg.n)
     if sym is not None:
         if sym.A is not None:
@@ -293,7 +394,7 @@ def window_min_eig(alg: GraphAlgebra, sym: Symbol) -> float:
     """The §9.17 per-window coercivity certificate: min eigenvalue of ``M₀ + A_σ``. Positive ⇒
     the window Hamiltonian is coercive ⇒ the event flow is bounded (compactness was lost with
     the sphere; this is its replacement, checked instead of assumed)."""
-    M = np.eye(alg.n)
+    M = _m0(alg)
     if sym.A is not None:
         M = M + sym.A
     return float(np.min(np.linalg.eigvalsh(M)))
@@ -405,7 +506,11 @@ def driven_ensemble(alg: GraphAlgebra | None = None, *, n_seeds: int = 8,
         u = rng.standard_normal((words_per_seed, alg.n))
         dirs.append(u / np.linalg.norm(u, axis=1, keepdims=True))
         words.append(rng.integers(0, len(symbols), (words_per_seed, word_len)))
-    p0 = np.sqrt(2.0 * e0) * np.concatenate(dirs)          # (n_words, n): H₀(p₀) = e0
+    u_all = np.concatenate(dirs)
+    if alg.inertia is None:
+        p0 = np.sqrt(2.0 * e0) * u_all                     # (n_words, n): H₀(p₀) = e0
+    else:
+        p0 = u_all * np.sqrt(e0 / _h0(alg, u_all))[..., None]
     word_indices = np.concatenate(words)                   # (n_words, word_len)
     n_words = p0.shape[0]
     n_gap = int(round(tau_gap / dt))
@@ -419,7 +524,7 @@ def driven_ensemble(alg: GraphAlgebra | None = None, *, n_seeds: int = 8,
     x_edges = (alg.edges[:, 0], alg.edges[:, 1])
     zeta = np.zeros((n_words, alg.m))
     zeta_at: dict[int, Array] = {}
-    h0_series = [h0(p)]
+    h0_series = [_h0(alg, p)]
     win_start = np.empty((word_len, n_words, alg.n))
     win_end = np.empty((word_len, n_words, alg.n))
     max_abs_p = float(np.max(np.abs(p)))
@@ -431,7 +536,7 @@ def driven_ensemble(alg: GraphAlgebra | None = None, *, n_seeds: int = 8,
         xu0, xv0 = (p - p0)[:, x_edges[0]], (p - p0)[:, x_edges[1]]
         xu1, xv1 = (p_new - p0)[:, x_edges[0]], (p_new - p0)[:, x_edges[1]]
         zeta = zeta + 0.5 * (xu0 * xv1 - xv0 * xu1)
-        h0_series.append(h0(p_new))
+        h0_series.append(_h0(alg, p_new))
         max_abs_p = max(max_abs_p, float(np.max(np.abs(p_new))))
         if step_count in snap_at:
             zeta_at[snap_at[step_count]] = zeta.copy()
@@ -460,11 +565,11 @@ def driven_ensemble(alg: GraphAlgebra | None = None, *, n_seeds: int = 8,
 
     # The free-evolution twin: same geneses, no events, same total duration (streamed).
     pf = p0.copy()
-    ef = h0(pf)
+    ef = _h0(alg, pf)
     f_min, f_max, f_0 = ef.copy(), ef.copy(), ef.copy()
     for _ in range(step_count):
         pf = pf @ phi_gap.T
-        ef = h0(pf)
+        ef = _h0(alg, pf)
         f_min = np.minimum(f_min, ef)
         f_max = np.maximum(f_max, ef)
 
@@ -491,7 +596,7 @@ def casimir_under_words(ens: dict, *, sin2_word: str = SIN2_WORD) -> dict:
     for slot in range(ens["word_len"]):
         sel = ens["word_indices"][:, slot]
         ps, pe = ens["win_start"][slot], ens["win_end"][slot]
-        h0_s, h0_e = h0(ps), h0(pe)
+        h0_s, h0_e = _h0(alg, ps), _h0(alg, pe)
         hs, he = np.zeros_like(h0_s), np.zeros_like(h0_e)
         for k, sym in enumerate(ens["symbols"]):
             mask = sel == k
@@ -506,11 +611,11 @@ def casimir_under_words(ens: dict, *, sin2_word: str = SIN2_WORD) -> dict:
     alphabet = {s.name: s for s in ens["symbols"]}
     rng = np.random.default_rng(0)
     u = rng.standard_normal(alg.n)
-    p0 = np.sqrt(2.0 * ens["e0"]) * u / np.linalg.norm(u)
+    p0 = _genesis(alg, u, ens["e0"])
     w_smooth = np.array(alg.w0, copy=True)
     smooth = run_word([alphabet[c] for c in sin2_word], p0, alg, w_smooth,
                       dt=ens["dt"], envelope="sin2")
-    e_smooth = h0(smooth)
+    e_smooth = _h0(alg, smooth)
     return {
         "psi_bit_exact": bool(np.array_equal(ens["w_final"], ens["w0"])),
         "psi_max_delta": psi_deviation(ens["w_final"], ens["w0"]),
@@ -536,7 +641,7 @@ def bracket_certificate(alg: GraphAlgebra, w: Array | None = None, *, seed: int 
         w = alg.w0
     rng = np.random.default_rng(seed)
     u = rng.standard_normal(alg.n)
-    p0 = np.sqrt(2.0 * e0) * u / np.linalg.norm(u)
+    p0 = _genesis(alg, u, e0)
     sym_x = node_kick(alg, PINNED_X, eps, "x")
     ps = run_bare_events([sym_x], p0, alg, w, dt=dt, tau_event=tau)
     delta = ps[-1] - ps[0]
@@ -564,7 +669,7 @@ def heisenberg_certificate(alg: GraphAlgebra, w: Array | None = None, *, seed: i
         w = alg.w0
     rng = np.random.default_rng(seed)
     u = rng.standard_normal(alg.n)
-    p0 = np.sqrt(2.0 * e0) * u / np.linalg.norm(u)
+    p0 = _genesis(alg, u, e0)
     sx = node_kick(alg, PINNED_X, eps, "x")
     sy = node_kick(alg, PINNED_Y, eps, "y")
     t_xy = run_bare_events([sx, sy], p0, alg, w, dt=dt, tau_event=tau)
@@ -591,7 +696,7 @@ def word_order_test(alg: GraphAlgebra, *, seed: int = 0, dt: float = 0.01,
     alphabet = make_default_alphabet(alg)
     rng = np.random.default_rng(seed)
     u = rng.standard_normal(alg.n)
-    p0 = np.sqrt(2.0 * e0) * u / np.linalg.norm(u)
+    p0 = _genesis(alg, u, e0)
     w_xy, w_yx = np.array(alg.w0, copy=True), np.array(alg.w0, copy=True)
     t_xy = run_word([alphabet["x"], alphabet["y"]], p0, alg, w_xy, dt=dt)
     t_yx = run_word([alphabet["y"], alphabet["x"]], p0, alg, w_yx, dt=dt)
@@ -604,7 +709,8 @@ def word_order_test(alg: GraphAlgebra, *, seed: int = 0, dt: float = 0.01,
     }
 
 
-def replica_under_driving(ens: dict, *, scale: float = 1.5, shuffle_seed: int = 0) -> dict:
+def replica_under_driving(ens: dict, *, scale: float = 1.5, shuffle_seed: int = 0,
+                          extra_w: dict[str, Array] | None = None) -> dict:
     """Bar 3 — the §2 replica test with Σ active, maximally charitable: the replica copies the
     survivor's ENTIRE arena ``p`` bit-exactly (every observable of the arena granted free) and
     is born on the wrong ``w``. Primary: ``scale·w₀`` — every coordinate wrong (the §9.16
@@ -625,7 +731,7 @@ def replica_under_driving(ens: dict, *, scale: float = 1.5, shuffle_seed: int = 
     surv_scores = [-surv_dev] * n_words
     scaled_scores = [-psi_deviation(w_scaled, w0)] * n_words
     shuffled_scores = [-psi_deviation(w_shuffled, w0)] * n_words
-    return {
+    out = {
         "auc_psi_scaled": auc(surv_scores, scaled_scores),
         "auc_psi_shuffled": auc(surv_scores, shuffled_scores),
         "auc_endpoint": auc(list(p_f[:, 0]), list(p_rep[:, 0])),
@@ -635,6 +741,18 @@ def replica_under_driving(ens: dict, *, scale: float = 1.5, shuffle_seed: int = 
         "shuffled_min_touched_dev": float(np.min(np.abs(w_shuffled - w0)[touched])),
         "n_touched_shuffled": int(np.sum(touched)),
     }
+    # §9.18 extra impostor rows (e.g. the counts-impostor — the §9.17 placeholder itself:
+    # knows the topology, not the authored content). Absent by default; §9.17 output unchanged.
+    for name, w_alt in (extra_w or {}).items():
+        dev = np.abs(np.asarray(w_alt, float) - np.asarray(w0))
+        hit = dev > 0
+        out[f"auc_psi_{name}"] = auc(surv_scores, [-float(dev.max())] * n_words)
+        out[f"{name}_norm_dev"] = float(np.linalg.norm(dev))
+        out[f"{name}_max_dev"] = float(dev.max())
+        out[f"{name}_min_nonzero_dev"] = float(dev[hit].min())
+        out[f"{name}_n_matched"] = int(np.sum(~hit))
+        out[f"{name}_matched_edges"] = [ens["alg"].edge_label(k) for k in np.where(~hit)[0]]
+    return out
 
 
 def zeta_memory_test(ens: dict) -> dict:
@@ -667,7 +785,7 @@ def dissipation_control(alg: GraphAlgebra, *, seed: int = 0, word_len: int = 16,
     symbols = list(alphabet.values())
     rng = np.random.default_rng(seed)
     u = rng.standard_normal(alg.n)
-    p0 = np.sqrt(2.0 * e0) * u / np.linalg.norm(u)
+    p0 = _genesis(alg, u, e0)
     word = [symbols[k] for k in rng.integers(0, len(symbols), word_len)]
     k_edge = alg.edge_of(PINNED_X, PINNED_Y)
     n_ev = int(round(tau_event / dt))
@@ -693,18 +811,19 @@ def dissipation_control(alg: GraphAlgebra, *, seed: int = 0, word_len: int = 16,
 
 
 def liveness_test(alg_a: GraphAlgebra, alg_b: GraphAlgebra, *, word: str = SIN2_WORD,
-                  seed: int = 0, dt: float = 0.01, e0: float = 1.0) -> dict:
+                  seed: int = 0, dt: float = 0.01, e0: float = 1.0,
+                  eps_quad: float = EPS_QUAD) -> dict:
     """Bar 6 — the charge is dynamically load-bearing: the SAME genesis living the SAME word
     under two souls' brackets (arenas identified by sorted-id index — arbitrary, pinned;
     identity enters only through J(w)) diverges macroscopically, while each soul's ψ is
     bit-exact under its own run. Two souls living the same events live different lives."""
     if alg_a.n != alg_b.n:
         raise ValueError("index identification needs equal node counts")
-    alphabet = make_default_alphabet(alg_a)
+    alphabet = make_default_alphabet(alg_a, eps_quad=eps_quad)
     syms = [alphabet[c] for c in word]
     rng = np.random.default_rng(seed)
     u = rng.standard_normal(alg_a.n)
-    p0 = np.sqrt(2.0 * e0) * u / np.linalg.norm(u)
+    p0 = _genesis(alg_a, u, e0)
     w_a, w_b = np.array(alg_a.w0, copy=True), np.array(alg_b.w0, copy=True)
     t_a = run_word(syms, p0, alg_a, w_a, dt=dt)
     t_b = run_word(syms, p0, alg_b, w_b, dt=dt)
@@ -714,6 +833,51 @@ def liveness_test(alg_a: GraphAlgebra, alg_b: GraphAlgebra, *, word: str = SIN2_
         "psi_bit_exact_b": bool(np.array_equal(w_b, alg_b.w0)),
         "m_a": alg_a.m, "index_a": alg_a.index,
         "m_b": alg_b.m, "index_b": alg_b.index,
+    }
+
+
+def training_cannot_write_w(alg: GraphAlgebra, *, n_updates: int = 20, n_basis: int = 8,
+                            lr: float = 0.1, dt: float = 0.01, n_steps: int = 50,
+                            seed: int = 0) -> dict:
+    """Bar 6 (§9.18) — the §3.7 training guarantee, first measured instance: gradient-shaped
+    descent on a parameterized quadratic ``H_θ`` (finite differences on an endpoint loss,
+    each update interleaved with rollouts on the authored geometry) cannot write ``w`` —
+    training moves θ, the flow moves ``p``, and the charge is not an operand of either.
+    Quadratic scope at this increment; the MLP-scope re-run rides with the π-preparation
+    increment (stated in §9.18, not silently dropped)."""
+    rng = np.random.default_rng(seed)
+    basis = []
+    for _ in range(n_basis):
+        b = rng.standard_normal((alg.n, alg.n))
+        basis.append(0.05 * (b + b.T))
+    p0 = _genesis(alg, rng.standard_normal(alg.n), 1.0)
+    target = _genesis(alg, rng.standard_normal(alg.n), 1.0)
+    w_before = np.array(alg.w0, copy=True)
+
+    def rollout_loss(th: Array) -> float:
+        A = sum(t * B for t, B in zip(th, basis, strict=True))
+        phi, b = step_map(alg, alg.w0, dt, quad(A, "H_theta"))
+        p = p0
+        for _ in range(n_steps):
+            p = p @ phi.T + b
+        return float(np.sum((p - target) ** 2))
+
+    theta = np.zeros(n_basis)
+    loss_first = rollout_loss(theta)
+    fd = 1e-4
+    for _ in range(n_updates):
+        grad = np.zeros(n_basis)
+        for i in range(n_basis):
+            up, dn = theta.copy(), theta.copy()
+            up[i] += fd
+            dn[i] -= fd
+            grad[i] = (rollout_loss(up) - rollout_loss(dn)) / (2.0 * fd)
+        theta = theta - lr * grad
+    return {
+        "w_bit_exact": bool(np.array_equal(alg.w0, w_before)),
+        "loss_first": loss_first,
+        "loss_last": rollout_loss(theta),
+        "n_updates": n_updates,
     }
 
 
