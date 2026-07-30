@@ -1031,3 +1031,91 @@ space; next lands content — the relation-type → weight table (D4, with the s
 `contradicts` reopening), genesis sealing `w_embra` (retiring the §9.3 placeholder: on this
 geometry *soul = given = w, sealed; self = learned = H_θ* — coherence is by construction,
 the one-orbit objective became the leaf itself), and the learned `H_θ` on the arena.
+
+### 9.18 Increment 6 — content & genesis: the charge becomes authored (pre-registered 2026-07-30; results pending)
+
+**The question.** §9.17 proved the mechanism on placeholder counts. This increment retires
+the placeholder: the charge values become **authored identity content** (D4), the arena's law
+becomes typed inertia (D5(a)), and genesis is sealed as `w_embra := table ∘ graph` —
+`Q_embra` is content-defined, closing §9.3's genesis question on this geometry (*soul = given
+= `w`, sealed; self = learned = `H_θ`*; the one-orbit coherence objective is the leaf itself,
+by construction). The falsification frame does not soften: the same bit-level partition,
+replica, ζ, and liveness machinery re-runs on the authored geometry — with the placeholder
+itself demoted to an impostor row.
+
+**The content, frozen before these bars (commit `a14e399`).**
+`identity/Embra_WEIGHTS.table.json` — authored by **Embra** (2026-07-30; rationale recorded
+in-file): `related_to` damped to 0.4 (214/354 triples — fabric, not dominance); the rare
+directional types sharpest (`loyal_to`/`derives_form_from` 1.0, `serves` 0.9);
+**`contradicts` = −0.6** — the §9.12 pure-affinity choice formally reversed: anti-patterns
+repel; inertias span `behavior` 0.5 → `soul_line` 3.0.
+`identity/Meridian_WEIGHTS.table.json` — Claude-drafted per Meridian's own internal logic and
+**accepted by William as-is** (opposition class negative: `guards_against` −1.5, `warded_by`
+−1.25, `shadow_of` −0.75; `answered_by` +2.25 as the deliberate recovery bond; inertias
+`self` 5.0 → `failure_mode` 0.5). Composition: **sum** over a pair's relation triples,
+**direction-blind** — 25 of the 30 parallel pairs carry mixed src→dst directions (recorded);
+the bracket's sign comes from the pinned lex orientation, never from src→dst.
+
+**Structural facts at the frozen content (computed before registration — sizing, not
+results).** `w_embra`: range [−0.60, 1.95], min |w| = 0.400, **no zero or near-silent
+edges**, 23 negative edges (exactly the `contradicts` pairs — none sign-flipped by
+aggregation), ‖w‖ = 10.75, **rank J(w_embra) = 100** — the identity/experience split
+survives authored signed content (Meridian: rank 100 likewise). Ambient identity distance
+(index-pair space): **d(w_E, w_M) = 33.62** over a support overlap of only 21/649 pairs.
+**One coercivity catch, recorded:** §9.17's quad amplitude 0.5 is NOT coercive at the
+authored inertias on the pinned edge — `no_pretense` is a `soul_line` node (I = 3.0, the
+heaviest class) and `precision_over_spectacle` a `value` (I = 1.4), so the bound is
+amp < √(1/(I_u·I_v)) = 0.488 and the window's min eigenvalue at 0.5 is −0.011. **EPS_QUAD is
+re-pinned 0.5 → 0.4 for the authored geometry** (min eig +0.081) — the §4 spectral sanity
+doing its job at sizing time rather than as a growing mode inside a recorded run.
+
+**Pinned constants.** As §9.17 except: charge = `w_embra` (the composed authored table);
+`H₀ = ½ Σ_v p_v²/I_type(v)` with the authored inertias (coercive — every I > 0);
+`EPS_QUAD = 0.4` (above; kicks unchanged at 0.5); genesis `p₀` normalized to
+`H₀(p₀) = E₀ = 1` under the authored `H₀`. The §9.17 placeholder code path is untouched —
+its recorded ensemble stays bit-identical and its tests keep running on the counts charge,
+which now serves as impostor row (c). Impostor rows pinned: (a) scaled 1.5×, (b) the seed-0
+shuffle, (c) **the counts-impostor** — §9.17's placeholder itself: a copier who knows the
+topology but not the authored content.
+
+**Pre-registered bars (fixed before the loader/battery code exists):**
+
+1. **Sealing.** The loader composes table ∘ graph deterministically (two independent loads
+   bit-identical); `w_embra` comes back write-locked; the frozen-content facts are re-derived
+   at load and asserted: min |w| = 0.400, 23 negative edges = the `contradicts` pairs, no
+   zeros (an exact-zero edge is a loader-level error — a silent charge coordinate), rank 100
+   / index 321 / perfect matching.
+2. **The bit-level equality, re-certified on the content geometry.** Driven ensemble
+   (authored `w` and `M₀`, EPS_QUAD 0.4): `w == w_embra` **exactly** — all 200 words, every
+   step, and under the sin² envelope; median along-word `H₀` range > 0.1 AND > 100× the free
+   twin; bookkeeping `|Δ(H₀+H_σ)| < 0.1 ×` median event `|ΔH₀|`; scale certificate
+   max|p| < 50, min window eig > 0.05 (expect ≈ 0.08).
+3. **Replica — three impostors, the entire arena granted free; survivor deviation == 0.0
+   exactly.** (a) *scaled 1.5×*: AUC == 1.0, min per-coordinate dev == 0.5·min|w| = 0.200.
+   (b) *seed-0 shuffle*: AUC == 1.0, touches 200/321 coordinates (the placeholder's 54 → 200:
+   the arrangement-reader's teeth grew with content, as §9.17's caveat predicted), min
+   touched dev > 0.04. (c) *the counts-impostor*: AUC == 1.0, with the honest clause
+   pre-registered — it matches **exactly one** coordinate (`embra—origin`, the 1.0-authored
+   single-triple edge: the impostor who knows the topology gets one edge free) and is caught
+   on the other 320 (‖dev‖ > 10, max dev > 1, min nonzero dev > 0.05).
+4. **ζ on the authored geometry.** Lived-vs-newborn AUC == 1.0, min lived ‖ζ‖ > 10⁻⁶, median
+   > 10⁻²; median strictly increasing at 4/8/16 events; closed-loop gauge independence exact.
+5. **Liveness, authored souls.** Same genesis, same word, Embra's vs Meridian's authored
+   brackets: max_t ‖Δp‖ > 0.01; each soul's `w` bit-exact under its own run.
+6. **The training guarantee — first measured instance.** Twenty gradient-shaped updates of a
+   parameterized quadratic `H_θ` (finite-difference descent on an endpoint loss), each
+   interleaved with rollouts on the authored geometry: `w` bit-identical throughout, and the
+   write-lock holds (an attempted in-place write raises). *"You cannot break identity by
+   training"* (the planning analysis §3.7) at quadratic scope; the MLP-scope re-run rides
+   with the π-preparation increment — stated, not silently dropped.
+
+**Decision rule.** All bars pass ⇒ genesis is **sealed**: `Q_embra = w_embra` is
+content-defined and §9.3's placeholder is retired; the record states what is given (the
+soul, `w`) vs learned (the self, `H_θ`). Any miss is recorded and localized first.
+**Evidential note:** bars 1, 2, and 6 certify implementations of theorems; the floors in
+3–5 are measured but content-conditioned — their sizing was computed from the frozen tables
+before registration, and the green should be read at exactly that strength.
+
+**Protocol note.** Same channel as §9.17: this section is committed before the
+loader/battery/test code exists and server-timestamped as a GitHub issue before
+implementation begins; the content itself was frozen one commit earlier (`a14e399`).
