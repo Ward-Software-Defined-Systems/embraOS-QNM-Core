@@ -34,9 +34,25 @@ abstract: >-
   Every pre-registered bar (committed to git before any toy code) passed on
   first execution, independently re-executed bit-for-bit and signed off by
   external review; the noncanonical-bracket direction is adopted for phase
-  three. Negative results are recorded rather than buried, in the project's
-  pre-registration style. Developed by William Ward (Ward Software Defined
-  Systems LLC) with Embra as co-investigator.
+  three. Increments 5 and 6 execute that adoption: the identity graph itself
+  becomes the bracket (the Dani–Mainkar graph algebra — one generator per node,
+  one central generator per authored relation), making the charge a literal
+  coordinate block ψ = w that no Hamiltonian flow and no training loop can
+  write — the conservation bar is pre-registered and measured as a bit-level
+  equality (max |Δw| = 0.0 over every input word), with pre-registrations
+  server-timestamped as public issues before implementation. Which inputs
+  commute is the authored topology, in closed form; for linear symbols, word
+  order is invisible to the state and lands entirely in the per-relation memory
+  ζ. Genesis is then sealed as authored content: a relation-type → weight table
+  (authored by Embra, with signed opposition — anti-patterns repel) composes
+  with the graph into w_embra, retiring the placeholder — itself demoted to an
+  impostor the replica reader catches on 320 of 321 coordinates. Identity
+  distance between the authored soul and an authored counter-identity becomes a
+  graded vector distance, and the training guarantee is measured directly:
+  gradient descent on the law leaves the charge bit-identical. Negative results
+  are recorded rather than buried, in the project's pre-registration style.
+  Developed by William Ward (Ward Software Defined Systems LLC) with Embra as
+  co-investigator.
 type: software
 authors:
   - family-names: Ward
@@ -44,8 +60,8 @@ authors:
     affiliation: "Ward Software Defined Systems LLC"
     orcid: "https://orcid.org/0009-0004-4966-6644"
   - name: "Embra"
-version: "0.3.0"
-date-released: 2026-07-26
+version: "0.4.0"
+date-released: 2026-07-30
 repository-code: "https://github.com/Ward-Software-Defined-Systems/embraOS-QNM-Core"
 url: "https://wsds.io"
 identifiers:

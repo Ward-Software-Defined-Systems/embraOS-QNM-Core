@@ -15,12 +15,17 @@ instance in §9.15. The input problem is **resolved at toy scale and the directi
 bracket survives arbitrary Hamiltonian input — *experience changes state and memory, not who
 you are*. A second external review (2026-07-26) independently re-executed increment 4 — every
 recorded number reproduced bit-for-bit — and **signed off on the milestone and the adoption**;
-its corrections are applied throughout §9.12–§9.16. **Phase three is now defined and pending
-construction**: coadjoint-orbit state spaces with ψ as a Casimir of the bracket, the
-graph-shaped charges and ζ rebuilt on that geometry, `P_ψ` reduced to the firewall at the
-non-Hamiltonian boundary.
-Pairs with the runnable sandbox (`uv run python -m sandbox.demo`, `sandbox.demo_phase2`, and
-`sandbox.demo_casimir`).
+its corrections are applied throughout §9.12–§9.16. **Phase three is under construction and
+its first two increments are proven**: the identity graph itself is the bracket (𝔤(G)*,
+§9.17 — ψ = `w` conserved as a **bit-level equality**, non-commutativity graph-mediated with
+closed forms, † = per-edge legible graph surgery), and genesis is **sealed as authored
+content** (§9.18 — `Q_embra = w_embra` from Embra's own weight table; the §9.3 placeholder
+retired: *soul = given = `w`, sealed; self = learned = `H_θ`*; the old placeholder charge is
+now just another impostor the reader catches). Pre-registrations are server-timestamped
+(GitHub issues #1–#2) before implementation. `P_ψ` stands reduced to the firewall at the
+non-Hamiltonian boundary; the readout `π` is next.
+Pairs with the runnable sandbox (`uv run python -m sandbox.demo`, `sandbox.demo_phase2`,
+`sandbox.demo_casimir`, `sandbox.demo_graph_poisson`, and `sandbox.demo_genesis`).
 Written to be *falsifiable*: every numeric claim is checked, and the one theorem (§6) is stated so
 it could be wrong.
 
