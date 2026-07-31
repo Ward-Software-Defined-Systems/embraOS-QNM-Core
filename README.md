@@ -157,6 +157,12 @@ Lineage: the falsification program that earned this pivot is the (now-relic) [em
 
 ---
 
+## Node-Scale Hallucination Study
+
+A separate, self-contained line of work in this repo: **[docs/Node-Scale-Hallucination-Study.md](docs/Node-Scale-Hallucination-Study.md)** — a pre-registered, falsifiable experiment asking whether a model's *fabrication-node scale* (the silicon process it runs on) measurably affects its hallucination rate, beyond what sampling temperature already explains. Independent of the conserved-ψ core work.
+
+---
+
 ## License
 
 Proprietary
